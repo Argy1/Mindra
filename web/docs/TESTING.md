@@ -198,6 +198,29 @@ kata sandi atau kunci yang dimasukkan. Alatnya `curl` terhadap daftar rute di ba
 Teman cerita dengan model asli, MFA TOTP, portal psikolog, faskes, dan admin. Itu butuh akun atau rahasia yang hanya
 pemilik pegang (lihat [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 15).
 
+## 3b. Verifikasi migrasi `…000700` di cloud
+
+Dilakukan 15 Okt 2026 setelah pemilik menempelkan berkasnya di SQL Editor. Semua perintah di bawah dijalankan terhadap proyek
+cloud; pengujian perilaku memakai satu blok yang diakhiri `raise exception`, sehingga **seluruh data uji dan perubahan izin
+dibatalkan otomatis** (diperiksa sesudahnya: 0 baris percakapan uji, izin `ai_summary` kembali `false`).
+
+| Pemeriksaan | Hasil |
+| ----------- | ----- |
+| Katalog | `client_companion_activity(p_client uuid, p_days integer)` ada: `security definer`, `stable`, `search_path=""`, plpgsql |
+| Hak akses | Hanya `authenticated`, `service_role`, dan pemilik (`postgres`); tidak ada `anon` atau `public` |
+| Kolom yang dirujuk | `ai_conversations.user_id`, `messages` (jsonb), `crisis_detected`, `updated_at` ada dengan tipe yang diharapkan |
+| Pemilik (aal1), 30 hari | 3 percakapan, 5 pesan, 3 hari aktif, 1 percakapan krisis (percakapan 200 hari lalu dan pesan bukan-array dihitung benar) |
+| Jepit rentang | 365 hari = 4 percakapan; 99999 dijepit ke 365 (sama); -5 dijepit ke 1; `null` memakai 30 |
+| Psikolog aal2 dengan izin `ai_summary` mati (keadaan nyata sekarang) | Ditolak 42501 |
+| Psikolog aal2 dengan izin menyala | Berhasil, angka sama dengan pemilik |
+| Psikolog aal1 dengan izin menyala | Ditolak 42501 (sakelar demo `app.psychologist_mfa` tidak diatur di cloud, jadi MFA berlaku) |
+| Pendamping aal2 | Ditolak 42501 |
+| `p_client` null; psikolog ke akun tanpa tautan | Ditolak 42501 |
+| `anon` | `permission denied for function` (42501) |
+| Psikolog aal2 membaca `ai_conversations` langsung | **0 baris** (isi percakapan tidak bisa dibaca lewat jalur lain) |
+
+Data sungguhan tidak tersentuh: baris uji dibuat dan dibatalkan dalam transaksi yang sama.
+
 ## 4. Uji beban
 
 **Skrip k6: [`load/read-endpoints.js`](../load/read-endpoints.js)**, 200 VU, naik 15 dtk, bertahan 2 menit, ambang p95 < 500 ms
@@ -291,7 +314,7 @@ Protokol, persetujuan, tugas, kuesioner SUS, dan alat rekap sudah siap: [UJI-PEN
 | Alur dengan akun sungguhan (`*.auth.spec.ts`) | 56 kasus dilewati; alur Gelombang 1 (profil dan admin dengan akun nyata) belum punya spec berakun | Akun uji + variabel `E2E_*` (petunjuk di PANDUAN-PENGEMBANG) |
 | Migrasi `…000600` di proyek cloud | **Sudah diterapkan dan diverifikasi** (14 Okt 2026); akun admin dan calon psikolog ditambahkan lewat `pnpm seed --yes --add-accounts` | - |
 | Fungsi baru dari aplikasi Flutter di perangkat | Teruji pemetaan, logika, dan analisis statis; belum dijalankan di perangkat atau emulator | Bangun ulang aplikasi setelah migrasi diterapkan, coba pesan konsultasi, ubah profil, hapus akun |
-| Migrasi `…000700` di proyek cloud | Teruji di Postgres tiruan, **belum diterapkan di cloud** | Pemilik menempelkan berkasnya di SQL Editor; lalu verifikasi di cloud |
+| Migrasi `…000700` di proyek cloud | **Sudah diterapkan dan diverifikasi** (15 Okt 2026), lihat bagian 3b | - |
 | Latihan napas dan grounding dengan pembaca layar sungguhan | Belum (struktur, wilayah live, dan axe terbukti) | NVDA, TalkBack, VoiceOver |
 | Lighthouse untuk `/profil` dan `/admin/*` | `/syarat-penggunaan`, `/bantuan`, `/layanan-terdekat` sudah diukur di produksi; halaman berlogin belum | Lewat pratinjau lokal `/dev/profil` dan `/dev/admin` (`pnpm lighthouse`) |
 | Login admin faskes memakai TOTP asli | Hanya diuji di database dan komponen | Pasang TOTP di aplikasi autentikator sungguhan sekali |

@@ -610,6 +610,7 @@ Sumber: `web/docs/TESTING.md` (lengkap dengan perintah untuk mengulang). Ringkas
 | Pembatas laju di bawah beban | Satu IP, 600 permintaan: tepat 60 lolos, 540 ditolak 429 | [TERBUKTI] |
 | Uji mutasi (perusakan sengaja lalu memastikan suite gagal) | Fase 1: 11 (pengerasan pendamping) + 12 (integritas asesmen); Fase 2: 12 SQL + 12 server; Fase 4: 25 SQL; Fase 5: 42; Gelombang 1: 33 SQL + 84 logika web; Gelombang 3: 139; perbaikan alamat situs: 9. Yang lolos pada putaran pertama diperbaiki (celah tes) atau terbukti setara perilaku (tiga: G06, Q03, K21) | [TERBUKTI] |
 | Pemeriksaan live 14/15 Okt 2026 | Bagian 13 | [TERBUKTI] |
+| Migrasi `…000700` di cloud (ringkasan penggunaan Teman cerita) | Diterapkan pemilik, diverifikasi 15 Okt 2026 dengan simulasi JWT yang dibatalkan: pemilik dan psikolog aal2 berizin berhasil; izin mati, aal1, pendamping, tanpa tautan, `null`, dan `anon` ditolak (42501); psikolog melihat 0 baris di `ai_conversations`. Rincian: `docs/TESTING.md` bagian 3b | [TERBUKTI] |
 | **Uji pengguna SUS** | Protokol, persetujuan, tugas, kuesioner, dan alat rekap siap (`web/docs/UJI-PENGGUNA.md`, `pnpm usability:report`). **Belum ada responden dan belum ada skor.** Jadwal 24-26 Okt | **[BELUM] [PEMILIK]** |
 | **k6 asli** | Skrip siap (`web/load/read-endpoints.js`), **belum dijalankan** (k6 tidak terpasang). Jangan menulis angka padanan Node sebagai hasil k6 | **[BELUM] [PEMILIK]** |
 | Uptime | `/api/health` dan `uptime.yml` siap; monitor eksternal **belum terpasang** | **[BELUM] [PEMILIK]** |
@@ -722,8 +723,8 @@ layar dan uji dengan pengguna disabilitas.
    `MFA_ENFORCEMENT` **kosong**; isi juga `NEXT_PUBLIC_SITE_URL` dengan alamat produksi (cadangan di kode hanya jaring pengaman).
    Redeploy setelah mengubah variabel `NEXT_PUBLIC_*`.
 3. **SMTP kustom + tiga templat email** (`web/docs/email-templates/`) di Supabase; layanan email bawaan sangat dibatasi.
-4. **Tempel migrasi `supabase/migrations/20261014000700_companion_activity_summary.sql`** di SQL Editor (tanpa itu halaman
-   detail klien yang mengizinkan `ai_summary` menampilkan galat). Setelah itu minta Claude Code memverifikasinya di cloud.
+4. **Selesai (15 Okt 2026):** migrasi `20261014000700_companion_activity_summary.sql` sudah ditempel pemilik dan diverifikasi
+   di cloud oleh Claude Code (bagian 11 dan Lampiran D). Tidak ada tindakan tersisa untuk butir ini.
 5. **Cabut kunci Anthropic lama** (F7) di console.anthropic.com; APK atau IPA lama yang pernah dibangun masih memuatnya.
 
 **Wajib sebelum penilaian**
@@ -896,7 +897,7 @@ maksimal 32 kB, hanya `application/json`. `GET /api/v1/facilities?near=` belum a
 | `20261014000400_drop_inert_psychologist_policies.sql` | web | Menghapus 4 policy psikolog lama (F5) | diterapkan dan diverifikasi |
 | `20261014000500_facility_mfa_and_booking.sql` | web | MFA admin faskes, `book_consultation`, EXCLUDE gist | diterapkan dan diverifikasi |
 | `20261014000600_region_optin_admin_review.sql` | web | Statistik wilayah opt-in, slot, hapus akun, portal admin | diterapkan dan diverifikasi |
-| `20261014000700_companion_activity_summary.sql` | web | Ringkasan penggunaan Teman cerita untuk psikolog | **belum diterapkan [PEMILIK]** |
+| `20261014000700_companion_activity_summary.sql` | web | Ringkasan penggunaan Teman cerita untuk psikolog | diterapkan dan diverifikasi (15 Okt 2026) |
 
 ## Lampiran E: variabel lingkungan (hanya nama; nilai tidak pernah ditulis di repositori)
 

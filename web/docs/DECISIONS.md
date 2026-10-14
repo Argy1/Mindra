@@ -1675,6 +1675,16 @@ Ukuran produksi ditulis ke `docs/lighthouse/produksi/` agar tidak menimpa hasil 
 ditemui: `--out` dengan jalur absolut bergaris miring di Bash membuat berkas kosong bernama `C` dan skrip berhenti saat
 membaca laporan yang tidak ada; jalankan lewat PowerShell dengan `--out` folder sederhana.
 
+### Migrasi `…000700` diterapkan dan diverifikasi di cloud (15 Okt 2026)
+
+Pemilik menempelkan berkasnya di SQL Editor; saya memverifikasinya terhadap proyek cloud tanpa mengubah data: katalog (`security
+definer`, `stable`, `search_path=""`, hak hanya `authenticated` dan `service_role`) dan perilaku lewat simulasi JWT dalam satu blok
+yang diakhiri `raise exception` agar semua data uji dan perubahan izin dibatalkan. Hasil: pemilik dan psikolog aal2 berizin
+mendapat angka yang sama; psikolog tanpa izin, aal1, pendamping, klien tanpa tautan, `null`, dan `anon` ditolak (42501);
+rentang hari dijepit 1 sampai 365; psikolog tetap melihat 0 baris di `ai_conversations`. Sesudahnya tidak ada baris uji tersisa
+dan izin `ai_summary` demo tetap `false`. Tabel lengkap di [TESTING.md](TESTING.md), bagian 3b. Catatan: izin `ai_summary`
+pada tautan demo sengaja tetap mati; nyalakan lewat `/privasi` bila ingin mendemokan bagian "Teman cerita" di detail klien.
+
 ### Yang belum diverifikasi (butuh pemilik)
 
 Daftar dan masuk dengan akun nyata, email (SMTP dan templat), Site URL dan Redirect URLs Supabase, Teman cerita dengan kunci

@@ -2,8 +2,8 @@
 
 > **Status 15 Okt 2026:** situs sudah berjalan di <https://web-omega-one-69.vercel.app> (proyek Vercel `web`, Root Directory
 > `web`, deploy otomatis dari `main`). Langkah 1-3 selesai. Yang masih menunggu pemilik: bagian 4 (URL Auth Supabase),
-> bagian 5 (SMTP dan templat), bagian 6 (kunci Anthropic baru dan pencabutan kunci lama), migrasi `…000700`, bagian 7
-> (aplikasi mobile), dan bagian 9 (uptime, k6). Hasil pemeriksaan live ada di [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 13.
+> bagian 5 (SMTP dan templat), bagian 6 (kunci Anthropic baru dan pencabutan kunci lama), bagian 7
+> (aplikasi mobile), dan bagian 9 (uptime, k6). Migrasi `…000700` sudah diterapkan dan diverifikasi (15 Okt 2026). Hasil pemeriksaan live ada di [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 13.
 
 Urutan kerja dari repositori kosong sampai demo online. Yang ditandai **(kamu)** hanya bisa dilakukan pemilik akun
 (membuat akun layanan, menyalin rahasia); sisanya sudah disiapkan di repositori. Rahasia **tidak pernah** ditulis ke
@@ -14,9 +14,8 @@ folder `web/` = aplikasi Next.js yang dideploy ke Vercel. Web dan aplikasi mobil
 
 ## 0. Yang harus sudah ada
 
-- Migrasi `supabase/migrations/…000000` sampai `…000600` sudah diterapkan di proyek Supabase (kamu sudah menempelkannya;
-  verifikasi terakhir di cloud: 14 Okt 2026). **`…000700`** (ringkasan Teman cerita untuk psikolog, Gelombang 3) perlu
-  ditempelkan juga; tanpa itu halaman detail klien psikolog yang klien-nya mengizinkan `ai_summary` menampilkan galat memuat.
+- Migrasi `supabase/migrations/…000000` sampai `…000700` sudah diterapkan di proyek Supabase (kamu sudah menempelkannya;
+  verifikasi terakhir di cloud: 15 Okt 2026, termasuk `…000700`, ringkasan Teman cerita untuk psikolog).
 - Akun demo sudah ada (`pnpm seed --yes` dan `pnpm seed --yes --add-accounts`). Data demo ada di proyek yang SAMA dengan
   aplikasi mobile; hanya baris `is_demo = true` yang disentuh seed.
 

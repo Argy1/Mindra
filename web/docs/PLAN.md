@@ -187,13 +187,13 @@ Hasil telaah kesenjangan web + aplikasi mobile sebelum deploy; keputusan dan ala
 - [ ] Bangun ulang aplikasi Flutter dan coba di perangkat
 - [x] Flutter memakai `POST /api/v1/companion/chat` (kunci Anthropic dihapus dari aplikasi); templat email Indonesia (`docs/email-templates/`); panduan deploy (`docs/DEPLOY.md`); CI di akar repositori
 - [x] Vercel dibuat pemilik dan diperiksa (14-15 Okt 2026): halaman publik, `/api/health` (menyentuh Supabase), guard rute, header, Lighthouse produksi
-- [ ] **(pemilik)** Upstash + kunci Anthropic baru + SMTP + URL Auth Supabase; cabut kunci lama (F7); migrasi `…000700`; isi `WEB_API_BASE_URL` di aplikasi mobile
+- [ ] **(pemilik)** Upstash + kunci Anthropic baru + SMTP + URL Auth Supabase; cabut kunci lama (F7); isi `WEB_API_BASE_URL` di aplikasi mobile
 - [x] Lighthouse terhadap URL demo (20 pengukuran, `docs/lighthouse/produksi/`)
 - [ ] Uji berakun dari awal ke akhir (`*.auth.spec.ts`, termasuk `gelombang1.auth.spec.ts` yang baru), monitor uptime
 
 ## Gelombang 3 — Opsional
 
-- [x] `/bantuan` (napas terpandu, grounding, kontak krisis, panduan menemani orang lain), `/layanan-terdekat` (publik; lokasi hanya di perangkat), ringkasan penggunaan Teman cerita untuk psikolog (`ai_summary`, tanpa isi percakapan), panduan awal di Beranda. Migrasi `…000700` ditulis dan diuji; **belum diterapkan di cloud**
+- [x] `/bantuan` (napas terpandu, grounding, kontak krisis, panduan menemani orang lain), `/layanan-terdekat` (publik; lokasi hanya di perangkat), ringkasan penggunaan Teman cerita untuk psikolog (`ai_summary`, tanpa isi percakapan), panduan awal di Beranda. Migrasi `…000700` ditulis dan diuji, **diterapkan di cloud dan diverifikasi (15 Okt 2026)**
 
 ## Fase 6 — Proposal (24–29 Okt, di Claude Cowork)
 

@@ -302,6 +302,7 @@ dan penjaga kolom istimewa pada `profiles` tetap menolak semua jalan lain. Uji: 
 **Isi percakapan tidak pernah keluar** dari fungsi ini, dan tidak ada policy baru pada `ai_conversations`, jadi psikolog tidak
 bisa membaca teks lewat jalur lain (diuji: psikolog berizin tetap melihat 0 baris di tabel itu). Web mencatat akses ke
 `data_access_logs` SEBELUM memanggilnya. Uji: `tests/db/companion-activity.test.ts` (19) dan 22 uji mutasi.
+**Diterapkan dan diverifikasi di cloud 15 Okt 2026** (rincian di [TESTING.md](./TESTING.md), bagian 3b).
 
 ### 4.3 Data demo
 
