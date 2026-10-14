@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft } from '@phosphor-icons/react/ssr';
 import { ClientAssessmentSection } from '@/components/features/psychologist/ClientAssessmentSection';
+import { ClientCompanionSection } from '@/components/features/psychologist/ClientCompanionSection';
 import { ClientMoodSection } from '@/components/features/psychologist/ClientMoodSection';
 import { ClientSleepSection } from '@/components/features/psychologist/ClientSleepSection';
 import { NotSharedNotice } from '@/components/features/psychologist/NotSharedNotice';
@@ -130,6 +131,15 @@ export function ClientDetailView({ detail, now }: { detail: ClientDetail; now: D
                 </li>
               ))}
             </ul>
+          )}
+        </Card>
+
+        <Card as="section" aria-labelledby="h-teman">
+          <CardHeader title="Teman cerita" titleId="h-teman" />
+          {detail.companion === null ? (
+            <NotSharedNotice what="ringkasan penggunaan Teman cerita" />
+          ) : (
+            <ClientCompanionSection activity={detail.companion} />
           )}
         </Card>
       </div>

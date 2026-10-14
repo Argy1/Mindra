@@ -16,7 +16,9 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: isCI ? 2 : 0,
+  // Satu ulangan juga secara lokal: ada ketidakcocokan id hidrasi acak (~5% pemuatan) pada halaman server asinkron yang memuat
+  // komponen klien ber-useId; lihat docs/TEMUAN-KEAMANAN.md (Gelombang 3). Tes yang gagal lalu lulus ditandai "flaky" oleh Playwright.
+  retries: isCI ? 2 : 1,
   reporter: isCI ? [['github'], ['html', { open: 'never' }]] : [['list']],
   use: {
     baseURL: REMOTE_BASE_URL ?? `http://localhost:${PORT}`,

@@ -40,7 +40,7 @@ kesehatan nasional (SATUSEHAT) memakai standar terbuka (FHIR R4 + OpenAPI).
 
 | Role             | Rute                                                                          | Akses data                                                                                      |
 | ---------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `user`           | `/beranda`, `/asesmen`, `/jurnal`, `/teman-cerita`, `/konsultasi`, `/privasi`, `/profil` | Hanya datanya sendiri                                                                           |
+| `user`           | `/beranda`, `/asesmen`, `/jurnal`, `/teman-cerita`, `/konsultasi`, `/privasi`, `/profil` (plus halaman publik `/bantuan` dan `/layanan-terdekat`) | Hanya datanya sendiri                                                                           |
 | `psychologist`   | `/psikolog/*`                                                                 | Data klien yang **memberi izin** lewat `care_links` (sesuai `permissions`)                      |
 | `caregiver`      | `/pendamping/*`                                                               | Data orang yang didampingi lewat `caregiver_relationships` (tabel lama, sesuai `permissions`)   |
 | `facility_admin` | `/faskes/*`                                                                   | **Hanya agregat anonim** (k-anonymity ≥ 10) untuk wilayah faskesnya. Tidak pernah data individu |
@@ -293,6 +293,16 @@ Next.js. Admin tidak memegang kunci sakti, tidak ada jalan "setengah jadi" (pera
 dan penjaga kolom istimewa pada `profiles` tetap menolak semua jalan lain. Uji: `tests/db/region-admin.test.ts` (33) dan
 6 uji kesetaraan slot di `consultation-parity.test.ts`, plus 33 uji mutasi SQL.
 
+### 4.2g Migrasi Gelombang 3: ringkasan penggunaan Teman cerita (`20261014000700_companion_activity_summary.sql`)
+
+| Objek                                    | Fungsi                                                                                                                       |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `client_companion_activity(klien, hari)` | Hitungan penggunaan Teman cerita (percakapan, pesan, hari aktif WIB, percakapan bertanda krisis, waktu terakhir) untuk 1 sampai 365 hari (bawaan 30). Menolak 42501 bila `can_view(klien, 'ai_summary')` salah: psikolog harus aal2, tautan aktif, dan izin menyala; pendamping tidak pernah (jenis ini tidak dipetakan untuk mereka) |
+
+**Isi percakapan tidak pernah keluar** dari fungsi ini, dan tidak ada policy baru pada `ai_conversations`, jadi psikolog tidak
+bisa membaca teks lewat jalur lain (diuji: psikolog berizin tetap melihat 0 baris di tabel itu). Web mencatat akses ke
+`data_access_logs` SEBELUM memanggilnya. Uji: `tests/db/companion-activity.test.ts` (19) dan 22 uji mutasi.
+
 ### 4.3 Data demo
 
 `scripts/seed.ts` (service role) membuat: 6 akun demo (pengguna, psikolog, pendamping, admin
@@ -406,6 +416,8 @@ secara eksplisit (RLS saja tidak cukup; lihat TEMUAN-KEAMANAN, Fase 3).
 | Eskalasi hak lewat portal admin | Admin wajib aal2 **di database** (`psychologist_mfa_ok()` di setiap fungsi admin); satu-satunya jalan menaikkan peran adalah fungsi definer yang membuka "pintu peninjauan" di trigger penjaga; fungsi definer biasa tetap ditolak (diuji); semua keputusan tercatat di `admin_actions` |
 | Data wilayah dipakai tanpa persetujuan | `share_region_stats` bawaan mati, dijaga trigger (tanpa kota atau provinsi, otomatis mati), dan `facility_aggregate()` hanya menghitung yang setuju; dapat dicabut kapan saja di Profil |
 | Akun sulit dihapus / data tertinggal | `delete_my_account()` + kata sandi diperiksa ulang lewat klien terpisah + kata penegas HAPUS; unduh salinan JSON di Profil (`/profil/unduh`, tanpa NIK, token video, kode undangan) |
+| Lokasi pengguna bocor lewat "layanan terdekat" | Lokasi hanya dipakai di peramban untuk menghitung jarak; tidak ada permintaan jaringan yang memuat koordinat pengguna (diuji dengan merekam semua permintaan), tautan peta hanya memuat koordinat faskes, dan tidak ada yang disimpan |
+| Psikolog membaca isi curhat | Izin `ai_summary` hanya membuka HITUNGAN penggunaan lewat fungsi database; tidak ada policy baca pada `ai_conversations` untuk psikolog |
 | Header keamanan              | HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, frame-ancestors 'none'       |
 
 Catatan keputusan (Fase 0b):

@@ -32,6 +32,9 @@ export const REGION_ADMIN_MIGRATION = '20261014000600_region_optin_admin_review.
 export const hasRegionAdminMigration = existsSync(
   path.join(MIGRATIONS_DIR, REGION_ADMIN_MIGRATION),
 );
+/** Gelombang 3: ringkasan penggunaan Teman cerita (tanpa isi percakapan) untuk psikolog yang diizinkan. */
+export const COMPANION_MIGRATION = '20261014000700_companion_activity_summary.sql';
+export const hasCompanionMigration = existsSync(path.join(MIGRATIONS_DIR, COMPANION_MIGRATION));
 export const hasMigrations = existsSync(path.join(MIGRATIONS_DIR, WEB_MIGRATION));
 export const hasHardeningMigration = existsSync(path.join(MIGRATIONS_DIR, HARDENING_MIGRATION));
 export const hasIntegrityMigration = existsSync(path.join(MIGRATIONS_DIR, INTEGRITY_MIGRATION));
@@ -98,7 +101,11 @@ export async function applyRegionAdminMigration(db: PGlite): Promise<void> {
   await db.exec(withoutExtensions(readMigration(REGION_ADMIN_MIGRATION)));
 }
 
-/** Keadaan proyek cloud: migrasi Flutter + web + pengerasan + integritas + Fase 2 + pembersihan + Fase 4 + gelombang 1. */
+export async function applyCompanionMigration(db: PGlite): Promise<void> {
+  await db.exec(withoutExtensions(readMigration(COMPANION_MIGRATION)));
+}
+
+/** Keadaan proyek cloud: migrasi Flutter + web + pengerasan + integritas + Fase 2 + pembersihan + Fase 4 + gelombang 1 + 3. */
 export async function applyAllWebMigrations(db: PGlite): Promise<void> {
   await applyWebMigration(db);
   await applyHardeningMigration(db);
@@ -107,6 +114,7 @@ export async function applyAllWebMigrations(db: PGlite): Promise<void> {
   if (hasLegacyCleanupMigration) await applyLegacyCleanupMigration(db);
   if (hasBookingMigration) await applyBookingMigration(db);
   if (hasRegionAdminMigration) await applyRegionAdminMigration(db);
+  if (hasCompanionMigration) await applyCompanionMigration(db);
 }
 
 export interface Session {

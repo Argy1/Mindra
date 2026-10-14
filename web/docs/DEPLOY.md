@@ -10,7 +10,8 @@ folder `web/` = aplikasi Next.js yang dideploy ke Vercel. Web dan aplikasi mobil
 ## 0. Yang harus sudah ada
 
 - Migrasi `supabase/migrations/…000000` sampai `…000600` sudah diterapkan di proyek Supabase (kamu sudah menempelkannya;
-  verifikasi terakhir di cloud: 14 Okt 2026).
+  verifikasi terakhir di cloud: 14 Okt 2026). **`…000700`** (ringkasan Teman cerita untuk psikolog, Gelombang 3) perlu
+  ditempelkan juga; tanpa itu halaman detail klien psikolog yang klien-nya mengizinkan `ai_summary` menampilkan galat memuat.
 - Akun demo sudah ada (`pnpm seed --yes` dan `pnpm seed --yes --add-accounts`). Data demo ada di proyek yang SAMA dengan
   aplikasi mobile; hanya baris `is_demo = true` yang disentuh seed.
 
@@ -42,6 +43,11 @@ kunci `sk-ant-`, JWT, atau kunci pribadi di berkas yang dilacak).
 ## 3. Vercel **(kamu)**
 
 1. Vercel > Add New > Project > impor `Argy1/Mindra`.
+   **Nama proyek menentukan alamat** (`<nama>.vercel.app`, siapa cepat dia dapat). Per 14 Okt 2026 `mindra.vercel.app` **sudah
+   dipakai proyek lain** (bukan milik kita), jadi pakai nama lain yang masih kosong, mis. `mindra-web`
+   (`mindra-web.vercel.app`; `mindra-id` dan `mindra-sehat` juga masih kosong saat dicek). Alamat final = nilai
+   `NEXT_PUBLIC_SITE_URL`. Konektor Vercel di sesi pengembangan hanya-baca (membuat proyek ditolak 403), jadi proyek dibuat
+   pemilik lewat dasbor.
 2. **Root Directory: `web`**. Framework Next.js terdeteksi otomatis. Install command bawaan (`pnpm install`) dan build
    command bawaan (`next build`) sudah benar; Node.js 24.
 3. Environment Variables (Production dan Preview). **Jangan** memberi awalan `NEXT_PUBLIC_` pada rahasia.
@@ -50,7 +56,7 @@ kunci `sk-ant-`, JWT, atau kunci pribadi di berkas yang dilacak).
 | ------------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`      | tidak   | Supabase > Settings > API > Project URL                                                        |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | tidak   | Supabase > Settings > API > kunci `anon` (publik; RLS yang menjaga)                            |
-| `NEXT_PUBLIC_SITE_URL`          | tidak   | Alamat produksi, mis. `https://mindra.vercel.app` (lihat catatan di bawah)                     |
+| `NEXT_PUBLIC_SITE_URL`          | tidak   | Alamat produksi, mis. `https://mindra-web.vercel.app` (lihat catatan di bawah)                     |
 | `SUPABASE_SERVICE_ROLE_KEY`     | **ya**  | Supabase > Settings > API > `service_role`. Hanya dipakai kode server (API mitra); jangan bagikan |
 | `UPSTASH_REDIS_REST_URL`        | tidak   | Dari Upstash                                                                                   |
 | `UPSTASH_REDIS_REST_TOKEN`      | **ya**  | Dari Upstash                                                                                   |

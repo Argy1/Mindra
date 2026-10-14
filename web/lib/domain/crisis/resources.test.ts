@@ -12,6 +12,14 @@ describe('kontak krisis (sumber tunggal)', () => {
     expect(CRISIS_RESOURCES[0]).toBe(PRIMARY_CRISIS_RESOURCE);
   });
 
+  it('urutan: SEJIWA (bicara dengan konselor) lebih dulu, lalu 112 (bahaya yang sedang terjadi)', () => {
+    expect(CRISIS_RESOURCES.map((resource) => resource.displayNumber)).toEqual([
+      '119 ext. 8',
+      '112',
+    ]);
+    expect(CRISIS_RESOURCES.map((resource) => resource.telHref)).toEqual(['tel:119,8', 'tel:112']);
+  });
+
   it('id unik', () => {
     const ids = CRISIS_RESOURCES.map((resource) => resource.id);
     expect(new Set(ids).size).toBe(ids.length);

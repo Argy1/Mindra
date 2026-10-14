@@ -29,7 +29,7 @@ describe('AppShell', () => {
     expect(within(main).getByRole('heading', { name: 'Isi halaman' })).toBeInTheDocument();
   });
 
-  it('sidebar user memuat 6 tujuan sesuai mockup, ditambah Profil di grup Akun', () => {
+  it('sidebar user memuat 6 tujuan sesuai mockup, ditambah grup Bantuan (2) dan Akun (Profil)', () => {
     renderShell();
     const [sidebarNav] = screen.getAllByRole('navigation', { name: 'Navigasi utama' });
     const labels = within(sidebarNav!)
@@ -42,6 +42,8 @@ describe('AppShell', () => {
       'Teman cerita',
       'Konsultasi',
       'Privasi dan izin',
+      'Bantuan dan latihan',
+      'Layanan terdekat',
       'Profil',
     ]);
   });

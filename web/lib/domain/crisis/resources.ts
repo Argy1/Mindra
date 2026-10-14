@@ -37,8 +37,24 @@ export const SEJIWA_HOTLINE: CrisisResource = {
   verified: false,
 };
 
+/**
+ * Nomor darurat nasional untuk ancaman langsung pada nyawa (ambulans, polisi, pemadam kebakaran). Berbeda dari SEJIWA:
+ * SEJIWA untuk bicara dengan konselor, 112 untuk bahaya yang sedang terjadi. Cakupan 112 bisa berbeda antar-daerah,
+ * jadi halaman Bantuan selalu menyebut unit gawat darurat (IGD) terdekat sebagai cadangan.
+ */
+export const EMERGENCY_112: CrisisResource = {
+  id: 'darurat-112',
+  name: 'Layanan darurat nasional',
+  operator: 'Pemerintah Republik Indonesia',
+  displayNumber: '112',
+  telHref: 'tel:112',
+  description: 'Untuk bahaya yang sedang terjadi dan butuh bantuan segera di tempat.',
+  availability: '24 jam',
+  verified: false,
+};
+
 /** Urutan = urutan tampil. Resource pertama dianggap kontak utama. */
-export const CRISIS_RESOURCES: readonly CrisisResource[] = [SEJIWA_HOTLINE];
+export const CRISIS_RESOURCES: readonly CrisisResource[] = [SEJIWA_HOTLINE, EMERGENCY_112];
 
 export const PRIMARY_CRISIS_RESOURCE: CrisisResource = SEJIWA_HOTLINE;
 

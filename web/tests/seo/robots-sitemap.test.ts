@@ -55,6 +55,8 @@ describe('sitemap', () => {
     expect(urls).toEqual([
       'https://mindra.example.id',
       'https://mindra.example.id/tentang',
+      'https://mindra.example.id/bantuan',
+      'https://mindra.example.id/layanan-terdekat',
       'https://mindra.example.id/kebijakan-privasi',
       'https://mindra.example.id/syarat-penggunaan',
       'https://mindra.example.id/developers',

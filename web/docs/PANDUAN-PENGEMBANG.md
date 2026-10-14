@@ -66,7 +66,7 @@ pnpm exec playwright test e2e/fase3.auth.spec.ts --project=desktop-1440
 ## Menyambungkan Supabase
 
 1. Pilih proyek Supabase untuk web dan mobile. Terapkan SEMUA migrasi di `../supabase/migrations/`
-   berurutan: lima migrasi aplikasi Flutter, lalu tujuh migrasi web:
+   berurutan: lima migrasi aplikasi Flutter, lalu delapan migrasi web:
    - `20261014000000_web_ecosystem.sql` (peran, izin psikolog, alert krisis, log akses, faskes, agregat anonim)
    - `20261014000100_caregiver_invite_hardening.sql` (menutup F1, F3, F4, F8; **mengubah aplikasi Flutter**: bangun ulang)
    - `20261014000200_assessment_integrity.sql` (menutup F6: skor dihitung ulang server)
@@ -75,7 +75,7 @@ pnpm exec playwright test e2e/fase3.auth.spec.ts --project=desktop-1440
    - `20261014000500_facility_mfa_and_booking.sql` (Fase 4: **MFA admin faskes di database**, constraint anti-bentrok jadwal konsultasi, fungsi pemesanan; butuh ekstensi `btree_gist`; **mengubah perilaku aplikasi Flutter**: sesi yang bertumpuk kini ditolak)
    - `20261014000600_region_optin_admin_review.sql` (Gelombang 1: **statistik wilayah opt-in** `profiles.share_region_stats` dan `facility_aggregate()` yang hanya menghitung yang setuju; `psychologist_available_slots()` untuk daftar slot (dipakai web dan Flutter); `delete_my_account()`; **portal admin**: tabel `admin_actions`, `admin_pending_psychologists()`, `admin_review_psychologist()`, dan pintu peninjauan pada trigger penjaga kolom istimewa)
 
-   Pada proyek yang lima migrasi Flutter-nya sudah ada, cukup tujuh migrasi web. Halaman Fase 2 (`/privasi`,
+   Pada proyek yang lima migrasi Flutter-nya sudah ada, cukup delapan migrasi web. Halaman Fase 2 (`/privasi`,
    `/psikolog`, `/pendamping`) memakai RPC dari `…000300`; tanpa migrasi itu halaman tersebut menampilkan halaman galat. Semuanya idempotent.
    Rincian celah yang ditutup: [`docs/TEMUAN-KEAMANAN.md`](TEMUAN-KEAMANAN.md).
 
@@ -172,13 +172,13 @@ memiliki faktor TOTP: saat masuk ia diarahkan memasangnya (atau matikan sakelar 
 `/dev/ui` (katalog semua komponen), `/dev/shell` (kerangka aplikasi), dan pratinjau halaman berdata contoh
 (`/dev/asesmen`, `/dev/beranda`, `/dev/jurnal`, `/dev/psikolog`, `/dev/klien`, `/dev/privasi`, `/dev/pendamping`,
 `/dev/pendamping-detail`, `/dev/kunci-api`, `/dev/faskes`, `/dev/faskes-peta`, `/dev/faskes-laporan`, `/dev/teman-cerita`,
-`/dev/konsultasi`, `/dev/konsultasi-detail`, `/dev/jadwal`, `/dev/profil`, `/dev/admin`) aktif otomatis saat pengembangan. Di produksi semuanya 404 kecuali `ENABLE_DEV_PAGES=true` diatur. `/dev/psikolog` memakai klien Realtime palsu: tombol
+`/dev/konsultasi`, `/dev/konsultasi-detail`, `/dev/jadwal`, `/dev/profil`, `/dev/admin`, `/dev/layanan-terdekat`) aktif otomatis saat pengembangan. Di produksi semuanya 404 kecuali `ENABLE_DEV_PAGES=true` diatur. `/dev/psikolog` memakai klien Realtime palsu: tombol
 "Simulasikan peringatan masuk" menunjukkan peringatan krisis baru muncul tanpa memuat ulang halaman.
 
 ## Struktur
 
 ```
-app/              rute: (marketing: landing, tentang, syarat-penggunaan, kebijakan-privasi, developers) (auth) (user: (shell) dengan sidebar dan profil, (focus) mode fokus) (psychologist) (caregiver) (facility) (admin), developers, api/health, api/v1/* (API publik), auth/callback, dev/* (pratinjau)
+app/              rute: (marketing: landing, tentang, bantuan, layanan-terdekat, syarat-penggunaan, kebijakan-privasi, developers) (auth) (user: (shell) dengan sidebar dan profil, (focus) mode fokus) (psychologist) (caregiver) (facility) (admin), developers, api/health, api/v1/* (API publik), auth/callback, dev/* (pratinjau)
 components/ui/        komponen dasar (Button, Input, Dialog, Tabs, Toast, …)
 components/layout/    AppShell, PortalShell, MarketingHeader/Footer, navigasi per peran
 components/features/  komponen fitur (auth, assessment, journal, home, privacy, psychologist, caregiver)

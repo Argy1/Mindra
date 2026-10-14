@@ -15,6 +15,8 @@ const PUBLIC_ROUTES = [
   '/tentang',
   '/kebijakan-privasi',
   '/syarat-penggunaan',
+  '/bantuan',
+  '/layanan-terdekat',
   '/developers',
   '/masuk',
   '/daftar',
@@ -34,6 +36,7 @@ const PREVIEW_ROUTES = [
   '/dev/privasi',
   '/dev/profil',
   '/dev/admin',
+  '/dev/layanan-terdekat',
   '/dev/psikolog',
   '/dev/klien',
   '/dev/jadwal',
@@ -135,7 +138,7 @@ test.describe('landing (/)', () => {
   test('tidak ada tanda seru dan tidak ada kata klinis terlarang di teks yang terlihat', async ({
     page,
   }) => {
-    for (const route of ['/', '/tentang', '/kebijakan-privasi', '/syarat-penggunaan']) {
+    for (const route of ['/', '/tentang', '/bantuan', '/kebijakan-privasi', '/syarat-penggunaan']) {
       await page.goto(route);
       const text = await page.locator('main').innerText();
       expect(text, route).not.toContain('!');
@@ -144,7 +147,7 @@ test.describe('landing (/)', () => {
   });
 
   test('tidak ada overflow horizontal di semua halaman marketing', async ({ page }) => {
-    for (const route of ['/', '/tentang', '/kebijakan-privasi', '/syarat-penggunaan']) {
+    for (const route of ['/', '/tentang', '/bantuan', '/kebijakan-privasi', '/syarat-penggunaan']) {
       await page.goto(route);
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -240,7 +243,14 @@ test.describe('halaman tentang dan kebijakan privasi', () => {
     const hrefs = await footer
       .getByRole('link')
       .evaluateAll((links) => links.map((a) => a.getAttribute('href')));
-    expect(hrefs).toEqual(['/tentang', '/kebijakan-privasi', '/syarat-penggunaan', '/developers']);
+    expect(hrefs).toEqual([
+      '/tentang',
+      '/bantuan',
+      '/layanan-terdekat',
+      '/kebijakan-privasi',
+      '/syarat-penggunaan',
+      '/developers',
+    ]);
     for (const href of hrefs) {
       const response = await page.request.get(href as string);
       expect(response.status(), String(href)).toBe(200);
@@ -263,7 +273,9 @@ test.describe('robots.txt dan sitemap.xml', () => {
     expect(body).toMatch(/Sitemap: https?:\/\/[^\s]+\/sitemap\.xml/);
   });
 
-  test('sitemap memuat lima halaman publik dan tidak ada halaman berlogin', async ({ request }) => {
+  test('sitemap memuat tujuh halaman publik dan tidak ada halaman berlogin', async ({
+    request,
+  }) => {
     const response = await request.get('/sitemap.xml');
     expect(response.status()).toBe(200);
     const body = await response.text();
@@ -273,8 +285,10 @@ test.describe('robots.txt dan sitemap.xml', () => {
     );
     expect(locs.sort()).toEqual([
       '/',
+      '/bantuan',
       '/developers',
       '/kebijakan-privasi',
+      '/layanan-terdekat',
       '/syarat-penggunaan',
       '/tentang',
     ]);

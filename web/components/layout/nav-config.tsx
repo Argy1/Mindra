@@ -8,7 +8,9 @@ import {
   FileText,
   House,
   Key,
+  Lifebuoy,
   LockKey,
+  MapPin,
   MapTrifold,
   Notebook,
   ShieldCheck,
@@ -69,6 +71,13 @@ export const SHELL_NAV: Record<ShellRole, RoleNavDef> = {
           { href: '/teman-cerita', label: 'Teman cerita', icon: ChatsCircle },
           { href: '/konsultasi', label: 'Konsultasi', icon: CalendarHeart },
           { href: '/privasi', label: 'Privasi dan izin', icon: LockKey },
+        ],
+      },
+      {
+        label: 'Bantuan',
+        items: [
+          { href: '/bantuan', label: 'Bantuan dan latihan', icon: Lifebuoy },
+          { href: '/layanan-terdekat', label: 'Layanan terdekat', icon: MapPin },
         ],
       },
       {

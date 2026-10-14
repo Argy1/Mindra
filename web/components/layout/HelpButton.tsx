@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Lifebuoy, Phone } from '@phosphor-icons/react/ssr';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -67,6 +68,11 @@ export function HelpButton({ variant, className }: HelpButtonProps) {
             </li>
           ))}
         </ul>
+        <p className="mt-4 text-sm text-fg-2">
+          Butuh menenangkan diri dulu? Ada{' '}
+          <Link href="/bantuan">latihan napas, grounding, dan panduan menemani orang lain</Link>,
+          serta <Link href="/layanan-terdekat">layanan kesehatan terdekat</Link>.
+        </p>
       </Dialog>
     </>
   );

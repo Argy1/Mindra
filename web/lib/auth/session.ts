@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { connection } from 'next/server';
 import { cache } from 'react';
 import { ROLE_HOME, isUserRole, type UserRole } from '@/lib/auth/roles';
+import { isOnboardingDone } from '@/lib/domain/onboarding/steps';
 import { readPublicEnv } from '@/lib/env/public';
 import { createClient } from '@/lib/supabase/server';
 
@@ -12,6 +13,8 @@ export interface SessionProfile {
   name: string;
   /** Dari tabel profiles, SUMBER KEBENARAN peran (bukan klaim JWT). */
   role: UserRole;
+  /** Panduan awal Beranda sudah ditutup (metadata akun `onboarding_done_at`). Kosong dianggap belum. */
+  onboardingDone?: boolean;
 }
 
 export type SessionState =
@@ -38,7 +41,14 @@ export const getSessionState = cache(async (): Promise<SessionState> => {
     .maybeSingle();
 
   if (!profile || !isUserRole(profile.role)) return { status: 'no-profile' };
-  return { status: 'ok', profile: { ...profile, role: profile.role } };
+  return {
+    status: 'ok',
+    profile: {
+      ...profile,
+      role: profile.role,
+      onboardingDone: isOnboardingDone(data.user.user_metadata),
+    },
+  };
 });
 
 /**

@@ -1477,3 +1477,155 @@ tidak). Ditemukan dengan mereproduksi klon bersih dari GitHub secara lokal, dipe
 Urutan di [`DEPLOY.md`](DEPLOY.md): akun Vercel dan impor repositori (Root Directory `web`), variabel lingkungan, Redirect URLs
 Supabase, Upstash, kunci Anthropic baru lalu **cabut yang lama**, SMTP dan templat email, isi `WEB_API_BASE_URL` di aplikasi
 mobile, pasang TOTP pada akun demo psikolog, admin faskes, dan admin, lalu ukur ulang bukti terhadap URL demo.
+
+## Gelombang 3: bantuan, layanan terdekat, panduan awal, ringkasan Teman cerita (14 Okt 2026)
+
+Hasil dari saran Gelombang 3 yang disetujui pemilik ("kalau bisa lanjut"). Empat hal yang semuanya menjawab kebutuhan pengguna
+(bobot 20%) dan keselamatan: bantuan yang bisa dibuka siapa saja saat panik, menemukan layanan di dekatnya tanpa menyerahkan
+lokasi, panduan awal agar pengguna baru tidak tersesat, dan psikolog yang bisa melihat apakah kliennya memakai Teman cerita
+(tanpa membaca isi curhatnya). Satu migrasi baru: `20261014000700_companion_activity_summary.sql` (belum diterapkan di cloud).
+
+### 4 keputusan utama
+
+#### 1. `/bantuan`: halaman publik statis, latihan yang berjalan sepenuhnya di perangkat
+
+Bantuan krisis tidak boleh menuntut masuk akun, jadi halamannya publik, statis (○ di tabel rute, bisa dari CDN), tanpa cookie
+dan tanpa kolom isian. e2e membuktikan: tidak ada cookie, tidak ada `localStorage` atau `sessionStorage`, tidak ada
+`input/textarea/select/form` di dalam `<main>`. Isinya: kontak krisis dari sumber tunggal (`lib/domain/crisis/resources.ts`,
+kini SEJIWA 119 ext. 8 dan **112**, keduanya `verified: false` sampai Argy memeriksanya), napas terpandu, grounding 5-4-3-2-1,
+jalan ke Teman cerita, psikolog, dan layanan terdekat, serta panduan menemani orang lain (dengarkan, tanyakan langsung, tetap
+bersama, jauhkan benda berbahaya, bantu menghubungi bantuan, jaga dirimu).
+
+- **Napas 4-4-6, 5 siklus.** `breathPosition(waktuBerlalu)` fungsi murni: posisi dihitung dari selisih waktu (`Date.now()`),
+  bukan dari hitungan tik pewaktu, sehingga tab yang tertahan di latar belakang tidak membuat latihan melenceng.
+  Batas fase diuji tepat (3999 ms tarik, 4000 ms tahan; 70.000 ms = selesai).
+- **Pembaca layar.** Hanya pergantian fase yang diumumkan ("Tarik napas. Siklus 1 dari 5."), bukan tiap detik; hitungan mundur
+  `aria-hidden`. Diuji: dalam 12 detik hanya 3 teks pengumuman berbeda.
+- **Gerak dikurangi.** Lingkaran napas bertransisi `transform` selama durasi fase; di bawah `prefers-reduced-motion` aturan
+  global CSS meniadakan transisi, dan petunjuk teks (label fase dan hitungan) tetap lengkap. e2e memeriksa durasi transisi
+  terhitung < 0,01 detik.
+- **Nomor 112 ditambahkan ke sumber tunggal** dan otomatis tampil di dialog "Butuh bantuan sekarang" (yang kini juga menautkan
+  `/bantuan` dan `/layanan-terdekat`). Deskripsinya membedakan: SEJIWA untuk bicara dengan konselor, 112 untuk bahaya yang sedang
+  terjadi; IGD terdekat disebut sebagai cadangan karena cakupan 112 bisa berbeda antar-daerah.
+
+#### 2. `/layanan-terdekat`: direktori publik, lokasi tidak pernah meninggalkan perangkat
+
+RLS `Facilities are public` memang dibuat untuk pengunjung ("halaman faskes terdekat juga untuk pengguna", migrasi pertama),
+jadi halaman ini publik. Server hanya membaca kolom yang tampil (`id, name, type, city, province, address, phone, lat, lng`,
+dibatasi 1000 baris, hanya `has_mental_health_service`); semua penyaringan dan pengurutan terjadi di peramban.
+Jarak memakai haversine (garis lurus, bukan rute; ditulis "garis lurus" di tampilan). Tombol "Urutkan dari lokasiku" memakai
+Geolocation API dengan `enableHighAccuracy: false`; **koordinat pengguna tidak dikirim ke mana pun**. e2e merekam semua
+permintaan jaringan setelah lokasi diizinkan dan memastikan tidak ada yang memuat koordinat; tautan "Lihat di peta" (OpenStreetMap)
+hanya memuat koordinat faskes. Penolakan izin, galat lokasi, waktu habis, dan peramban tanpa dukungan masing-masing punya pesan
+yang jelas dan daftar tetap bisa dipakai lewat provinsi dan pencarian.
+
+- **Direktori dinyatakan contoh.** Data faskes bawaan berasal dari seed sintetis (nama dan koordinat karangan). Konstanta
+  `FACILITY_DIRECTORY_VERIFIED = false` menampilkan catatan "Daftar ini masih contoh" yang mengarahkan ke SEJIWA dan IGD; ubah ke
+  `true` hanya setelah data sungguhan dimuat dan diperiksa manusia (pola yang sama dengan `verified` pada kontak krisis).
+- **Kegagalan memuat tidak berupa daftar kosong.** Galat database, lingkungan belum diisi, atau pengecualian menghasilkan
+  `ok: false` dan tampilan peringatan yang menyebut SEJIWA, bukan "tidak ada layanan" yang menyesatkan.
+
+#### 3. Panduan awal: penanda di metadata akun, tanpa migrasi
+
+Tiga langkah opsional di Beranda (kenali perasaan, pegang kendali atas data, tahu ke mana mencari bantuan) dengan satu tombol
+"Sembunyikan panduan ini". Penandanya `onboarding_done_at` di `user_metadata` akun (`auth.updateUser`), bukan di perangkat, jadi
+tidak muncul lagi di perangkat lain, dan tidak butuh migrasi. Aksi membaca metadata yang ada lalu menggabungkannya (nama dan versi
+syarat yang disetujui tidak hilang, apa pun perilaku server Auth), hanya untuk peran `user`, dan galatnya ditampilkan tanpa
+menyembunyikan panduan. Status dibawa oleh `getSessionState` (tanpa panggilan tambahan).
+
+#### 4. Izin `ai_summary` akhirnya dibaca: hitungan penggunaan, bukan isi curhat
+
+Izin itu ada sejak migrasi pertama tetapi tidak ada yang membacanya. Rancangan yang dipilih: fungsi database
+`client_companion_activity(klien, hari)` yang mengembalikan HANYA hitungan (percakapan, pesan, hari aktif menurut tanggal WIB,
+percakapan bertanda krisis, waktu terakhir). Izinnya diperiksa `can_view` (psikolog harus aal2, tautan aktif, izin menyala;
+pendamping tidak pernah, karena jenis ini tidak dipetakan untuk mereka). Tidak ada policy baru pada `ai_conversations`, jadi tidak
+ada jalur untuk membaca teks; web mencatat akses sebelum memanggil. Ditolak: **ringkasan isi buatan model** (risiko keliru
+menyimpulkan kondisi seseorang dan menyimpan turunan baru dari data sangat sensitif; bisa menjadi proyeksi pengembangan dengan
+persetujuan per ringkasan). Jawaban database yang tak masuk akal (hitungan negatif, pecahan, krisis lebih banyak dari
+percakapan) tidak ditampilkan sebagai angka; halaman memberi galat memuat.
+
+### Yang ditangkap oleh pemeriksaan (bahan cerita "kualitas teknis")
+
+| Temuan | Bagaimana tertangkap | Perbaikan |
+| ------ | -------------------- | --------- |
+| `formatDistance(0.999)` menghasilkan "1000 m" dan `9.95` menjadi "9,9 km" (galat pembulatan `toFixed`) | Tes batas yang ditulis dari nilai tepi | Pembulatan ke 10 m dulu, satuan km bila 1000 m atau lebih, desimal dari `Math.round(km * 10)` |
+| Pratinjau layanan tanpa `<main>`: `landmark-one-main` dan `region` | axe di e2e | Pratinjau dibungkus `<main>` |
+| Judul kartu layanan `h3` langsung setelah `h1` saat catatan "contoh" tidak tampil: `heading-order` | axe pada keadaan "gagal" | Judul tersembunyi `h2` "Daftar layanan"; keadaan kosong dan gagal memakai `h2` |
+| `color-contrast` pada tombol saat axe berjalan | axe mengukur warna di tengah transisi hover | Pointer dijauhkan dan transisi dibiarkan selesai sebelum axe |
+| axe menggantung saat jam palsu Playwright dibekukan | Tes macet | `page.clock.resume()` sebelum axe; jam dibekukan hanya untuk bagian yang menguji waktu |
+| `userEvent` menggantung di bawah jam palsu Vitest | Tes macet | `fireEvent` di dalam `act` untuk tes berwaktu |
+| Tes regex dengan `\\b` ditulis sebagai karakter backspace oleh skrip penyunting | Mutan "Anda" tetap lolos | Ditulis ulang dengan karakter garis miring yang benar; dipindai tidak ada `\\x08` di sumber |
+| Dialog bantuan krisis kini memuat dua tombol "Hubungi": tes lama yang mengandaikan satu tombol gagal | Playwright | Tes memeriksa dua tombol (SEJIWA dan 112) |
+| 6 mutan SQL ringkasan lolos: batas 365 hari, batas bawah 1 hari, bawaan 30 hari, hari aktif WIB vs UTC, waktu terakhir | Uji mutasi | Data uji ditambah (percakapan 400 hari, 3 jam, dan 20 hari lalu; dua waktu yang sama menurut WIB tetapi berbeda menurut UTC) dan waktu terakhir diperiksa persis |
+
+#### Temuan sampingan: ketidakcocokan id hidrasi acak (sudah ada sebelum Gelombang 3, belum diperbaiki)
+
+Saat memverifikasi, tiga tes dialog dan formulir di `gelombang1.spec.ts` gagal secara acak (1 sampai 3 dari ±680 pada satu putaran).
+Diselidiki sampai akar: `aria-describedby` menunjuk ke id yang tidak ada (`..._R_p5ai..-error`) padahal kolomnya ber-id `_R_34la..`. Di
+server dev React melaporkan *"A tree hydrated but some attributes of the server rendered HTML didn't match... This won't be patched
+up"*: id hasil `useId` di komponen klien berbeda antara HTML server dan hidrasi. Pola yang terukur (dev, tanpa interaksi apa pun):
+
+| Halaman uji | Ketidakcocokan |
+| ----------- | -------------- |
+| Halaman server **statis** berisi dua `HelpButton` | 0 dari 60 |
+| Halaman server **async** (menunggu sebentar) berisi hal yang sama | 3 dari 60 |
+| Halaman yang membaca `searchParams` (juga async) | 4 dari 60 |
+| Dua `Dialog` telanjang pada halaman async | 0 dari 40 |
+
+Dibuktikan **sudah ada sebelum Gelombang 3**: commit `ce7ea70` (tanpa kode Gelombang 3) dibangun di worktree terpisah dan menghasilkan
+laju yang sama (4 dari 40 pada tes pengganggu). Menunggu hidrasi (`networkidle`) menurunkan laju tetapi tidak menghilangkannya, jadi
+bukan sekadar klik yang terlalu cepat. Dugaan kuat: antarmuka React/Next di sekitar komponen server asinkron (data RSC tiba
+setelah hidrasi dimulai, lalu konteks pohon `useId` dipulihkan berbeda); tidak ditemukan penyebab di kode kita (tidak ada cabang
+`window`, `Date.now`, atau `Math.random` pada komponen yang terdampak).
+
+- **Dampak nyata:** pada sebagian kecil pemuatan halaman server asinkron, hubungan label/galat/nama-dialog lewat id bisa tidak sinkron
+  sampai halaman dimuat ulang. Fungsi formulir tetap jalan; yang terdampak adalah pembacaan galat dan nama dialog oleh pembaca layar.
+- **Yang dilakukan sekarang:** satu ulangan Playwright secara lokal (`retries: 1`; CI sudah 2), dan temuan dicatat di
+  `TEMUAN-KEAMANAN.md`. Tes yang lulus pada ulangan ditandai "flaky" oleh Playwright, bukan disembunyikan.
+- **Perbaikan yang layak bila waktu ada:** id stabil dari properti (bukan posisi pohon) untuk `Dialog` dan `Field`, dengan lingkup
+  (`scope`) untuk komponen yang berulang pada satu halaman (kartu antrean admin, daftar catatan sesi). Sengaja belum dikerjakan:
+  menyentuh sekitar 15 formulir dan berisiko menimbulkan id ganda bila lingkup salah.
+
+### Uji mutasi Gelombang 3
+
+**139 perusakan**: logika napas (13), grounding (8), layanan terdekat (21), sumber kontak krisis (3), komponen napas, grounding, dan
+layanan (10 + 5 + 13), pembaca server layanan (7), migrasi SQL ringkasan Teman cerita (17), domain dan aksi panduan awal (7 + 9),
+kartu panduan awal (4), ringkasan Teman cerita di web (10 + 5 + 7). Putaran pertama meloloskan 7 + 8; semuanya celah tes yang
+ditutup (angka tepi 80/70/365 hari, teks kosong yang menjadi nol, "Anda" pada ajakan, pencarian lewat kota saja, label tipe,
+mengatur ulang halaman saat mengganti provinsi dan mengetik pencarian, judul tersembunyi, waktu terakhir yang tepat, batas jendela
+1 dan 365 hari, bawaan 30 hari, tanggal WIB berbanding UTC) **kecuali dua yang setara perilaku**: Q03 (pemeriksaan klien null
+berlebih karena `can_view(null)` sudah salah) dan K21 (galat RPC diabaikan di satu tempat tetapi tertangkap oleh pemeriksaan bentuk
+jawaban yang melempar galat yang sama). Satu perusakan (B08, `Math.max(0, ...)` pada hitungan mundur) membuktikan kode yang
+berlebih: pembatas dihapus karena `ceil` dari angka positif selalu 1 atau lebih.
+
+### Verifikasi (14 Okt 2026)
+
+| Pemeriksaan | Hasil |
+| ----------- | ----- |
+| `tsc --noEmit`, `eslint --max-warnings=0`, `prettier --check` (web) | bersih |
+| Vitest setelah `pnpm build` bersih | 2235 dari 2235 lulus (116 berkas) |
+| Playwright, seluruh suite, build produksi (`E2E_PORT=3200`) | 614 lulus, 68 dilewati (spec berakun), 0 gagal |
+| axe WCAG 2.2 AA | 33 rute x 2 viewport (11 publik + 22 pratinjau), ditambah keadaan berubah: napas berjalan dan selesai, grounding, lokasi aktif, daftar kosong dan gagal, panduan awal setelah galat |
+| Uji mutasi Gelombang 3 | 139 perusakan; semua tertangkap kecuali 2 yang setara perilaku |
+| Migrasi `…000700` | teruji di PGlite (19 tes) dan 17 uji mutasi SQL; **belum diterapkan di cloud** |
+
+### Yang belum ada (jujur)
+
+- **Migrasi `…000700` belum diterapkan di cloud.** Sampai ditempel, halaman detail klien psikolog yang kliennya mengizinkan
+  `ai_summary` menampilkan galat memuat (klien yang tidak mengizinkan tidak terpengaruh).
+- **Daftar layanan masih data contoh** (seed sintetis), ditandai di halaman. Belum ada sumber data layanan sungguhan.
+- **Nomor 112 dan SEJIWA belum diverifikasi manusia** (`verified: false`).
+- **Latihan napas dan grounding belum dicoba dengan pembaca layar sungguhan** (NVDA, TalkBack, VoiceOver); yang terbukti adalah
+  struktur, pengumuman di wilayah live, dan axe.
+- **Lokasi di peramban seluler sungguhan** belum dicoba; diuji dengan lokasi palsu Playwright.
+- **Ringkasan isi Teman cerita** untuk psikolog sengaja tidak dibuat (hanya hitungan).
+- **Ketidakcocokan id hidrasi acak** (lihat di atas) belum diperbaiki, hanya dikurangi dampaknya pada tes.
+
+### Perlu tindakan Anda
+
+1. **Tempel `supabase/migrations/20261014000700_companion_activity_summary.sql`** di Supabase SQL Editor (idempotent). Setelah itu
+   saya verifikasi di cloud (simulasi JWT yang di-rollback).
+2. Verifikasi nomor SEJIWA 119 ext. 8 dan 112 ke sumber resmi, lalu ubah `verified` dan isi `verifiedAt` di
+   `lib/domain/crisis/resources.ts`.
+3. Bila punya data layanan kesehatan jiwa yang sungguhan (puskesmas, rumah sakit, biro psikologi di wilayah demo), muat ke tabel
+   `facilities`, periksa, lalu ubah `FACILITY_DIRECTORY_VERIFIED` menjadi `true`.

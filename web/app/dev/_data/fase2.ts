@@ -261,6 +261,7 @@ export function sampleClientDetail(variant: 'lengkap' | 'sebagian'): ClientDetai
       moods: sampleMoodsFor(SARI),
       sleeps: sampleSleeps(),
       alerts: null,
+      companion: null,
       consultations: [
         {
           id: '33333333-3333-4333-8333-333333333333',
@@ -275,7 +276,8 @@ export function sampleClientDetail(variant: 'lengkap' | 'sebagian'): ClientDetai
   }
 
   return {
-    client: SAMPLE_CLIENTS[0]!,
+    // Dimas membagikan ringkasan Teman cerita di halaman detail ini (izin `ai_summary` menyala).
+    client: { ...SAMPLE_CLIENTS[0]!, permissions: { ...ALL_SHARED, ai_summary: true } },
     assessments: SAMPLE_ASSESSMENTS.filter((row) => row.user_id === DIMAS).reverse(),
     moods: sampleMoodsFor(DIMAS),
     sleeps: sampleSleeps(),
@@ -293,6 +295,14 @@ export function sampleClientDetail(variant: 'lengkap' | 'sebagian'): ClientDetai
         createdAt: wib('2026-09-29', '21:15'),
       },
     ],
+    companion: {
+      conversations: 6,
+      messages: 52,
+      activeDays: 4,
+      crisisConversations: 1,
+      lastActivity: wib('2026-10-13', '07:50'),
+      windowDays: 30,
+    },
     consultations: [
       {
         id: '44444444-4444-4444-8444-444444444444',

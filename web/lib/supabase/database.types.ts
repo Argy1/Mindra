@@ -1260,6 +1260,16 @@ export type Database = {
           status: string
         }[]
       }
+      client_companion_activity: {
+        Args: { p_client: string; p_days?: number }
+        Returns: {
+          active_days: number
+          conversations: number
+          crisis_conversations: number
+          last_activity: string | null
+          messages: number
+        }[]
+      }
       psychologist_clients: {
         Args: never
         Returns: { linked_at: string; name: string; patient_id: string; permissions: Json }[]

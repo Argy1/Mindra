@@ -191,7 +191,7 @@ Hasil telaah kesenjangan web + aplikasi mobile sebelum deploy; keputusan dan ala
 
 ## Gelombang 3 — Opsional
 
-- [ ] `/bantuan` (napas, grounding, kontak krisis), faskes terdekat untuk pengguna, pembaca `ai_summary` untuk psikolog, onboarding
+- [x] `/bantuan` (napas terpandu, grounding, kontak krisis, panduan menemani orang lain), `/layanan-terdekat` (publik; lokasi hanya di perangkat), ringkasan penggunaan Teman cerita untuk psikolog (`ai_summary`, tanpa isi percakapan), panduan awal di Beranda. Migrasi `…000700` ditulis dan diuji; **belum diterapkan di cloud**
 
 ## Fase 6 — Proposal (24–29 Okt, di chat bersama Claude)
 

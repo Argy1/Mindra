@@ -2,6 +2,7 @@ import { SAMPLE_PHQ9_HISTORY, sampleInsight } from '@/app/dev/_data/fase1';
 import { InsightCard } from '@/components/features/home/InsightCard';
 import { LastAssessmentCard } from '@/components/features/home/LastAssessmentCard';
 import { QuickCheckIn } from '@/components/features/journal/QuickCheckIn';
+import { OnboardingCard } from '@/components/features/onboarding/OnboardingCard';
 import { AppShell } from '@/components/layout/AppShell';
 import type { AssessmentSummary } from '@/lib/server/assessments';
 
@@ -10,7 +11,12 @@ import type { AssessmentSummary } from '@/lib/server/assessments';
  * tetapi tanpa login. Check-in cepat tetap memakai Server Action asli, jadi di sini menjawab
  * "sesimu sudah berakhir" (belum masuk). Itu memang cara memeriksa tampilan galatnya.
  */
-export default function HomePreviewPage() {
+export default async function HomePreviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ panduan?: string | string[] }>;
+}) {
+  const { panduan } = await searchParams;
   const history: AssessmentSummary[] = SAMPLE_PHQ9_HISTORY.map((point, index) => ({
     id: `contoh-${index}`,
     type: 'phq9',
@@ -35,6 +41,8 @@ export default function HomePreviewPage() {
           <QuickCheckIn todayMood={null} />
         </div>
       </section>
+
+      {panduan ? <OnboardingCard /> : null}
 
       <div className="grid items-start gap-5 wide:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <InsightCard insight={sampleInsight()} />

@@ -305,3 +305,26 @@ Cabut di console.anthropic.com, lalu buat kunci baru khusus server (variabel Ver
 - **CI di GitHub berjalan hijau** (`.github/workflows/ci.yml`: web, e2e web, Flutter; [putaran 2](https://github.com/Argy1/Mindra/actions/runs/38585195586)). Putaran pertama
   menemukan cacat bukan-keamanan: folder aset Flutter kosong yang tidak dilacak git membuat `flutter analyze` gagal di klon bersih
   (diperbaiki). CI tidak memakai rahasia sungguhan: variabel Supabase berisi nilai tiruan dan `.env` Flutter berasal dari `.env.example`.
+
+## Temuan tambahan (Gelombang 3)
+
+- **Lokasi pengguna di "layanan terdekat" tidak meninggalkan perangkat.** Koordinat dari peramban hanya dipakai menghitung jarak di
+  halaman itu; e2e merekam semua permintaan jaringan setelah lokasi diizinkan dan tidak ada yang memuat koordinat, dan tautan peta
+  hanya memuat koordinat faskes. Tidak ada yang disimpan (tanpa cookie atau penyimpanan lokal). Izin lokasi sepenuhnya di tangan
+  peramban dan bisa ditolak tanpa mengurangi fungsi (daftar tetap bisa dipakai lewat provinsi dan pencarian).
+- **Izin `ai_summary` hanya membuka hitungan, bukan isi.** Fungsi `client_companion_activity` mengembalikan lima angka/waktu dan tidak
+  ada policy baru pada `ai_conversations` (diuji: psikolog berizin tetap melihat 0 baris di tabel itu). Pendamping tidak pernah
+  bisa (jenis izin itu tidak dipetakan untuk mereka). Psikolog tanpa TOTP (aal1) ditolak di database. Aksesnya dicatat sebelum dibaca.
+- **Metadata akun bisa diubah pemiliknya sendiri.** `user_metadata` (tempat `terms_version`, `terms_accepted_at`, dan kini
+  `onboarding_done_at`) bisa ditulis pengguna lewat API Auth mereka sendiri. Untuk penanda panduan awal itu tidak masalah (hanya
+  kenyamanan), tetapi **bukan bukti persetujuan yang kebal ubah**: catatan versi syarat yang disetujui sebaiknya pindah ke tabel
+  yang hanya bisa ditulis server bila suatu hari dibutuhkan sebagai bukti. Dicatat sebagai batas, bukan celah baru.
+- **Direktori layanan publik memuat data contoh.** RLS `Facilities are public` sengaja mengizinkan anon membaca tabel; isinya kini seed
+  sintetis. Halaman menyatakannya ("Daftar ini masih contoh") dan mengarahkan ke SEJIWA dan IGD; bendera `FACILITY_DIRECTORY_VERIFIED`
+  mencegah data karangan tampil sebagai fakta bila nanti data sungguhan dimuat tanpa pemeriksaan.
+- **Nomor 112 ditambahkan ke sumber kontak krisis, belum diverifikasi manusia** (`verified: false`, sama seperti SEJIWA).
+- **Ketidakcocokan id hidrasi acak (aksesibilitas, bukan kebocoran).** Pada halaman server asinkron, id `useId` di komponen klien
+  kadang berbeda antara HTML server dan hidrasi (React: "won't be patched up"), sehingga `aria-describedby` dan `aria-labelledby`
+  bisa menunjuk ke id yang tidak ada pada ±5% pemuatan dalam pengujian. Sudah ada sebelum Gelombang 3 (dibuktikan pada commit
+  `ce7ea70`). Dampaknya pada pembaca layar: galat kolom atau nama dialog tidak terbaca sampai halaman dimuat ulang; fungsi formulir
+  tetap jalan. Mitigasi: satu ulangan di tes; perbaikan yang diusulkan (id stabil dari properti) ada di DECISIONS Gelombang 3.

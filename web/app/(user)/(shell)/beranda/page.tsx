@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { InsightCard } from '@/components/features/home/InsightCard';
 import { LastAssessmentCard } from '@/components/features/home/LastAssessmentCard';
 import { QuickCheckIn } from '@/components/features/journal/QuickCheckIn';
+import { OnboardingCard } from '@/components/features/onboarding/OnboardingCard';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -51,6 +52,8 @@ export default async function BerandaPage() {
           <QuickCheckIn todayMood={home.todayMood} />
         </div>
       </section>
+
+      {profile.onboardingDone ? null : <OnboardingCard />}
 
       <div className="grid items-start gap-5 wide:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <InsightCard insight={home.insight} />

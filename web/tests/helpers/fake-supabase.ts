@@ -15,6 +15,8 @@ export interface RecordedQuery {
   filters: Array<{ op: string; column: string; value: unknown }>;
   orders: Array<{ column: string; ascending: boolean }>;
   limit?: number;
+  /** Daftar kolom pada `select(...)`, bila diberikan. */
+  columns?: string;
 }
 
 export interface QueryResult {
@@ -70,7 +72,8 @@ export function createFakeSupabase(options: FakeSupabaseOptions = {}) {
       this.record.payload = payload;
       return this;
     }
-    select() {
+    select(columns?: string) {
+      if (columns !== undefined) this.record.columns = columns;
       return this;
     }
     insert(payload: unknown) {

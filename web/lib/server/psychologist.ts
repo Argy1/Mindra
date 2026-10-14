@@ -5,6 +5,11 @@ import {
   type AlertItem,
 } from '@/lib/domain/psychologist/alerts';
 import {
+  COMPANION_WINDOW_DAYS,
+  parseCompanionActivity,
+  type CompanionActivity,
+} from '@/lib/domain/psychologist/companion';
+import {
   buildClientSummaries,
   summarizeDashboard,
   type AssessmentRow,
@@ -259,6 +264,8 @@ export interface ClientDetail {
   moods: MoodRow[] | null;
   sleeps: { bedtime: string; wake_time: string; quality: number }[] | null;
   alerts: { id: string; severity: string; status: string; createdAt: string }[] | null;
+  /** Gambaran penggunaan Teman cerita (tanpa isi percakapan); null = klien tidak membagikan izin `ai_summary`. */
+  companion: CompanionActivity | null;
   consultations: ConsultationNote[];
 }
 
@@ -277,11 +284,12 @@ export async function getClientDetail(
   if (permissions.mood) await auditAccess(patientId, 'mood');
   if (permissions.sleep) await auditAccess(patientId, 'sleep');
   if (permissions.crisis_alerts) await auditAccess(patientId, 'crisis_alerts');
+  if (permissions.ai_summary) await auditAccess(patientId, 'ai_summary');
 
   const supabase = await createClient();
   const since = `${addDaysToKey(dateKeyWib(now), -30)}T00:00:00+07:00`;
 
-  const [assessments, moods, sleeps, alerts, consultations] = await Promise.all([
+  const [assessments, moods, sleeps, alerts, companion, consultations] = await Promise.all([
     permissions.assessments
       ? supabase
           .from('assessments')
@@ -316,6 +324,12 @@ export async function getClientDetail(
           .order('created_at', { ascending: false })
           .limit(20)
       : null,
+    permissions.ai_summary
+      ? supabase.rpc('client_companion_activity', {
+          p_client: patientId,
+          p_days: COMPANION_WINDOW_DAYS,
+        })
+      : null,
     supabase
       .from('consultations')
       .select('id, scheduled_at, status, duration_minutes, session_summary, notes_for_patient')
@@ -323,9 +337,11 @@ export async function getClientDetail(
       .order('scheduled_at', { ascending: false })
       .limit(20),
   ]);
-  for (const result of [assessments, moods, sleeps, alerts, consultations]) {
+  for (const result of [assessments, moods, sleeps, alerts, companion, consultations]) {
     if (result?.error) throw new Error('Gagal memuat data klien.');
   }
+  const companionActivity = companion ? parseCompanionActivity(companion.data) : null;
+  if (companion && companionActivity === null) throw new Error('Gagal memuat data klien.');
 
   return {
     client,
@@ -340,6 +356,7 @@ export async function getClientDetail(
           createdAt: row.created_at,
         }))
       : null,
+    companion: companionActivity,
     consultations: (consultations.data ?? []).map((row) => ({
       id: row.id,
       scheduledAt: row.scheduled_at,

@@ -212,6 +212,112 @@ describe('getOpenAlerts', () => {
   });
 });
 
+describe('getClientDetail: ringkasan penggunaan Teman cerita (ai_summary)', () => {
+  const D = 'dadadada-dada-4ada-8ada-dadadadadada';
+  const SHARES = { ...NONE, ai_summary: true };
+  const activityRow = {
+    conversations: 3,
+    messages: 10,
+    active_days: 2,
+    crisis_conversations: 1,
+    last_activity: '2026-10-12T04:00:00+00:00',
+  };
+
+  function setupSummary(
+    permissions: typeof NONE,
+    rpcResult?: { data: unknown; error: { message: string } | null },
+  ) {
+    state.auditFailure = false;
+    state.supabase = createFakeSupabase({
+      rpcs: {
+        psychologist_clients: [
+          { patient_id: D, name: 'Klien D', linked_at: '2026-09-01T00:00:00Z', permissions },
+        ],
+        client_companion_activity: [activityRow],
+      },
+      ...(rpcResult ? { results: { 'rpc:client_companion_activity': rpcResult } } : {}),
+    });
+    return state.supabase;
+  }
+
+  it('klien yang mengizinkan: dicatat dulu, lalu RPC dipanggil dengan id klien dan jendela 30 hari', async () => {
+    const fake = setupSummary(SHARES);
+    const detail = await getClientDetail(D, NOW);
+
+    expect(detail!.companion).toEqual({
+      conversations: 3,
+      messages: 10,
+      activeDays: 2,
+      crisisConversations: 1,
+      lastActivity: '2026-10-12T04:00:00+00:00',
+      windowDays: 30,
+    });
+    expect(fake.rpcCalls.filter((call) => call.name === 'client_companion_activity')).toEqual([
+      { name: 'client_companion_activity', args: { p_client: D, p_days: 30 } },
+    ]);
+    const audit = fake.log.indexOf(`audit:ai_summary:read:${D}`);
+    expect(audit).toBeGreaterThanOrEqual(0);
+    expect(audit).toBeLessThan(fake.log.indexOf('rpc:client_companion_activity'));
+  });
+
+  it('klien yang TIDAK mengizinkan: companion null, tanpa RPC dan tanpa catatan akses', async () => {
+    const fake = setupSummary(NONE);
+    const detail = await getClientDetail(D, NOW);
+    expect(detail!.companion).toBeNull();
+    expect(fake.rpcCalls.map((call) => call.name)).toEqual(['psychologist_clients']);
+    expect(fake.log.some((entry) => entry.startsWith('audit:'))).toBe(false);
+  });
+
+  it('hanya ai_summary yang diminta: tidak ada tabel data klien lain yang dibaca selain jadwal sesi', async () => {
+    const fake = setupSummary(SHARES);
+    await getClientDetail(D, NOW);
+    expect(fake.tablesQueried()).toEqual(['consultations']);
+    expect(fake.log.filter((entry) => entry.startsWith('audit:'))).toEqual([
+      `audit:ai_summary:read:${D}`,
+    ]);
+  });
+
+  it('tidak pernah membaca tabel ai_conversations (isi percakapan tidak diminta sama sekali)', async () => {
+    const fake = setupSummary({ ...SHARES, assessments: true, mood: true });
+    await getClientDetail(D, NOW);
+    expect(fake.tablesQueried()).not.toContain('ai_conversations');
+  });
+
+  it('gagal mencatat akses = RPC tidak dipanggil', async () => {
+    const fake = setupSummary(SHARES);
+    state.auditFailure = true;
+    await expect(getClientDetail(D, NOW)).rejects.toBeInstanceOf(Error);
+    expect(fake.rpcCalls.map((call) => call.name)).not.toContain('client_companion_activity');
+  });
+
+  it('galat dari database: melempar galat umum (bukan angka kosong yang menyesatkan)', async () => {
+    setupSummary(SHARES, { data: null, error: { message: 'Tidak berwenang.' } });
+    await expect(getClientDetail(D, NOW)).rejects.toThrow('Gagal memuat data klien.');
+  });
+
+  it('jawaban database tak masuk akal: melempar galat umum, bukan menampilkan angka', async () => {
+    setupSummary(SHARES, { data: [{ ...activityRow, messages: -5 }], error: null });
+    await expect(getClientDetail(D, NOW)).rejects.toThrow('Gagal memuat data klien.');
+  });
+
+  it('klien tanpa percakapan: nol semua, waktu terakhir kosong', async () => {
+    setupSummary(SHARES, {
+      data: [
+        {
+          conversations: 0,
+          messages: 0,
+          active_days: 0,
+          crisis_conversations: 0,
+          last_activity: null,
+        },
+      ],
+      error: null,
+    });
+    const detail = await getClientDetail(D, NOW);
+    expect(detail!.companion).toMatchObject({ conversations: 0, lastActivity: null });
+  });
+});
+
 describe('getClientDetail', () => {
   it('orang yang bukan klien: null, tanpa membaca data apa pun dan tanpa catatan akses', async () => {
     const fake = setup();

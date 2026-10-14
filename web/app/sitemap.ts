@@ -5,6 +5,8 @@ import { siteUrl } from '@/lib/env/public';
 const PUBLIC_PATHS = [
   '/',
   '/tentang',
+  '/bantuan',
+  '/layanan-terdekat',
   '/kebijakan-privasi',
   '/syarat-penggunaan',
   '/developers',

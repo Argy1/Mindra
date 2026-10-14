@@ -13,8 +13,8 @@ test.describe('AppShell /dev/shell', () => {
 
     if (isDesktop) {
       await expect(nav).not.toHaveAttribute('data-bottom-nav', /.*/);
-      // Enam menu utama + Profil (grup "Akun").
-      await expect(nav.getByRole('link')).toHaveCount(7);
+      // Enam menu utama + dua tautan Bantuan (grup "Bantuan") + Profil (grup "Akun").
+      await expect(nav.getByRole('link')).toHaveCount(9);
       const box = await nav.boundingBox();
       expect(box?.x).toBeLessThan(64); // di tepi kiri
     } else {
@@ -59,7 +59,10 @@ test.describe('AppShell /dev/shell', () => {
 
     const dialog = page.getByRole('dialog', { name: 'Butuh bantuan sekarang' });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole('link', { name: /^Hubungi / })).toHaveAttribute('href', /^tel:/);
+    const calls = dialog.getByRole('link', { name: /^Hubungi / });
+    await expect(calls).toHaveCount(2); // SEJIWA dan 112
+    await expect(calls.first()).toHaveAttribute('href', 'tel:119,8');
+    await expect(calls.last()).toHaveAttribute('href', 'tel:112');
 
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();

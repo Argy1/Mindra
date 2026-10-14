@@ -75,6 +75,8 @@ describe.skipIf(!hasBuild)('hasil build: rute bersesi bersifat dinamis', () => {
     '/dev/kunci-api',
     '/dev/profil',
     '/dev/admin',
+    '/dev/layanan-terdekat',
+    '/layanan-terdekat',
     '/dev/faskes',
     '/dev/faskes-peta',
     '/dev/faskes-laporan',
@@ -98,7 +100,7 @@ describe.skipIf(!hasBuild)('hasil build: rute bersesi bersifat dinamis', () => {
     expect(prerendered).not.toContain(route);
   });
 
-  it.each(['/', '/tentang', '/kebijakan-privasi', '/syarat-penggunaan', '/developers'])(
+  it.each(['/', '/tentang', '/bantuan', '/kebijakan-privasi', '/syarat-penggunaan', '/developers'])(
     'halaman marketing %s tetap statis (CDN)',
     (route) => {
       expect(prerendered).toContain(route);

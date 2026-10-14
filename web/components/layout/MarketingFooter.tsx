@@ -5,6 +5,8 @@ import { Logo } from '@/components/layout/Logo';
 /** Naskah hukum berasal dari ketentuan aplikasi mobile (docs/terms_of_service.md), disesuaikan untuk web. */
 const FOOTER_LINKS = [
   { href: '/tentang', label: 'Tentang' },
+  { href: '/bantuan', label: 'Bantuan' },
+  { href: '/layanan-terdekat', label: 'Layanan terdekat' },
   { href: '/kebijakan-privasi', label: 'Kebijakan privasi' },
   { href: '/syarat-penggunaan', label: 'Syarat penggunaan' },
   { href: '/developers', label: 'API' },

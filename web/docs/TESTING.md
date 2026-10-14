@@ -6,9 +6,9 @@ Terakhir diperbarui 14 Oktober 2026.
 
 | Bukti | Hasil | Cara mengulang |
 | ----- | ----- | -------------- |
-| Tes unit, komponen, dan basis data (Vitest) | **2030 lulus**, 103 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
-| Tes e2e + aksesibilitas (Playwright, desktop 1440 dan mobile 390) | **552 lulus**, 56 dilewati (spec yang butuh akun sungguhan), 0 gagal, terhadap build produksi | `E2E_PORT=3200 pnpm test:e2e` (server produksi di port itu) |
-| Audit aksesibilitas (axe, WCAG 2.2 AA) | 30 rute x 2 viewport, **0 pelanggaran**; ditambah dialog yang sedang terbuka (hapus akun, persetujuan admin) di `e2e/gelombang1.spec.ts` | `e2e/fase5.spec.ts` |
+| Tes unit, komponen, dan basis data (Vitest) | **2235 lulus**, 116 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
+| Tes e2e + aksesibilitas (Playwright, desktop 1440 dan mobile 390) | **614 lulus**, 68 dilewati (spec yang butuh akun sungguhan), 0 gagal, terhadap build produksi | `E2E_PORT=3200 pnpm test:e2e` (server produksi di port itu) |
+| Audit aksesibilitas (axe, WCAG 2.2 AA) | 33 rute x 2 viewport, **0 pelanggaran**; ditambah keadaan yang berubah (dialog hapus akun dan persetujuan admin terbuka, napas berjalan dan selesai, grounding, lokasi aktif, daftar kosong dan gagal, panduan awal setelah galat) di `e2e/gelombang1.spec.ts` dan `e2e/gelombang3.spec.ts` | `e2e/fase5.spec.ts` |
 | Lighthouse (12.8.2) | Aksesibilitas **100** di semua 48 pengukuran; halaman publik P 93-100, BP 100, SEO 100 | `pnpm lighthouse` |
 | Uji beban lokal, 200 pengguna virtual | **25.426 permintaan, 0 galat, p95 10,6 ms** (bukan k6; lihat catatan) | `pnpm load` |
 | Pembatas laju di bawah beban | Satu IP, 200 koneksi paralel, 600 permintaan: tepat **60 lolos, 540 ditolak 429** | `pnpm load --limiter-check` |
@@ -17,11 +17,11 @@ Terakhir diperbarui 14 Oktober 2026.
 
 ## 1. Tes otomatis
 
-- **Vitest** (2030 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
+- **Vitest** (2235 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
   slot konsultasi, SUS), kerangka API, komponen, dan **aturan RLS di Postgres sungguhan** (PGlite dengan peran dan klaim JWT
   yang meniru Supabase). Tes penjaga hasil build memastikan rute yang memuat data per pengguna tidak ikut diprerender (data satu orang tak boleh
   masuk cache CDN) dan halaman marketing tetap statis; tes itu hanya aktif setelah `pnpm build`.
-- **Playwright** (608 kasus = 304 per viewport): halaman publik, formulir, guard rute, 21 halaman pratinjau berisi komponen
+- **Playwright** (682 kasus = 341 per viewport): halaman publik, formulir, guard rute, 22 halaman pratinjau berisi komponen
   yang sama dengan halaman berlogin, perilaku HTTP API (401, 403, 422, 429, OpenAPI, FHIR), dan audit aksesibilitas.
   56 kasus dilewati karena membutuhkan akun uji sungguhan dan MENULIS data; cara menjalankannya ada di
   [PANDUAN-PENGEMBANG.md](PANDUAN-PENGEMBANG.md).
@@ -43,6 +43,13 @@ Terakhir diperbarui 14 Oktober 2026.
   trigger). Aplikasi Flutter: `flutter analyze` 0 galat dan 0 peringatan (115 info, sama seperti sebelum Gelombang 1),
   `flutter test` 160 lulus (137 setelah Gelombang 1, ditambah 23 tes Gelombang 2 untuk pembaca SSE dan layanan Teman cerita lewat
   web). `e2e/gelombang1.auth.spec.ts` (spec berakun) ditulis tetapi belum dijalankan.
+- **Gelombang 3** (bantuan, layanan terdekat, panduan awal, ringkasan Teman cerita): domain napas dan grounding (tes batas fase
+  tepat, pengumuman hanya di pergantian fase), 47 tes hitung jarak dan penyaringan layanan, tes komponen (jam palsu, lokasi
+  palsu, keadaan galat), `tests/db/companion-activity.test.ts` (19, Postgres tiruan), dan `e2e/gelombang3.spec.ts` (jam
+  Playwright dibekukan untuk batas fase, lokasi palsu dengan perekaman semua permintaan jaringan, `/bantuan` tanpa cookie dan
+  penyimpanan, axe pada keadaan yang berubah). **139 perusakan sengaja**, semua tertangkap kecuali 2 yang setara perilaku. Satu
+  temuan di luar cakupan (ketidakcocokan id hidrasi acak, sudah ada sebelumnya) dicatat di `TEMUAN-KEAMANAN.md`; Playwright
+  dikonfigurasi satu ulangan lokal.
 - **Pelajaran dari pengukuran yang tampak "lulus".** Tes aksesibilitas diberi kontrol negatif: elemen berkontras buruk dan
   tombol tanpa nama disuntikkan ke halaman, dan axe melaporkan `color-contrast` serta `button-name`. Artinya 0 pelanggaran
   di atas bukan karena audit yang tak bisa gagal.
@@ -53,12 +60,12 @@ Target: WCAG 2.1 AA (CLAUDE.md). Diukur lebih ketat: **WCAG 2.2 AA + praktik ter
 
 | Pemeriksaan | Cakupan | Hasil |
 | ----------- | ------- | ----- |
-| axe-core (tag `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`, `best-practice`) | 9 rute publik/auth + 21 pratinjau berlogin (termasuk `/dev/profil` dan `/dev/admin`), desktop dan mobile | 0 pelanggaran |
-| Jalan-jalan keyboard otomatis | Tab melewati setiap elemen yang bisa difokus di 30 rute x 2 viewport | Tidak ada jebakan keyboard, setiap fokus tampak punya cincin (outline atau bayangan), tidak ada `tabindex` positif, tidak ada elemen tak terlihat yang bisa difokus |
+| axe-core (tag `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`, `best-practice`) | 11 rute publik/auth + 22 pratinjau berlogin (termasuk `/dev/profil`, `/dev/admin`, dan `/dev/layanan-terdekat`), desktop dan mobile | 0 pelanggaran |
+| Jalan-jalan keyboard otomatis | Tab melewati setiap elemen yang bisa difokus di 33 rute x 2 viewport | Tidak ada jebakan keyboard, setiap fokus tampak punya cincin (outline atau bayangan), tidak ada `tabindex` positif, tidak ada elemen tak terlihat yang bisa difokus |
 | Skip link, urutan Tab landing | Tab pertama = "Langsung ke konten"; urutan logo, menu, masuk, daftar, hero | lulus |
 | `prefers-reduced-motion` | Diagram ekosistem: benang tergambar penuh, denyut disembunyikan, 0 animasi berulang | lulus |
 | Kontras | Dihitung axe di setiap rute (teks normal 4,5:1, teks besar 3:1); tombol sage memakai sage-600 (4,76:1 dengan teks putih) bukan sage-500 dari desain (3,19:1) | lulus |
-| Tidak ada overflow horizontal | Halaman marketing dan 21 pratinjau, 390 px | lulus |
+| Tidak ada overflow horizontal | Halaman marketing (termasuk `/bantuan`) dan 22 pratinjau, 390 px | lulus |
 
 **Batas yang jujur.** Alat otomatis hanya menangkap sebagian masalah aksesibilitas. Yang **belum** dilakukan: uji dengan
 pembaca layar sungguhan (NVDA, TalkBack, VoiceOver), perbesaran teks 200% di perangkat nyata, dan uji dengan pengguna
@@ -234,6 +241,8 @@ Protokol, persetujuan, tugas, kuesioner SUS, dan alat rekap sudah siap: [UJI-PEN
 | Alur dengan akun sungguhan (`*.auth.spec.ts`) | 56 kasus dilewati; alur Gelombang 1 (profil dan admin dengan akun nyata) belum punya spec berakun | Akun uji + variabel `E2E_*` (petunjuk di PANDUAN-PENGEMBANG) |
 | Migrasi `…000600` di proyek cloud | Teruji di Postgres tiruan (PGlite), **belum diterapkan di cloud** | Pemilik menempelkan berkasnya di SQL Editor; lalu verifikasi terhadap cloud dan `pnpm seed --yes` |
 | Fungsi baru dari aplikasi Flutter di perangkat | Teruji pemetaan, logika, dan analisis statis; belum dijalankan di perangkat atau emulator | Bangun ulang aplikasi setelah migrasi diterapkan, coba pesan konsultasi, ubah profil, hapus akun |
-| Lighthouse untuk `/profil`, `/admin/*`, `/syarat-penggunaan` | Belum diukur (halaman baru) | `pnpm lighthouse` setelah menambah rute; halaman berlogin lewat pratinjau `/dev/profil` dan `/dev/admin` |
+| Migrasi `…000700` di proyek cloud | Teruji di Postgres tiruan, **belum diterapkan di cloud** | Pemilik menempelkan berkasnya di SQL Editor; lalu verifikasi di cloud |
+| Latihan napas dan grounding dengan pembaca layar sungguhan | Belum (struktur, wilayah live, dan axe terbukti) | NVDA, TalkBack, VoiceOver |
+| Lighthouse untuk `/profil`, `/admin/*`, `/syarat-penggunaan`, `/bantuan`, `/layanan-terdekat` | Belum diukur (halaman baru) | `pnpm lighthouse` setelah menambah rute; halaman berlogin lewat pratinjau `/dev/profil` dan `/dev/admin` |
 | Login admin faskes memakai TOTP asli | Hanya diuji di database dan komponen | Pasang TOTP di aplikasi autentikator sungguhan sekali |
 | Uji pembaca layar | Belum | NVDA/TalkBack/VoiceOver |
