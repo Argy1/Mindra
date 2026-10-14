@@ -1,0 +1,116 @@
+name: mindra
+description: Aplikasi Kesehatan Mental Digital Indonesia — teman digitalmu untuk bernapas, merenung, dan tumbuh.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Navigation
+  go_router: ^14.2.7
+
+  # Backend
+  supabase_flutter: ^2.5.6
+
+  # Fonts & icons
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10+1
+
+  # Charts & data visualization
+  fl_chart: ^0.67.0
+
+  # Images
+  cached_network_image: ^3.3.1
+
+  # Loading states
+  shimmer: ^3.0.0
+
+  # Animation
+  lottie: ^3.1.0
+  flutter_animate: ^4.5.0
+  smooth_page_indicator: ^1.1.0
+
+  # Environment variables
+  flutter_dotenv: ^5.1.0
+
+  # Notifications
+  flutter_local_notifications: ^17.2.4
+
+  # PDF Export
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  path_provider: ^2.1.3
+  url_launcher: ^6.3.0
+
+  # Audio playback
+  just_audio: ^0.9.36
+  audioplayers: ^6.0.0
+
+  # Storage & Security
+  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.3.2
+
+  # HTTP client (AI companion streaming)
+  http: ^1.2.2
+
+  # Utilities
+  intl: ^0.20.2
+  uuid: ^4.4.0
+  logger: ^2.3.0
+  connectivity_plus: ^6.0.3
+
+  # Permissions
+  permission_handler: ^11.3.1
+
+  # Encryption
+  encrypt: ^5.0.3
+
+  # Voice recording
+  record: ^6.2.0
+
+  # Maps & location
+  # NOTE: Requires Google Maps API key in AndroidManifest.xml and AppDelegate.swift
+  # google_maps_flutter: ^2.6.0
+  # geolocator: ^11.0.0
+
+  # Video call (Agora)
+  # NOTE: Requires Agora SDK native setup — see README for instructions
+  # agora_rtc_engine: ^6.3.2
+
+  # Firebase (Push Notifications)
+  # NOTE: Requires google-services.json (Android) and GoogleService-Info.plist (iOS)
+  # firebase_core: ^2.30.1
+  # firebase_messaging: ^14.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_driver:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.11
+  riverpod_generator: ^2.4.3
+  custom_lint: ^0.7.6
+  riverpod_lint: ^2.6.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/mood/
+    - assets/lottie/
+    - .env

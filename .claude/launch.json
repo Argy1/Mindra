@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mindra-web-dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "web", "exec", "next", "dev", "--turbopack", "--port", "3100"],
+      "port": 3100
+    }
+  ]
+}

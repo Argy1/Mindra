@@ -1,0 +1,7 @@
+# Build script dependensi sengaja DITOLAK secara eksplisit (hak akses minimum).
+# unrs-resolver (dependensi eslint-config-next) tetap bekerja lewat binding prebuilt
+# @unrs/resolver-binding-* yang sudah ikut terpasang sebagai optionalDependency.
+allowBuilds:
+  unrs-resolver: false
+  # esbuild (dependensi tsx): binary platform sudah ikut terpasang via optionalDependencies.
+  esbuild: false

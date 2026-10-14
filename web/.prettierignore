@@ -1,0 +1,13 @@
+.next
+node_modules
+pnpm-lock.yaml
+playwright-report
+test-results
+coverage
+# Mockup statis = acuan visual dari desainer, bukan kode produksi.
+design
+# Dokumen milik pemilik proyek: jangan diformat otomatis.
+docs
+CLAUDE.md
+# Dihasilkan oleh `pnpm db:types`; diformat ulang hanya akan membuat selisih palsu pada regenerasi berikutnya.
+lib/supabase/database.types.ts

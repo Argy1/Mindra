@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  body { padding: 24px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card { background: white; border-radius: 20px; padding: 18px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 10px; }
+  .card.hero { background: linear-gradient(140deg, #EEF3F7 0%, #F1F4EE 100%); }
+  .card-eyebrow { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--biru-600); }
+  .card-title { font-family: var(--font-display); font-size: 22px; line-height: 1.2; color: var(--fg-1); }
+  .card-body { font-family: var(--font-body); font-size: 13px; line-height: 1.55; color: var(--fg-3); }
+  .meta { display: flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: 11px; color: var(--fg-4); }
+  .dot-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--tinta-300); }
+  .icon-wrap { width: 38px; height: 38px; border-radius: 50%; background: var(--biru-100); display: grid; place-items: center; }
+  .pill-cta { align-self: flex-start; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--biru-700); padding: 8px 14px; border-radius: 999px; background: var(--biru-50); }
+  .head { display: flex; align-items: center; gap: 12px; }
+</style></head><body>
+<div class="row">
+  <div class="card hero">
+    <div class="head">
+      <div class="icon-wrap" style="background: #D6E2EC;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="12" cy="12" r="8" stroke="#437094" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#437094"/></svg>
+      </div>
+      <div class="card-eyebrow">Latihan pagi</div>
+    </div>
+    <div class="card-title">Napas 4-7-8 untuk memulai hari</div>
+    <div class="card-body">Empat tarikan napas pelan, tujuh hitungan ditahan, delapan hitungan dilepaskan.</div>
+    <div class="meta">5 menit <div class="dot-sep"></div> pemula <div class="dot-sep"></div> tanpa suara</div>
+  </div>
+  <div class="card">
+    <div class="head">
+      <div class="icon-wrap" style="background: #DDE5D2;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M5 12c0-4 3-7 7-7s7 3 7 7" stroke="#647C50" stroke-width="1.8" stroke-linecap="round"/><path d="M9 12v6m6-6v6" stroke="#647C50" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="card-eyebrow" style="color: var(--sage-700);">Jurnal</div>
+    </div>
+    <div class="card-title">Tiga kalimat sebelum tidur</div>
+    <div class="card-body">Tutup hari dengan tiga kalimat pendek. Apa yang baik, apa yang berat, apa yang kamu syukuri.</div>
+    <div class="pill-cta">Mulai →</div>
+  </div>
+</div>
+</body></html>

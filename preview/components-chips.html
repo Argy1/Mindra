@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  body { padding: 28px 24px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .label { font-family: var(--font-mono); font-size: 10px; color: var(--fg-4); width: 80px; }
+  .chip {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: white;
+    color: var(--fg-2);
+    box-shadow: inset 0 0 0 1px var(--tinta-100);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .chip.active { background: var(--biru-50); color: var(--biru-700); box-shadow: inset 0 0 0 1.5px var(--biru-300); }
+  .chip.sage { background: var(--sage-50); color: var(--sage-700); box-shadow: inset 0 0 0 1.5px var(--sage-300); }
+  .chip.warm { background: var(--hangat-100); color: var(--hangat-700); box-shadow: inset 0 0 0 1.5px var(--hangat-300); }
+  .chip .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .badge {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 11px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    letter-spacing: 0.02em;
+  }
+  .badge.streak { background: var(--matahari-100); color: var(--matahari-700); }
+  .badge.new   { background: var(--biru-100); color: var(--biru-700); }
+  .badge.gentle { background: var(--sage-100); color: var(--sage-700); }
+</style></head><body>
+<div class="row">
+  <div class="label">Chips</div>
+  <span class="chip active">Pagi</span>
+  <span class="chip">Siang</span>
+  <span class="chip">Malam</span>
+  <span class="chip sage">5 menit</span>
+  <span class="chip warm">Pemula</span>
+</div>
+<div class="row">
+  <div class="label">Filters</div>
+  <span class="chip"><span class="dot" style="background:#84A7C1;"></span> Tenang</span>
+  <span class="chip"><span class="dot" style="background:#9DB287;"></span> Syukur</span>
+  <span class="chip"><span class="dot" style="background:#E7B860;"></span> Bahagia</span>
+  <span class="chip"><span class="dot" style="background:#A39BB5;"></span> Lelah</span>
+</div>
+<div class="row">
+  <div class="label">Badges</div>
+  <span class="badge streak">12 HARI</span>
+  <span class="badge new">BARU</span>
+  <span class="badge gentle">GRATIS</span>
+</div>
+</body></html>

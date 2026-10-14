@@ -1,0 +1,52 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  body { padding: 24px; }
+  .nav {
+    background: white;
+    border-radius: 28px;
+    box-shadow: var(--shadow-lg);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 10px 8px;
+    max-width: 380px;
+    margin: 8px auto;
+  }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border-radius: 16px; cursor: pointer; }
+  .item.active { background: var(--biru-50); }
+  .item svg { width: 22px; height: 22px; }
+  .item .lbl { font-family: var(--font-body); font-size: 10px; color: var(--fg-4); font-weight: 600; }
+  .item.active .lbl { color: var(--biru-700); }
+
+  .topbar { background: rgba(251,248,242,0.78); backdrop-filter: blur(20px) saturate(120%); display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 18px; box-shadow: var(--shadow-sm); margin-top: 18px; }
+  .greet { font-family: var(--font-display); font-size: 19px; color: var(--fg-1); flex: 1; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--hangat-300), var(--matahari-500)); display: grid; place-items: center; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: white; }
+  .bell { width: 34px; height: 34px; border-radius: 50%; background: var(--krem-100); display: grid; place-items: center; }
+  .bell svg { width: 18px; height: 18px; }
+</style></head><body>
+<div class="topbar">
+  <div class="greet">Halo, Ayu</div>
+  <div class="bell"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z" stroke="#3C4A55" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 18a2 2 0 1 0 4 0" stroke="#3C4A55" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+  <div class="avatar">A</div>
+</div>
+<div class="nav">
+  <div class="item active">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z" stroke="#437094" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    <div class="lbl">Beranda</div>
+  </div>
+  <div class="item">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#8E99A4" stroke-width="1.6"/><path d="M8 14a4 4 0 0 0 8 0" stroke="#8E99A4" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="10" r="1" fill="#8E99A4"/><circle cx="15" cy="10" r="1" fill="#8E99A4"/></svg>
+    <div class="lbl">Suasana</div>
+  </div>
+  <div class="item">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#8E99A4" stroke-width="1.6"/><circle cx="12" cy="12" r="3" fill="#8E99A4"/></svg>
+    <div class="lbl">Napas</div>
+  </div>
+  <div class="item">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="#8E99A4" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 10h8M8 14h6" stroke="#8E99A4" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <div class="lbl">Jurnal</div>
+  </div>
+  <div class="item">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="3.5" stroke="#8E99A4" stroke-width="1.6"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#8E99A4" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <div class="lbl">Saya</div>
+  </div>
+</div>
+</body></html>

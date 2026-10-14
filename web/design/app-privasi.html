@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mindra — Privasi dan izin</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+  .intro { padding: 16px 0 28px; max-width: 62ch; }
+  .intro p { margin-top: 8px; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+
+  .who { padding: 20px 0; border-top: 1px solid var(--border-soft); }
+  .who:first-of-type { border-top: 0; padding-top: 0; }
+  .who__head { display: flex; align-items: center; gap: 12px; }
+  .who__head .name { flex: 1; }
+  .who__head .name strong { display: block; color: var(--fg-1); }
+  .perms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+  .perm { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: var(--radius-md); background: var(--surface-canvas); font-size: 14px; color: var(--fg-2); }
+  .perm .switch { transform: scale(.85); transform-origin: right center; }
+  @media (max-width: 640px) { .perms { grid-template-columns: 1fr; } }
+
+  .add { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+  .log-item { display: grid; grid-template-columns: 32px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--border-soft); }
+  .log-item:first-of-type { border-top: 0; padding-top: 0; }
+  .log-item p { font-size: 14px; color: var(--fg-2); line-height: 1.5; }
+  .log-item p strong { color: var(--fg-1); font-weight: 600; }
+  .log-item .meta { margin-top: 2px; }
+  .day-sep { font-size: 13px; font-weight: 600; color: var(--fg-4); padding: 16px 0 4px; }
+
+  .ss { display: flex; gap: 14px; align-items: center; }
+  .ss .txt { flex: 1; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#isi">Langsung ke konten</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Navigasi utama">
+    <div class="sidebar__logo"><img src="assets/logo-mindra.svg" alt="Mindra"></div>
+    <a class="nav-item" href="app-beranda.html"><i class="ph ph-house"></i> Beranda</a>
+    <a class="nav-item" href="app-asesmen.html"><i class="ph ph-clipboard-text"></i> Cek perasaan</a>
+    <a class="nav-item" href="#"><i class="ph ph-notebook"></i> Jurnal</a>
+    <a class="nav-item" href="app-teman-cerita.html"><i class="ph ph-chats-circle"></i> Teman cerita</a>
+    <a class="nav-item" href="#"><i class="ph ph-calendar-heart"></i> Konsultasi</a>
+    <a class="nav-item" href="#" aria-current="page"><i class="ph ph-lock-key"></i> Privasi dan izin</a>
+    <div class="sidebar__foot">
+      <a class="sidebar__help" href="#"><i class="ph-duotone ph-lifebuoy"></i> Butuh bantuan sekarang</a>
+      <div class="sidebar__user"><span class="avatar avatar--biru">AF</span><div><p style="font-size:14px;font-weight:600;color:var(--fg-1);line-height:1.3">Argy</p><p class="meta">Pengguna</p></div></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar"><p class="body-m">Privasi dan izin</p><div class="topbar__actions"><button class="icon-btn" aria-label="Notifikasi"><i class="ph ph-bell"></i></button></div></header>
+    <main id="isi" class="page">
+      <section class="intro">
+        <h1 class="display-3">Datamu, aturanmu.</h1>
+        <p class="lead">Pilih siapa yang boleh melihat apa. Perubahan berlaku saat itu juga, dan setiap kali datamu dibuka, kamu bisa melihatnya di sini.</p>
+      </section>
+
+      <div class="layout">
+        <section class="card card--hero" aria-labelledby="h-akses">
+          <div class="card__head"><h2 id="h-akses" class="h3">Yang punya akses</h2></div>
+
+          <div class="who">
+            <div class="who__head">
+              <span class="avatar avatar--biru">RS</span>
+              <div class="name"><strong>Rina Sari, M.Psi.</strong><span class="meta">Psikolog · sejak 2 Sep 2026</span></div>
+              <button class="btn btn--ghost btn--sm" style="color:var(--danger-700)">Cabut semua</button>
+            </div>
+            <div class="perms">
+              <div class="perm">Hasil skrining <button class="switch" role="switch" aria-checked="true" aria-label="Hasil skrining untuk Rina Sari"></button></div>
+              <div class="perm">Mood harian <button class="switch" role="switch" aria-checked="true" aria-label="Mood harian untuk Rina Sari"></button></div>
+              <div class="perm">Catatan tidur <button class="switch" role="switch" aria-checked="true" aria-label="Catatan tidur untuk Rina Sari"></button></div>
+              <div class="perm">Peringatan krisis <button class="switch" role="switch" aria-checked="true" aria-label="Peringatan krisis untuk Rina Sari"></button></div>
+              <div class="perm">Ringkasan teman cerita <button class="switch" role="switch" aria-checked="false" aria-label="Ringkasan teman cerita untuk Rina Sari"></button></div>
+            </div>
+          </div>
+
+          <div class="who">
+            <div class="who__head">
+              <span class="avatar">IB</span>
+              <div class="name"><strong>Ibu</strong><span class="meta">Pendamping · sejak 20 Agu 2026</span></div>
+              <button class="btn btn--ghost btn--sm" style="color:var(--danger-700)">Cabut semua</button>
+            </div>
+            <div class="perms">
+              <div class="perm">Mood harian <button class="switch" role="switch" aria-checked="true" aria-label="Mood harian untuk Ibu"></button></div>
+              <div class="perm">Hasil skrining <button class="switch" role="switch" aria-checked="false" aria-label="Hasil skrining untuk Ibu"></button></div>
+              <div class="perm">Aktivitas aplikasi <button class="switch" role="switch" aria-checked="false" aria-label="Aktivitas aplikasi untuk Ibu"></button></div>
+              <div class="perm">Peringatan darurat <button class="switch" role="switch" aria-checked="true" aria-label="Peringatan darurat untuk Ibu"></button></div>
+            </div>
+          </div>
+
+          <div class="add">
+            <button class="btn btn--secondary btn--sm"><i class="ph ph-user-plus"></i> Undang pendamping</button>
+            <button class="btn btn--secondary btn--sm"><i class="ph ph-stethoscope"></i> Hubungkan psikolog</button>
+          </div>
+        </section>
+
+        <div class="stack" style="gap:20px">
+          <section class="card" aria-labelledby="h-riwayat">
+            <div class="card__head"><h2 id="h-riwayat" class="h3">Riwayat akses</h2><a class="meta" href="#">Unduh CSV</a></div>
+            <p class="day-sep">Hari ini</p>
+            <div class="log-item"><span class="avatar avatar--biru avatar--sm">RS</span><div><p><strong>Rina Sari, M.Psi.</strong> membuka hasil skrining PHQ-9</p><p class="meta">09.12 WIB · web</p></div></div>
+            <div class="log-item"><span class="avatar avatar--biru avatar--sm">RS</span><div><p><strong>Rina Sari, M.Psi.</strong> membuka catatan tidur 7 hari</p><p class="meta">09.10 WIB · web</p></div></div>
+            <p class="day-sep">Kemarin</p>
+            <div class="log-item"><span class="avatar avatar--sm">IB</span><div><p><strong>Ibu</strong> membuka mood harian</p><p class="meta">20.40 WIB · aplikasi</p></div></div>
+            <div class="log-item"><span class="avatar avatar--matahari avatar--sm"><i class="ph ph-buildings"></i></span><div><p><strong>Puskesmas Bogor Tengah</strong> menerima data gabungan wilayah. Namamu tidak termasuk.</p><p class="meta">06.00 WIB · otomatis</p></div></div>
+          </section>
+
+          <section class="card" aria-labelledby="h-ss">
+            <h2 id="h-ss" class="h3" style="margin-bottom:12px">SATUSEHAT</h2>
+            <div class="ss">
+              <div class="txt"><p class="body-m">Kirim hasil skrining ke rekam kesehatan nasionalmu supaya dokter di puskesmas atau rumah sakit bisa melihatnya.</p></div>
+              <button class="switch" role="switch" aria-checked="false" aria-label="Izinkan sinkronisasi SATUSEHAT"></button>
+            </div>
+            <p class="meta" style="margin-top:12px">2 hasil terkirim · terakhir 6 Okt 2026</p>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<nav class="bottom-nav" aria-label="Navigasi utama">
+  <a href="app-beranda.html"><i class="ph ph-house"></i>Beranda</a>
+  <a href="app-asesmen.html"><i class="ph ph-clipboard-text"></i>Cek</a>
+  <a href="#"><i class="ph ph-notebook"></i>Jurnal</a>
+  <a href="app-teman-cerita.html"><i class="ph ph-chats-circle"></i>Cerita</a>
+  <a href="#" aria-current="page"><i class="ph ph-user"></i>Saya</a>
+</nav>
+</body>
+</html>

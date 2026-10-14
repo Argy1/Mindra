@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mindra — Dashboard faskes</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 16px 0 20px; }
+  .anon { display: flex; gap: 12px; align-items: center; padding: 12px 18px; border-radius: var(--radius-md); background: var(--sage-50); color: var(--sage-800); font-size: 14px; margin-bottom: 20px; }
+  .anon i { font-size: 22px; flex: none; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .stat { background: var(--surface-raised); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow-xs); }
+  .stat b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 40px; line-height: 1.1; color: var(--fg-1); }
+  .stat span { font-size: 14px; color: var(--fg-3); }
+  .stat .delta { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; margin-top: 6px; }
+  .delta.up { color: var(--warning-700); } .delta.down { color: var(--success-700); }
+  @media (max-width: 860px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+
+  .chart text { font-family: var(--font-body); font-size: 12px; fill: var(--fg-4); }
+  .chart .grid line { stroke: var(--border-soft); }
+  .chart-legend { display: flex; gap: 18px; font-size: 13px; color: var(--fg-3); margin-top: 8px; flex-wrap: wrap; }
+  .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .chart-legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  .note { margin-top: 16px; display: flex; gap: 12px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--matahari-50); color: var(--matahari-800); font-size: 14px; }
+  .note i { font-size: 22px; flex: none; }
+
+  .bars { display: grid; gap: 14px; }
+  .bar-row { display: grid; grid-template-columns: 120px 1fr 44px; gap: 12px; align-items: center; font-size: 14px; }
+  .bar-row .track { height: 12px; border-radius: var(--radius-pill); background: var(--neutral-100); overflow: hidden; }
+  .bar-row .track span { display: block; height: 100%; border-radius: inherit; background: var(--biru-400); }
+  .bar-row.me .track span { background: var(--biru-600); }
+  .bar-row.me { font-weight: 700; color: var(--fg-1); }
+  .bar-row .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--fg-1); }
+  .bar-row.hidden { color: var(--fg-4); }
+  .bar-row.hidden .track { background: repeating-linear-gradient(45deg, var(--neutral-100) 0 6px, transparent 6px 12px); }
+
+  .stacked { display: grid; gap: 12px; }
+  .stacked .r { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; font-size: 14px; }
+  .stacked .s { display: flex; height: 22px; border-radius: 6px; overflow: hidden; }
+  .stacked .s span { display: block; height: 100%; }
+  .c-min { background: var(--success-200); } .c-mild { background: var(--info-200); } .c-mod { background: var(--warning-200); } .c-sev { background: var(--danger-300); }
+  .key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--fg-3); margin-top: 12px; }
+  .key span { display: inline-flex; gap: 6px; align-items: center; }
+  .key i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  .api { display: flex; gap: 14px; align-items: center; }
+  .api code { display: inline-block; margin-top: 6px; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#isi">Langsung ke konten</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Navigasi faskes">
+    <div class="sidebar__logo"><img src="assets/logo-mindra.svg" alt="Mindra"></div>
+    <a class="nav-item" href="#" aria-current="page"><i class="ph ph-chart-line"></i> Tren wilayah</a>
+    <a class="nav-item" href="#"><i class="ph ph-map-trifold"></i> Peta layanan</a>
+    <a class="nav-item" href="#"><i class="ph ph-file-text"></i> Laporan bulanan</a>
+    <p class="sidebar__group">Integrasi</p>
+    <a class="nav-item" href="#"><i class="ph ph-key"></i> Kunci API</a>
+    <a class="nav-item" href="#"><i class="ph ph-book-open"></i> Dokumentasi API</a>
+    <div class="sidebar__foot">
+      <div class="sidebar__user"><span class="avatar avatar--matahari"><i class="ph ph-buildings"></i></span><div><p style="font-size:14px;font-weight:600;color:var(--fg-1);line-height:1.3">Puskesmas Bogor Tengah</p><p class="meta">Admin faskes</p></div></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <p class="body-m">Kota Bogor, Jawa Barat</p>
+      <div class="topbar__actions"><button class="btn btn--secondary btn--sm"><i class="ph ph-download-simple"></i> Unduh laporan</button></div>
+    </header>
+
+    <main id="isi" class="page">
+      <div class="head">
+        <div>
+          <h1 class="display-3">Kesehatan mental warga Kota Bogor</h1>
+          <p class="body-m" style="margin-top:4px">12 minggu terakhir, diperbarui setiap hari pukul 06.00</p>
+        </div>
+        <div class="segmented" role="tablist" aria-label="Periode">
+          <button role="tab" aria-selected="false">4 minggu</button>
+          <button role="tab" aria-selected="true">12 minggu</button>
+          <button role="tab" aria-selected="false">1 tahun</button>
+        </div>
+      </div>
+
+      <div class="anon"><i class="ph-duotone ph-shield-check"></i><p>Semua angka di halaman ini adalah gabungan anonim. Kelompok dengan kurang dari 10 orang tidak ditampilkan, dan tidak ada data perorangan yang bisa dibuka.</p></div>
+
+      <div class="stats">
+        <div class="stat"><b class="num">1.284</b><span>warga aktif memakai Mindra</span><div class="delta down"><i class="ph ph-trend-up"></i> 112 orang baru</div></div>
+        <div class="stat"><b class="num">7,4</b><span>rata-rata skor PHQ-9</span><div class="delta up"><i class="ph ph-arrow-up-right"></i> naik 0,6</div></div>
+        <div class="stat"><b class="num">23%</b><span>skor sedang atau berat</span><div class="delta up"><i class="ph ph-arrow-up-right"></i> naik 4 poin</div></div>
+        <div class="stat"><b class="num">14</b><span>peringatan krisis tercatat</span><div class="delta down"><i class="ph ph-check"></i> semua ditindaklanjuti</div></div>
+      </div>
+
+      <div class="layout">
+        <section class="card card--hero" aria-labelledby="h-tren">
+          <div class="card__head"><h2 id="h-tren" class="h3">Rata-rata skor per minggu</h2></div>
+          <svg class="chart" viewBox="0 0 660 220" role="img" aria-label="Rata-rata skor PHQ-9 naik dari 6,8 ke puncak 8,2 di minggu ke-9, lalu turun ke 7,4. GAD-7 mengikuti pola yang sama dari 5,9 ke 7,7 lalu 6,6.">
+            <g class="grid"><line x1="40" x2="640" y1="190" y2="190"/><line x1="40" x2="640" y1="133.3" y2="133.3"/><line x1="40" x2="640" y1="76.7" y2="76.7"/><line x1="40" x2="640" y1="20" y2="20"/></g>
+            <text x="28" y="194" text-anchor="end">4</text><text x="28" y="137" text-anchor="end">6</text><text x="28" y="81" text-anchor="end">8</text><text x="28" y="24" text-anchor="end">10</text>
+            <rect x="400" y="14" width="100" height="176" rx="8" fill="var(--matahari-50)"/>
+            <text x="450" y="34" text-anchor="middle" style="fill:var(--matahari-700);font-weight:600">masa UTS</text>
+            <polyline points="40.0,110.7 94.5,107.8 149.1,113.5 203.6,105.0 258.2,107.8 312.7,102.2 367.3,96.5 421.8,82.3 476.4,71.0 530.9,76.7 585.5,88.0 640.0,93.7" fill="none" stroke="var(--biru-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="40.0,136.2 94.5,133.3 149.1,130.5 203.6,133.3 258.2,127.7 312.7,122.0 367.3,107.8 421.8,93.7 476.4,85.2 530.9,96.5 585.5,107.8 640.0,116.3" fill="none" stroke="var(--sage-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 0"/>
+            <circle cx="640" cy="93.7" r="5" fill="var(--biru-500)"/><circle cx="640" cy="116.3" r="5" fill="var(--sage-500)"/>
+            <text x="40" y="212">21 Jul</text><text x="640" y="212" text-anchor="end">6 Okt</text>
+          </svg>
+          <div class="chart-legend"><span><i style="background:var(--biru-500)"></i>PHQ-9 (depresi)</span><span><i style="background:var(--sage-500)"></i>GAD-7 (kecemasan)</span></div>
+          <div class="note"><i class="ph-duotone ph-lightbulb"></i><p>Skor naik paling tajam pada usia 18–24 di masa ujian tengah semester. Pertimbangkan konseling kelompok di kampus dan sekolah sekitar pada periode ini.</p></div>
+        </section>
+
+        <div class="stack" style="gap:20px">
+          <section class="card" aria-labelledby="h-kota">
+            <div class="card__head"><h2 id="h-kota" class="h3">Dibanding kota lain</h2><span class="meta">PHQ-9 rata-rata</span></div>
+            <div class="bars">
+              <div class="bar-row"><span>Kota Depok</span><div class="track"><span style="width:84%"></span></div><span class="v">8,1</span></div>
+              <div class="bar-row me"><span>Kota Bogor</span><div class="track"><span style="width:77%"></span></div><span class="v">7,4</span></div>
+              <div class="bar-row"><span>Kota Bandung</span><div class="track"><span style="width:72%"></span></div><span class="v">6,9</span></div>
+              <div class="bar-row"><span>Kab. Bogor</span><div class="track"><span style="width:66%"></span></div><span class="v">6,3</span></div>
+              <div class="bar-row hidden"><span>Kab. Cianjur</span><div class="track"></div><span class="v" title="Kurang dari 10 pengguna">—</span></div>
+            </div>
+            <p class="meta" style="margin-top:12px">Kab. Cianjur disembunyikan karena penggunanya kurang dari 10.</p>
+          </section>
+
+          <section class="card" aria-labelledby="h-usia">
+            <div class="card__head"><h2 id="h-usia" class="h3">Sebaran kategori per usia</h2></div>
+            <div class="stacked">
+              <div class="r"><span>15–17</span><div class="s" aria-label="15 sampai 17 tahun: minimal 38%, ringan 34%, sedang 18%, berat 10%"><span class="c-min" style="width:38%"></span><span class="c-mild" style="width:34%"></span><span class="c-mod" style="width:18%"></span><span class="c-sev" style="width:10%"></span></div></div>
+              <div class="r"><span>18–24</span><div class="s" aria-label="18 sampai 24 tahun: minimal 31%, ringan 37%, sedang 21%, berat 11%"><span class="c-min" style="width:31%"></span><span class="c-mild" style="width:37%"></span><span class="c-mod" style="width:21%"></span><span class="c-sev" style="width:11%"></span></div></div>
+              <div class="r"><span>25–34</span><div class="s" aria-label="25 sampai 34 tahun: minimal 46%, ringan 33%, sedang 15%, berat 6%"><span class="c-min" style="width:46%"></span><span class="c-mild" style="width:33%"></span><span class="c-mod" style="width:15%"></span><span class="c-sev" style="width:6%"></span></div></div>
+              <div class="r"><span>35+</span><div class="s" aria-label="35 tahun ke atas: minimal 55%, ringan 29%, sedang 12%, berat 4%"><span class="c-min" style="width:55%"></span><span class="c-mild" style="width:29%"></span><span class="c-mod" style="width:12%"></span><span class="c-sev" style="width:4%"></span></div></div>
+            </div>
+            <div class="key"><span><i class="c-min"></i>Minimal</span><span><i class="c-mild"></i>Ringan</span><span><i class="c-mod"></i>Sedang</span><span><i class="c-sev"></i>Berat</span></div>
+          </section>
+
+          <section class="card card--sunken" aria-labelledby="h-api">
+            <div class="api">
+              <i class="ph-duotone ph-plugs-connected" style="font-size:32px;color:var(--biru-500)"></i>
+              <div><h2 id="h-api" class="h3">Sambungkan ke SIMRS atau SIMPUS</h2><p class="body-m">Tarik data yang sama lewat API. Kunci aktif: <code>mk_live_7f3a…</code></p></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

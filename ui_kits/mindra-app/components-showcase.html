@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mindra · Component Library</title>
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <link rel="stylesheet" href="screens.css" />
+  <link rel="stylesheet" href="components.css" />
+  <style>
+    html, body { margin: 0; padding: 0; background: #ECE6DA; font-family: var(--font-body); }
+    .artboard {
+      background: var(--neutral-50);
+      padding: 24px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .artboard h3.section-title {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 22px;
+      color: var(--fg-1);
+      margin: 0 0 4px;
+      letter-spacing: -0.01em;
+    }
+    .artboard p.section-sub {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--fg-4);
+      margin: 0 0 18px;
+      line-height: 1.5;
+    }
+    .group { margin-bottom: 18px; }
+    .group:last-child { margin-bottom: 0; }
+    .group-label {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-4);
+      margin-bottom: 10px;
+    }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .col { display: flex; flex-direction: column; gap: 12px; }
+    .frame-phone {
+      width: 100%;
+      background: var(--neutral-50);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1.5px rgba(26,26,46,0.08), 0 8px 22px rgba(26,26,46,0.06);
+    }
+  </style>
+</head>
+<body>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="atoms.jsx"></script>
+  <script type="text/babel" src="components.jsx"></script>
+
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+  (() => {
+    const {
+      DesignCanvas, DCSection, DCArtboard,
+      Button, TextField, Textarea, SearchBar,
+      CardDefault, CardMood, CardPsikolog, CardArtikel, CardAsesmen,
+      BottomNavClinical, Badge, Chip, Avatar, Toast,
+    } = window;
+
+    /* ─────────────────────────────────────────────
+       BUTTONS — all states
+       ───────────────────────────────────────────── */
+    const ButtonsArt = (
+      <div className="artboard" style={{ width: 720, minHeight: 720 }}>
+        <h3 className="section-title">Buttons</h3>
+        <p className="section-sub">52px tinggi · radius 16px · Plus Jakarta Sans 16 SemiBold</p>
+
+        <div className="group">
+          <div className="group-label">Primary</div>
+          <div className="row">
+            <Button variant="primary" fixed>Mulai sekarang</Button>
+            <Button variant="primary" loading>Mulai sekarang</Button>
+            <Button variant="primary" disabled>Tidak aktif</Button>
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <Button variant="primary" full>Mulai latihan pernapasan</Button>
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Secondary</div>
+          <div className="row">
+            <Button variant="secondary" fixed>Lewati dulu</Button>
+            <Button variant="secondary" disabled>Tidak aktif</Button>
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Ghost</div>
+          <div className="row">
+            <Button variant="ghost">Pelajari lagi</Button>
+            <Button variant="ghost" disabled>Tidak aktif</Button>
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Danger</div>
+          <div className="row">
+            <Button variant="danger">Hapus catatan</Button>
+            <Button variant="danger" disabled>Tidak aktif</Button>
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Size sm (40px)</div>
+          <div className="row">
+            <Button variant="primary" size="sm">Booking</Button>
+            <Button variant="secondary" size="sm">Atur</Button>
+            <Button variant="ghost" size="sm">Lihat semua</Button>
+          </div>
+        </div>
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       INPUTS
+       ───────────────────────────────────────────── */
+    const InputsArt = (
+      <div className="artboard" style={{ width: 480, minHeight: 720 }}>
+        <h3 className="section-title">Inputs</h3>
+        <p className="section-sub">Floating label · 52px · radius 16px · focus ring Biru 500</p>
+
+        <div className="group col" style={{ gap: 14 }}>
+          <div className="group-label">Text field</div>
+          <TextField label="Nama panggilan" value="Ayu" helper="Bagaimana kami menyapamu" />
+          <TextField label="Email" placeholder="" helper="Untuk masuk dan pulihkan akun" />
+          <TextField label="Email" value="ayu@email" error="Format email belum benar" />
+        </div>
+
+        <div className="group col" style={{ gap: 10, marginTop: 22 }}>
+          <div className="group-label">Search</div>
+          <SearchBar placeholder="Cari artikel, latihan, atau psikolog" />
+        </div>
+
+        <div className="group col" style={{ gap: 10, marginTop: 22 }}>
+          <div className="group-label">Textarea — jurnal / catatan</div>
+          <Textarea
+            label="Apa yang ada di pikiranmu?"
+            placeholder="Tulis sebanyak atau sedikit yang kamu mau. Tidak ada yang menilai."
+            helper="Privat · hanya untukmu"
+          />
+        </div>
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       CARDS
+       ───────────────────────────────────────────── */
+    const CardsArt = (
+      <div className="artboard" style={{ width: 480, minHeight: 880 }}>
+        <h3 className="section-title">Cards</h3>
+        <p className="section-sub">Default radius 16px · soft shadow · putih di atas Neutral 50</p>
+
+        <div className="group">
+          <div className="group-label">Default</div>
+          <CardDefault>
+            <div style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 16, color: 'var(--fg-1)' }}>Latihan singkat untuk sore ini</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--fg-3)', marginTop: 6, lineHeight: 1.55 }}>
+              Lima menit untuk menarik napas dan menenangkan diri sebelum melanjutkan hari.
+            </div>
+          </CardDefault>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Mood card</div>
+          <div className="col" style={{ gap: 8 }}>
+            <CardMood mood="baik" label="Hari ini terasa baik" time="Sore · 17.42" />
+            <CardMood mood="cukup" label="Cukup, sedikit lelah" time="Siang · 13.05" />
+            <CardMood mood="kurang" label="Agak cemas pagi tadi" time="Pagi · 08.12" />
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Psikolog card</div>
+          <CardPsikolog
+            name="Dr. Sari Wijaya"
+            spec="Psikolog Klinis · Kecemasan, Hubungan"
+            rating="4.9"
+            count="128"
+            price="180.000"
+            online
+          />
+        </div>
+
+        <div className="group">
+          <div className="group-label">Artikel card</div>
+          <CardArtikel
+            category="Tidur"
+            title="Tujuh kebiasaan kecil untuk tidur lebih nyenyak"
+            readTime="6 menit"
+            thumb="linear-gradient(135deg, #1B4267, #4F87B9)"
+          />
+        </div>
+
+        <div className="group">
+          <div className="group-label">Asesmen card</div>
+          <div className="col" style={{ gap: 10 }}>
+            <CardAsesmen title="Pengukuran kecemasan singkat" durasi="5 menit" status="belum" progress={0} />
+            <CardAsesmen title="Kualitas tidur tujuh hari terakhir" durasi="3 menit" status="sudah" progress={100} />
+          </div>
+        </div>
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       NAVIGATION
+       ───────────────────────────────────────────── */
+    const NavArt = (
+      <div className="artboard" style={{ width: 480, minHeight: 360 }}>
+        <h3 className="section-title">Bottom navigation</h3>
+        <p className="section-sub">64px tinggi + 16px safe area · 5 tab · active Biru 500 · inactive Neutral 400</p>
+
+        <div className="group">
+          <div className="group-label">Beranda active</div>
+          <div className="frame-phone"><BottomNavClinical active="beranda" badge="chat" /></div>
+        </div>
+        <div className="group">
+          <div className="group-label">Konsultasi active</div>
+          <div className="frame-phone"><BottomNavClinical active="konsultasi" /></div>
+        </div>
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       BADGES & CHIPS
+       ───────────────────────────────────────────── */
+    const BadgesArt = (
+      <div className="artboard" style={{ width: 480, minHeight: 540 }}>
+        <h3 className="section-title">Badges & Chips</h3>
+        <p className="section-sub">Status komunikasi tanpa drama</p>
+
+        <div className="group">
+          <div className="group-label">Status badge</div>
+          <div className="row">
+            <Badge kind="sehat">Sehat</Badge>
+            <Badge kind="perhatian">Perlu perhatian</Badge>
+            <Badge kind="segera">Segera tindak lanjut</Badge>
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Mood chip (7 mood)</div>
+          <div className="row">
+            <Chip swatch="#FFD700">Sangat baik</Chip>
+            <Chip swatch="#90EE90">Baik</Chip>
+            <Chip swatch="#87CEEB" active>Cukup</Chip>
+            <Chip swatch="#DDA0DD">Netral</Chip>
+            <Chip swatch="#FFA07A">Kurang</Chip>
+            <Chip swatch="#CD853F">Buruk</Chip>
+            <Chip swatch="#708090">Sangat buruk</Chip>
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Category chip — filter</div>
+          <div className="row">
+            <Chip active>Semua</Chip>
+            <Chip>Tidur</Chip>
+            <Chip>Cemas</Chip>
+            <Chip>Hubungan</Chip>
+            <Chip>Pekerjaan</Chip>
+            <Chip>Pernapasan</Chip>
+          </div>
+        </div>
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       AVATAR
+       ───────────────────────────────────────────── */
+    const AvatarsArt = (
+      <div className="artboard" style={{ width: 480, minHeight: 360 }}>
+        <h3 className="section-title">Avatar</h3>
+        <p className="section-sub">S 32 · M 40 · L 56 · XL 80 · initials fallback · online dot Sage</p>
+
+        <div className="group">
+          <div className="group-label">Sizes</div>
+          <div className="row" style={{ alignItems: 'flex-end', gap: 18 }}>
+            <Avatar size="s" name="Ayu Lestari" />
+            <Avatar size="m" name="Dewi Saraswati" />
+            <Avatar size="l" name="Dr. Sari Wijaya" online />
+            <Avatar size="xl" name="Budi Hartono" />
+          </div>
+        </div>
+
+        <div className="group">
+          <div className="group-label">Group / chat</div>
+          <div className="row" style={{ gap: 0 }}>
+            <Avatar size="m" name="Ayu Lestari" />
+            <div style={{ marginLeft: -10 }}><Avatar size="m" name="Dewi Saraswati" /></div>
+            <div style={{ marginLeft: -10 }}><Avatar size="m" name="Budi Hartono" /></div>
+            <div style={{ marginLeft: -10 }}>
+              <div className="mn-avatar m" style={{ background: 'var(--neutral-100)', color: 'var(--fg-2)' }}>
+                <span className="initials" style={{ color: 'var(--fg-2)' }}>+4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       TOASTS
+       ───────────────────────────────────────────── */
+    const ToastsArt = (
+      <div className="artboard" style={{ width: 520, minHeight: 480 }}>
+        <h3 className="section-title">Alerts & Toasts</h3>
+        <p className="section-sub">Empat intent · left accent · ikon + dismiss</p>
+
+        <div className="group col" style={{ gap: 12 }}>
+          <Toast kind="success" title="Catatan tersimpan" msg="Refleksi sore tadi sudah masuk jurnal kamu." />
+          <Toast kind="warning" title="Pengingat lembut" msg="Sudah dua hari belum mencatat suasana. Tidak ada paksaan." />
+          <Toast kind="error"   title="Gagal mengirim" msg="Sambungan internet terputus. Catatan tersimpan lokal dan akan diunggah saat online." />
+          <Toast kind="info"    title="Asesmen baru tersedia" msg="Kuesioner kualitas tidur sudah bisa kamu coba." />
+        </div>
+      </div>
+    );
+
+    /* ─────────────────────────────────────────────
+       App
+       ───────────────────────────────────────────── */
+    function App() {
+      return (
+        <DesignCanvas>
+          <DCSection id="buttons" title="Buttons" subtitle="Primary · Secondary · Ghost · Danger · semua state">
+            <DCArtboard id="all" label="All variants" width={720} height={720}>{ButtonsArt}</DCArtboard>
+          </DCSection>
+
+          <DCSection id="inputs" title="Inputs" subtitle="Text field · Search · Textarea · error state">
+            <DCArtboard id="all" label="Field types" width={480} height={720}>{InputsArt}</DCArtboard>
+          </DCSection>
+
+          <DCSection id="cards" title="Cards" subtitle="Default · Mood · Psikolog · Artikel · Asesmen">
+            <DCArtboard id="all" label="Card types" width={480} height={880}>{CardsArt}</DCArtboard>
+          </DCSection>
+
+          <DCSection id="nav" title="Navigation" subtitle="Bottom tab bar — Beranda · Asesmen · Chat · Konsultasi · Profil">
+            <DCArtboard id="all" label="States" width={480} height={360}>{NavArt}</DCArtboard>
+          </DCSection>
+
+          <DCSection id="badges" title="Badges & Chips" subtitle="Status · mood · category filter">
+            <DCArtboard id="all" label="All variants" width={480} height={540}>{BadgesArt}</DCArtboard>
+          </DCSection>
+
+          <DCSection id="avatars" title="Avatar" subtitle="Sizes & states">
+            <DCArtboard id="all" label="Sizes + group" width={480} height={360}>{AvatarsArt}</DCArtboard>
+          </DCSection>
+
+          <DCSection id="toasts" title="Alerts & Toasts" subtitle="Success · Warning · Error · Info">
+            <DCArtboard id="all" label="All intents" width={520} height={480}>{ToastsArt}</DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  })();
+  </script>
+</body>
+</html>

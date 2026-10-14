@@ -1,0 +1,53 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  body { padding: 20px 24px; }
+  .head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .head .name { font-family: var(--font-display); font-size: 22px; color: var(--fg-1); }
+  .head .sub { font-size: 12px; color: var(--fg-4); }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .mood {
+    aspect-ratio: 0.66;
+    border-radius: 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px 10px 12px;
+    color: rgba(26,26,46,0.85);
+    position: relative;
+  }
+  .mood.dark { color: rgba(255,255,255,0.96); }
+  .mood .num { font-family: var(--font-display); font-size: 22px; line-height: 1; opacity: 0.6; }
+  .mood .name { font-family: var(--font-body); font-weight: 700; font-size: 12px; line-height: 1.2; }
+  .mood .hex { font-family: var(--font-mono); font-size: 9.5px; opacity: 0.7; margin-top: 2px; }
+  .note { font-family: var(--font-mono); font-size: 10px; color: var(--fg-4); margin-top: 10px; }
+</style></head><body>
+<div class="head">
+  <div class="name">Mood palette</div>
+  <div class="sub">7 levels · sangat baik → sangat buruk</div>
+</div>
+<div class="grid" id="moods"></div>
+<div class="note">Used in mood tracker, journals, illustrations. Ordered semantically — left = most positive, right = most negative. Each level has its own hue, no monotonic ramp.</div>
+<script>
+const moods = [
+  {n: 1, l: 'Sangat Baik',    c: '#FFD700'},
+  {n: 2, l: 'Baik',           c: '#90EE90'},
+  {n: 3, l: 'Cukup',          c: '#87CEEB'},
+  {n: 4, l: 'Netral',         c: '#DDA0DD'},
+  {n: 5, l: 'Kurang',         c: '#FFA07A'},
+  {n: 6, l: 'Buruk',          c: '#CD853F'},
+  {n: 7, l: 'Sangat Buruk',   c: '#708090'},
+];
+function lum(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.slice(0,2),16)/255, g = parseInt(c.slice(2,4),16)/255, b = parseInt(c.slice(4,6),16)/255;
+  const f = v => v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+  return 0.2126*f(r) + 0.7152*f(g) + 0.0722*f(b);
+}
+const root = document.getElementById('moods');
+moods.forEach(m => {
+  const dark = lum(m.c) < 0.45;
+  const el = document.createElement('div');
+  el.className = 'mood ' + (dark ? 'dark' : 'light');
+  el.style.background = m.c;
+  el.innerHTML = `<div class="num">${m.n}</div><div><div class="name">${m.l}</div><div class="hex">${m.c}</div></div>`;
+  root.appendChild(el);
+});
+</script>
+</body></html>

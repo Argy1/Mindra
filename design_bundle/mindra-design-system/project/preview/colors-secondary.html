@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  body { padding: 22px 24px; }
+  .scale-row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+  .swatch { aspect-ratio: 0.78; border-radius: 10px; padding: 7px 7px 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+  .swatch .step { font-family: var(--font-body); font-weight: 700; font-size: 11px; }
+  .swatch .hex  { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.02em; opacity: 0.85; }
+  .swatch.light .step, .swatch.light .hex { color: rgba(26,26,46,0.78); }
+  .swatch.dark  .step, .swatch.dark  .hex { color: rgba(255,255,255,0.95); }
+  .swatch .star { position: absolute; top: 7px; right: 7px; font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px; background: rgba(255,255,255,0.85); color: #1A1A2E; }
+  .head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; margin-top: 14px; }
+  .head:first-child { margin-top: 0; }
+  .head .name { font-family: var(--font-display); font-size: 22px; color: var(--fg-1); }
+  .head .sub { font-size: 12px; color: var(--fg-4); }
+  .head .anchor { font-family: var(--font-mono); font-size: 11px; color: var(--sage-700); margin-left: auto; }
+</style></head><body>
+<div class="head">
+  <div class="name">Hijau Sage</div>
+  <div class="sub">secondary · natural, never clinical</div>
+  <div class="anchor">500 = #4A9E8F</div>
+</div>
+<div class="scale-row" id="sage"></div>
+<script>
+const steps = [50,100,200,300,400,500,600,700,800,900];
+const sage = ['#EEF6F4','#D4E9E4','#A9D3C9','#7EBDAE','#61AE9D','#4A9E8F','#3B7E72','#2D5F56','#1F4039','#11231F'];
+function lum(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.slice(0,2),16)/255, g = parseInt(c.slice(2,4),16)/255, b = parseInt(c.slice(4,6),16)/255;
+  const f = v => v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+  return 0.2126*f(r) + 0.7152*f(g) + 0.0722*f(b);
+}
+function ratio(a, b) { const la = lum(a)+0.05, lb = lum(b)+0.05; return la > lb ? la/lb : lb/la; }
+function render(rootId, colors, anchorIdx) {
+  const root = document.getElementById(rootId);
+  colors.forEach((c, i) => {
+    const dark = lum(c) < 0.45;
+    const passesAA = ratio(c, '#FFFFFF') >= 4.5;
+    const el = document.createElement('div');
+    el.className = 'swatch ' + (dark ? 'dark' : 'light');
+    el.style.background = c;
+    let badge = '';
+    if (i === anchorIdx) badge = '<span class="star">★</span>';
+    else if (passesAA) badge = '<span class="star">AA</span>';
+    el.innerHTML = `${badge}<div></div><div><div class="step">${steps[i]}</div><div class="hex">${c}</div></div>`;
+    root.appendChild(el);
+  });
+}
+render('sage', sage, 5);
+</script>
+</body></html>

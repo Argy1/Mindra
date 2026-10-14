@@ -1,0 +1,61 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  body { padding: 22px 24px; }
+  .spec { display: flex; flex-direction: column; gap: 16px; }
+  .row { display: grid; grid-template-columns: 122px 1fr; align-items: center; gap: 18px; }
+  .tag { display: flex; flex-direction: column; gap: 2px; }
+  .tag .lbl { font-family: var(--font-body); font-size: 11px; font-weight: 700; color: var(--fg-2); letter-spacing: 0.02em; }
+  .tag .meta { font-family: var(--font-mono); font-size: 9.5px; color: var(--fg-4); line-height: 1.5; }
+  .btn-primary { background: var(--biru-500); color: white; border: none; padding: 13px 22px; border-radius: 999px; cursor: pointer; }
+  .btn-secondary { background: white; color: var(--fg-1); border: none; padding: 11px 18px; border-radius: 999px; box-shadow: var(--shadow-sm); cursor: pointer; }
+  .demo-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .overline-chip { display: inline-block; background: var(--biru-50); padding: 4px 9px; border-radius: 6px; color: var(--biru-700); }
+  .label-tag { display: inline-block; color: var(--fg-2); }
+</style></head><body>
+<div class="spec">
+  <div class="row">
+    <div class="tag">
+      <div class="lbl">Button L</div>
+      <div class="meta">Plus Jakarta Sans<br>16 / 22 · SemiBold</div>
+    </div>
+    <div class="demo-row">
+      <button class="btn-primary" style="font-family: var(--font-body); font-weight: 600; font-size: 16px; line-height: 1.4;">Mulai latihan pernapasan</button>
+      <button class="btn-secondary" style="font-family: var(--font-body); font-weight: 600; font-size: 16px; line-height: 1.4;">Lewati dulu</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="tag">
+      <div class="lbl">Button M</div>
+      <div class="meta">Plus Jakarta Sans<br>14 / 20 · SemiBold</div>
+    </div>
+    <div class="demo-row">
+      <button class="btn-primary" style="font-family: var(--font-body); font-weight: 600; font-size: 14px; line-height: 1.4; padding: 10px 18px;">Simpan catatan</button>
+      <button class="btn-secondary" style="font-family: var(--font-body); font-weight: 600; font-size: 14px; line-height: 1.4; padding: 9px 16px;">Atur pengingat</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="tag">
+      <div class="lbl">Label</div>
+      <div class="meta">Plus Jakarta Sans<br>12 / 17 · Medium · +0.5px</div>
+    </div>
+    <div class="demo-row">
+      <span class="label-tag" style="font-family: var(--font-body); font-weight: 500; font-size: 12px; line-height: 1.4; letter-spacing: 0.04em;">Nama panggilan</span>
+      <span class="label-tag" style="font-family: var(--font-body); font-weight: 500; font-size: 12px; line-height: 1.4; letter-spacing: 0.04em;">Pengingat lembut</span>
+      <span class="label-tag" style="font-family: var(--font-body); font-weight: 500; font-size: 12px; line-height: 1.4; letter-spacing: 0.04em;">Apa yang ada di pikiranmu?</span>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="tag">
+      <div class="lbl">Overline</div>
+      <div class="meta">Plus Jakarta Sans<br>11 / 15 · Bold · +1px · CAPS</div>
+    </div>
+    <div class="demo-row">
+      <span class="overline-chip" style="font-family: var(--font-body); font-weight: 700; font-size: 11px; line-height: 1.4; letter-spacing: 0.09em; text-transform: uppercase;">Latihan pagi</span>
+      <span class="overline-chip" style="font-family: var(--font-body); font-weight: 700; font-size: 11px; line-height: 1.4; letter-spacing: 0.09em; text-transform: uppercase; background: var(--sage-50); color: var(--sage-700);">Jurnal</span>
+      <span class="overline-chip" style="font-family: var(--font-body); font-weight: 700; font-size: 11px; line-height: 1.4; letter-spacing: 0.09em; text-transform: uppercase; background: var(--matahari-50); color: var(--matahari-700);">Pemula</span>
+    </div>
+  </div>
+</div>
+</body></html>

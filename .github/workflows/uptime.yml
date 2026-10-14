@@ -1,0 +1,41 @@
+# Pemeriksa ketersediaan sederhana: memanggil /api/health tiap 15 menit. /api/health menyentuh database
+# (kueri head tanpa data) sehingga sekaligus mencegah proyek Supabase free tier "tertidur".
+#
+# Cara pakai: Settings > Secrets and variables > Actions > Variables > buat DEMO_URL, mis. https://mindra.vercel.app
+# Bila GAGAL, GitHub mengirim email ke pemilik repositori. Ini pelengkap, BUKAN pengganti monitor eksternal
+# (web/docs/TESTING.md bagian Uptime): jadwal Actions bersifat best-effort (bisa tertunda belasan menit) dan GitHub
+# menonaktifkan jadwal otomatis setelah 60 hari repositori tanpa aktivitas.
+name: Uptime
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Periksa /api/health
+        env:
+          DEMO_URL: ${{ vars.DEMO_URL }}
+        run: |
+          if [ -z "$DEMO_URL" ]; then
+            echo "::notice::Variabel repositori DEMO_URL belum diisi; pemeriksaan dilewati."
+            exit 0
+          fi
+          for attempt in 1 2 3; do
+            code=$(curl -s -o body.json -w '%{http_code}' --max-time 20 "${DEMO_URL%/}/api/health" || true)
+            if [ "$code" = "200" ] && grep -q '"status":"ok"' body.json; then
+              echo "sehat (percobaan $attempt)"
+              exit 0
+            fi
+            echo "percobaan $attempt: HTTP ${code:-tanpa jawaban}"
+            sleep 10
+          done
+          echo "::error::${DEMO_URL%/}/api/health tidak sehat setelah 3 percobaan"
+          exit 1

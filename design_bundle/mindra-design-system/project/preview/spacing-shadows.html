@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 16px 0; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .demo { width: 96px; height: 64px; background: white; border-radius: 14px; }
+  .name { font-family: var(--font-mono); font-size: 10px; color: var(--fg-3); }
+</style></head><body>
+<div class="row">
+  <div class="item"><div class="demo" style="box-shadow: 0 1px 2px rgba(30,42,51,0.04);"></div><div class="name">xs</div></div>
+  <div class="item"><div class="demo" style="box-shadow: 0 2px 6px rgba(30,42,51,0.05), 0 1px 2px rgba(30,42,51,0.04);"></div><div class="name">sm</div></div>
+  <div class="item"><div class="demo" style="box-shadow: 0 6px 16px rgba(30,42,51,0.07), 0 2px 4px rgba(30,42,51,0.04);"></div><div class="name">md</div></div>
+  <div class="item"><div class="demo" style="box-shadow: 0 14px 32px rgba(30,42,51,0.09), 0 4px 8px rgba(30,42,51,0.05);"></div><div class="name">lg</div></div>
+  <div class="item"><div class="demo" style="box-shadow: 0 24px 48px rgba(30,42,51,0.12), 0 8px 16px rgba(30,42,51,0.06);"></div><div class="name">xl</div></div>
+</div>
+<div style="font-family: var(--font-mono); font-size: 10px; color: var(--fg-4); margin-top: 6px;">Warm-tinted (deep-ink, not pure black). Most cards use sm.</div>
+</body></html>

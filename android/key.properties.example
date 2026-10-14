@@ -1,0 +1,15 @@
+# Mindra release-signing credentials.
+#
+# 1. Copy this file to android/key.properties
+# 2. Generate an upload keystore (valid 27 years):
+#
+#    keytool -genkey -v -keystore mindra-upload.jks \
+#      -keyalg RSA -keysize 2048 -validity 10000 -alias mindra
+#
+# 3. Fill in the values below with absolute paths / real passwords.
+# 4. NEVER commit android/key.properties or the .jks file — both are git-ignored.
+
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=mindra
+storeFile=/absolute/path/to/mindra-upload.jks

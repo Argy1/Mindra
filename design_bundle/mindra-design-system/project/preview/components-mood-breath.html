@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css"><style>
+  body { padding: 24px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .panel { background: white; border-radius: 18px; box-shadow: var(--shadow-sm); padding: 18px; }
+  .panel-title { font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--fg-2); margin-bottom: 14px; letter-spacing: 0.02em; }
+  .moods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mood { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 4px; border-radius: 12px; cursor: pointer; }
+  .mood img { width: 40px; height: auto; }
+  .mood-label { font-family: var(--font-body); font-size: 10px; color: var(--fg-3); }
+  .mood.selected { background: var(--biru-50); box-shadow: 0 0 0 1.5px var(--biru-300) inset; }
+
+  /* breath orb */
+  .orb-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 14px 0 8px; }
+  .orb {
+    width: 130px; height: 130px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #D6E2EC, #84A7C1 55%, #437094);
+    box-shadow: 0 18px 48px rgba(67,112,148,0.30), 0 0 0 16px rgba(132,167,193,0.18);
+    animation: breathe 4s ease-in-out infinite alternate;
+  }
+  @keyframes breathe { from { transform: scale(0.86); } to { transform: scale(1); } }
+  .breath-cue { font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--fg-2); }
+</style></head><body>
+<div class="row">
+  <div class="panel">
+    <div class="panel-title">Pilih perasaanmu sekarang</div>
+    <div class="moods">
+      <div class="mood"><img src="../assets/mood/tenang.svg"><div class="mood-label">Tenang</div></div>
+      <div class="mood selected"><img src="../assets/mood/syukur.svg"><div class="mood-label">Syukur</div></div>
+      <div class="mood"><img src="../assets/mood/bahagia.svg"><div class="mood-label">Bahagia</div></div>
+      <div class="mood"><img src="../assets/mood/hangat.svg"><div class="mood-label">Hangat</div></div>
+      <div class="mood"><img src="../assets/mood/lelah.svg"><div class="mood-label">Lelah</div></div>
+      <div class="mood"><img src="../assets/mood/sedih.svg"><div class="mood-label">Sedih</div></div>
+      <div class="mood"><img src="../assets/mood/cemas.svg"><div class="mood-label">Cemas</div></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Breath orb · 4s inhale loop</div>
+    <div class="orb-wrap">
+      <div class="orb"></div>
+      <div class="breath-cue">tarik napas pelan…</div>
+    </div>
+  </div>
+</div>
+</body></html>

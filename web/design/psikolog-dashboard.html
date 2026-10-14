@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mindra — Portal psikolog</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+  .live { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--sage-700); }
+  .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--sage-500); box-shadow: 0 0 0 4px var(--sage-100); }
+
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 16px 0 24px; }
+
+  /* Alert krisis realtime */
+  .crisis-card { border: 1.5px solid var(--danger-200); background: var(--surface-raised); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-md); }
+  .crisis-card__bar { display: flex; align-items: center; gap: 10px; padding: 12px 24px; background: var(--danger-50); color: var(--danger-700); font-weight: 700; font-size: 14px; }
+  .crisis-card__bar i { font-size: 20px; }
+  .crisis-card__bar .meta { margin-left: auto; color: var(--danger-700); font-weight: 500; }
+  .crisis-item { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 20px 24px; }
+  .crisis-item p strong { color: var(--fg-1); font-size: 16px; }
+  .crisis-item .why { font-size: 14px; color: var(--fg-2); margin-top: 2px; }
+  .crisis-item .src { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--fg-4); margin-top: 4px; }
+  .crisis-item .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  @media (max-width: 760px) { .crisis-item { grid-template-columns: auto 1fr; } .crisis-item .actions { grid-column: 1 / -1; justify-content: flex-start; } }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 20px 0; }
+  .stat { background: var(--surface-raised); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow-xs); }
+  .stat b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 40px; line-height: 1.1; color: var(--fg-1); }
+  .stat span { font-size: 14px; color: var(--fg-3); }
+  @media (max-width: 860px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+
+  .table-wrap { overflow-x: auto; margin: 0 -8px; }
+  .client { display: flex; align-items: center; gap: 10px; }
+  .client strong { color: var(--fg-1); display: block; font-weight: 600; }
+  .dots { display: flex; gap: 4px; }
+  .dots span { width: 12px; height: 12px; border-radius: 50%; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .slot { display: grid; grid-template-columns: 64px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--border-soft); }
+  .slot:first-of-type { border-top: 0; padding-top: 0; }
+  .slot time { font-weight: 700; color: var(--fg-1); font-variant-numeric: tabular-nums; }
+  .slot p strong { display: block; color: var(--fg-1); font-size: 15px; }
+  .slot.now { background: var(--biru-50); border-radius: var(--radius-md); padding: 12px; border-top: 0; margin: 4px -12px; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#isi">Langsung ke konten</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Navigasi psikolog">
+    <div class="sidebar__logo"><img src="assets/logo-mindra.svg" alt="Mindra"></div>
+    <a class="nav-item" href="#" aria-current="page"><i class="ph ph-squares-four"></i> Ringkasan <span class="count" aria-label="1 peringatan terbuka">1</span></a>
+    <a class="nav-item" href="#"><i class="ph ph-users"></i> Klien</a>
+    <a class="nav-item" href="#"><i class="ph ph-calendar-blank"></i> Jadwal</a>
+    <a class="nav-item" href="#"><i class="ph ph-note-pencil"></i> Catatan sesi</a>
+    <p class="sidebar__group">Akun</p>
+    <a class="nav-item" href="#"><i class="ph ph-identification-badge"></i> Profil praktik</a>
+    <a class="nav-item" href="#"><i class="ph ph-shield-check"></i> Keamanan (MFA aktif)</a>
+    <div class="sidebar__foot">
+      <div class="sidebar__user"><span class="avatar avatar--biru">RS</span><div><p style="font-size:14px;font-weight:600;color:var(--fg-1);line-height:1.3">Rina Sari, M.Psi.</p><p class="meta">Psikolog klinis</p></div></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="live" aria-live="polite">Terhubung langsung</span>
+      <div class="topbar__actions">
+        <label class="sr-only" for="cari">Cari klien</label>
+        <input id="cari" class="input" style="min-height:40px;width:240px;border-radius:999px" placeholder="Cari klien">
+        <button class="icon-btn" aria-label="Notifikasi"><i class="ph ph-bell"></i></button>
+      </div>
+    </header>
+
+    <main id="isi" class="page">
+      <div class="head">
+        <div>
+          <h1 class="display-3">Selamat pagi, Bu Rina.</h1>
+          <p class="body-m" style="margin-top:4px">Selasa, 13 Oktober · 4 sesi hari ini</p>
+        </div>
+      </div>
+
+      <section class="crisis-card" role="region" aria-labelledby="h-krisis">
+        <div class="crisis-card__bar" id="h-krisis"><i class="ph-duotone ph-warning-circle"></i> Peringatan krisis, perlu ditindaklanjuti <span class="meta">masuk 2 menit lalu</span></div>
+        <div class="crisis-item" role="alert">
+          <span class="avatar avatar--matahari">DP</span>
+          <div>
+            <p><strong>Dimas Pratama</strong>, 20 tahun</p>
+            <p class="why">PHQ-9 skor 17. Menjawab "beberapa hari" pada pertanyaan tentang pikiran lebih baik mati atau menyakiti diri.</p>
+            <p class="src"><i class="ph ph-device-mobile"></i> Diisi lewat aplikasi Mindra, 07.48 WIB</p>
+          </div>
+          <div class="actions">
+            <a class="btn btn--crisis btn--sm" href="tel:+62"><i class="ph ph-phone"></i> Hubungi klien</a>
+            <a class="btn btn--secondary btn--sm" href="#">Buka profil</a>
+            <button class="btn btn--ghost btn--sm">Tandai sudah ditangani</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="stats">
+        <div class="stat"><b class="num">18</b><span>klien aktif</span></div>
+        <div class="stat"><b class="num">1</b><span>peringatan terbuka</span></div>
+        <div class="stat"><b class="num">7</b><span>skrining baru minggu ini</span></div>
+        <div class="stat"><b class="num">3</b><span>skor memburuk</span></div>
+      </div>
+
+      <div class="layout">
+        <section class="card" aria-labelledby="h-klien">
+          <div class="card__head">
+            <h2 id="h-klien" class="h3">Klien</h2>
+            <div class="filters" role="group" aria-label="Filter">
+              <button class="chip" aria-pressed="true">Semua</button>
+              <button class="chip" aria-pressed="false">Skor memburuk</button>
+              <button class="chip" aria-pressed="false">Belum check-in 3 hari</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th scope="col">Klien</th><th scope="col">Skrining terakhir</th><th scope="col">Tren</th><th scope="col">Mood 7 hari</th><th scope="col">Sesi berikutnya</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="client"><span class="avatar avatar--matahari avatar--sm">DP</span><div><strong>Dimas Pratama</strong><span class="meta">PHQ-9</span></div></div></td>
+                <td><span class="num" style="font-weight:700;color:var(--fg-1)">17</span> <span class="badge badge--severe">Berat</span></td>
+                <td><svg width="72" height="24" aria-label="Naik dari 12 ke 17"><polyline points="2,18 26,15 50,12 70,4" fill="none" stroke="var(--danger-500)" stroke-width="2" stroke-linecap="round"/></svg></td>
+                <td><div class="dots" aria-label="Mood: cemas, sedih, lelah, sedih, cemas, sedih, belum diisi"><span style="background:var(--mood-cemas)"></span><span style="background:var(--mood-sedih)"></span><span style="background:var(--mood-lelah)"></span><span style="background:var(--mood-sedih)"></span><span style="background:var(--mood-cemas)"></span><span style="background:var(--mood-sedih)"></span><span style="border:1.5px dashed var(--border-strong)"></span></div></td>
+                <td>Kam, 15 Okt</td>
+              </tr>
+              <tr>
+                <td><div class="client"><span class="avatar avatar--sm">AF</span><div><strong>Argy F.</strong><span class="meta">PHQ-9</span></div></div></td>
+                <td><span class="num" style="font-weight:700;color:var(--fg-1)">11</span> <span class="badge badge--moderate">Sedang</span></td>
+                <td><svg width="72" height="24" aria-label="Turun dari 16 ke 11"><polyline points="2,4 26,9 50,9 70,16" fill="none" stroke="var(--sage-500)" stroke-width="2" stroke-linecap="round"/></svg></td>
+                <td><div class="dots" aria-label="Mood minggu ini"><span style="background:var(--mood-tenang)"></span><span style="background:var(--mood-lelah)"></span><span style="background:var(--mood-cemas)"></span><span style="background:var(--mood-bahagia)"></span><span style="background:var(--mood-syukur)"></span><span style="background:var(--mood-lelah)"></span><span style="border:1.5px dashed var(--border-strong)"></span></div></td>
+                <td>Jum, 16 Okt</td>
+              </tr>
+              <tr>
+                <td><div class="client"><span class="avatar avatar--biru avatar--sm">NA</span><div><strong>Nadia Azzahra</strong><span class="meta">GAD-7</span></div></div></td>
+                <td><span class="num" style="font-weight:700;color:var(--fg-1)">6</span> <span class="badge badge--mild">Ringan</span></td>
+                <td><svg width="72" height="24" aria-label="Stabil"><polyline points="2,12 26,11 50,13 70,12" fill="none" stroke="var(--neutral-400)" stroke-width="2" stroke-linecap="round"/></svg></td>
+                <td><div class="dots" aria-label="Mood minggu ini"><span style="background:var(--mood-tenang)"></span><span style="background:var(--mood-syukur)"></span><span style="background:var(--mood-tenang)"></span><span style="background:var(--mood-hangat)"></span><span style="background:var(--mood-cemas)"></span><span style="background:var(--mood-tenang)"></span><span style="background:var(--mood-bahagia)"></span></div></td>
+                <td>Sel, 20 Okt</td>
+              </tr>
+              <tr>
+                <td><div class="client"><span class="avatar avatar--sm">BH</span><div><strong>Bagas H.</strong><span class="meta">PSS-10</span></div></div></td>
+                <td><span class="num" style="font-weight:700;color:var(--fg-1)">22</span> <span class="badge badge--moderate">Sedang</span></td>
+                <td><svg width="72" height="24" aria-label="Naik sedikit"><polyline points="2,14 26,13 50,10 70,9" fill="none" stroke="var(--warning-500)" stroke-width="2" stroke-linecap="round"/></svg></td>
+                <td><div class="dots" aria-label="Belum check-in 3 hari"><span style="background:var(--mood-lelah)"></span><span style="background:var(--mood-cemas)"></span><span style="background:var(--mood-lelah)"></span><span style="background:var(--mood-sedih)"></span><span style="border:1.5px dashed var(--border-strong)"></span><span style="border:1.5px dashed var(--border-strong)"></span><span style="border:1.5px dashed var(--border-strong)"></span></div></td>
+                <td>Belum ada</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="h-jadwal">
+          <div class="card__head"><h2 id="h-jadwal" class="h3">Hari ini</h2><a class="meta" href="#">Kalender</a></div>
+          <div class="slot"><time>09.00</time><p><strong>Nadia Azzahra</strong><span class="meta">Video · sesi ke-4</span></p></div>
+          <div class="slot now"><time>11.00</time><p><strong>Bagas H.</strong><span class="meta">Video · mulai 15 menit lagi</span><a class="btn btn--primary btn--sm" style="margin-top:10px" href="#">Buka ringkasan klien</a></p></div>
+          <div class="slot"><time>14.00</time><p><strong>Klien baru</strong><span class="meta">Video · sesi perkenalan</span></p></div>
+          <div class="slot"><time>16.00</time><p><strong>Sari W.</strong><span class="meta">Chat · sesi ke-2</span></p></div>
+        </section>
+      </div>
+
+      <p class="meta" style="margin-top:20px"><i class="ph ph-eye"></i> Setiap data klien yang kamu buka tercatat dan dapat dilihat oleh klien yang bersangkutan.</p>
+    </main>
+  </div>
+</div>
+</body>
+</html>

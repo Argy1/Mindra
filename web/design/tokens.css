@@ -1,0 +1,531 @@
+/* =========================================================
+   Mindra — Design Tokens
+   Aplikasi Kesehatan Mental Digital Indonesia
+   Tone: hangat · aman · tenang · modern · tidak klinis
+   ========================================================= */
+
+/* ---------- Fonts ---------- */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  /* =====================================================
+     PRIMARY — Biru Tenang (calm blue)
+     Main brand color · #2E6DA4
+     ===================================================== */
+  --biru-50:  #EBF2F8;
+  --biru-100: #D1E1EF;
+  --biru-200: #A3C2DE;
+  --biru-300: #75A4CE;
+  --biru-400: #4F87B9;
+  --biru-500: #2E6DA4;  /* primary */
+  --biru-600: #245785;
+  --biru-700: #1B4267;
+  --biru-800: #132E48;
+  --biru-900: #0B1B2C;
+
+  /* =====================================================
+     SECONDARY — Hijau Sage (natural, never clinical)
+     Main · #4A9E8F
+     ===================================================== */
+  --sage-50:  #EEF6F4;
+  --sage-100: #D4E9E4;
+  --sage-200: #A9D3C9;
+  --sage-300: #7EBDAE;
+  --sage-400: #61AE9D;
+  --sage-500: #4A9E8F;  /* secondary */
+  --sage-600: #3B7E72;
+  --sage-700: #2D5F56;
+  --sage-800: #1F4039;
+  --sage-900: #11231F;
+
+  /* =====================================================
+     NEUTRAL — Abu Hangat (warm gray, never cold gray)
+     50 · #F8F7F5  →  900 · #1A1A2E
+     ===================================================== */
+  --neutral-50:  #F8F7F5;
+  --neutral-100: #EFEDE9;
+  --neutral-200: #DFDBD3;
+  --neutral-300: #CDC8BD;
+  --neutral-400: #A8A299;
+  --neutral-500: #837D74;
+  --neutral-600: #635E55;
+  --neutral-700: #44403A;
+  --neutral-800: #2D2B28;
+  --neutral-900: #1A1A2E;
+
+  /* Legacy aliases — kept so existing UI keeps working */
+  --krem-50:  var(--neutral-50);
+  --krem-100: var(--neutral-100);
+  --krem-200: var(--neutral-200);
+  --krem-300: var(--neutral-300);
+  --krem-400: var(--neutral-400);
+  --tinta-100: var(--neutral-200);
+  --tinta-200: var(--neutral-300);
+  --tinta-300: var(--neutral-400);
+  --tinta-400: var(--neutral-500);
+  --tinta-500: var(--neutral-600);
+  --tinta-700: var(--neutral-700);
+  --tinta-900: var(--neutral-900);
+
+  /* =====================================================
+     ACCENT — Kuning Matahari (highlights, badges, alerts)
+     Main · #E07B00
+     ===================================================== */
+  --matahari-50:  #FDF3E5;
+  --matahari-100: #FBE2BD;
+  --matahari-200: #F7C57A;
+  --matahari-300: #F1A53A;
+  --matahari-400: #E78F1A;
+  --matahari-500: #E07B00;  /* accent */
+  --matahari-600: #B36100;
+  --matahari-700: #864800;
+  --matahari-800: #5A3000;
+  --matahari-900: #2E1800;
+
+  /* Legacy coral accent — used sparingly */
+  --hangat-100: #FBE9DF;
+  --hangat-300: #F1B89C;
+  --hangat-500: #E08862;
+  --hangat-700: #B5613E;
+
+  /* =====================================================
+     SEMANTIC — Success / Warning / Danger / Info
+     Soft, never aggressive. Danger reserved for crisis.
+     ===================================================== */
+
+  /* Success — soft green · #2E8B57 */
+  --success-50:  #EAF5EE;
+  --success-100: #C8E4D2;
+  --success-200: #94CAA8;
+  --success-300: #5FAE7E;
+  --success-500: #2E8B57;
+  --success-700: #1F5E3B;
+  --success-900: #0F2F1D;
+
+  /* Warning — amber (same anchor as matahari) · #E07B00 */
+  --warning-50:  #FDF3E5;
+  --warning-100: #FBE2BD;
+  --warning-200: #F7C57A;
+  --warning-500: #E07B00;
+  --warning-700: #864800;
+  --warning-900: #2E1800;
+
+  /* Danger — soft red · #C0392B
+     Use sparingly. Only for errors / crisis. Never decorative. */
+  --danger-50:  #FBE9E7;
+  --danger-100: #F4C7C2;
+  --danger-200: #E89A92;
+  --danger-300: #DC6C61;
+  --danger-500: #C0392B;
+  --danger-700: #832720;
+  --danger-900: #3F120E;
+
+  /* Info — light blue · #3498DB */
+  --info-50:  #EAF5FD;
+  --info-100: #C6E3F5;
+  --info-200: #8DC7EC;
+  --info-300: #55ABE2;
+  --info-500: #3498DB;
+  --info-700: #1F6FA8;
+  --info-900: #0F3A58;
+
+  /* =====================================================
+     SURFACE / FOREGROUND / BORDERS
+     ===================================================== */
+  --surface-canvas:   var(--neutral-50);  /* app background */
+  --surface-raised:   #FFFFFF;            /* cards on canvas */
+  --surface-sunken:   var(--neutral-100); /* nested zones */
+  --surface-inverse:  var(--neutral-900); /* dark contrast surface */
+  --surface-tint:     var(--biru-50);     /* selected/highlight */
+
+  --fg-1: var(--neutral-900);  /* headings */
+  --fg-2: var(--neutral-700);  /* body */
+  --fg-3: var(--neutral-600);  /* secondary body */
+  --fg-4: var(--neutral-500);  /* muted / meta */
+  --fg-on-primary: #FFFFFF;
+  --fg-on-dark:    var(--neutral-50);
+
+  --border-soft:   var(--neutral-200);
+  --border-medium: var(--neutral-300);
+  --border-strong: var(--neutral-400);
+  --border-tint:   color-mix(in oklab, var(--biru-500) 18%, transparent);
+
+  /* Intent aliases */
+  --intent-primary:   var(--biru-500);
+  --intent-secondary: var(--sage-500);
+  --intent-success:   var(--success-500);
+  --intent-warning:   var(--warning-500);
+  --intent-danger:    var(--danger-500);
+  --intent-info:      var(--info-500);
+
+  /* =====================================================
+     MOOD PALETTE — 7-level mood tracker
+     Sangat Baik → Sangat Buruk
+     ===================================================== */
+  --mood-sangat-baik:   #FFD700;
+  --mood-baik:          #90EE90;
+  --mood-cukup:         #87CEEB;
+  --mood-netral:        #DDA0DD;
+  --mood-kurang:        #FFA07A;
+  --mood-buruk:         #CD853F;
+  --mood-sangat-buruk:  #708090;
+
+  /* Legacy mood aliases — original sentiment glyphs */
+  --mood-tenang:   #75A4CE;
+  --mood-syukur:   #7EBDAE;
+  --mood-bahagia:  #E7B860;
+  --mood-hangat:   #E08862;
+  --mood-lelah:    #A39BB5;
+  --mood-sedih:    #6B89A8;
+  --mood-cemas:    #B58A6E;
+
+  /* -----------------------------------------------------
+     TYPOGRAPHY
+     Display: Instrument Serif — warm, modern, soulful
+     Body:    Plus Jakarta Sans — Indonesian-designed (Tokotype)
+     Mono:    JetBrains Mono
+     ----------------------------------------------------- */
+  --font-display: "Instrument Serif", "Lora", Georgia, serif;
+  --font-body:    "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  /* Raw type scale (kept for ad-hoc use) */
+  --text-2xs: 11px;
+  --text-xs:  12px;
+  --text-sm:  14px;
+  --text-md:  16px;
+  --text-lg:  18px;
+  --text-xl:  20px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+  --text-4xl: 32px;
+  --text-5xl: 40px;
+  --text-6xl: 48px;
+
+  /* Named tokens — the canonical Mindra scale */
+  --type-display-xl-size:   40px;  --type-display-xl-weight: 400;
+  --type-display-l-size:    32px;  --type-display-l-weight:  400;
+  --type-display-m-size:    28px;  --type-display-m-weight:  500;
+  --type-h1-size:           24px;  --type-h1-weight:         700;
+  --type-h2-size:           20px;  --type-h2-weight:         600;
+  --type-h3-size:           18px;  --type-h3-weight:         600;
+  --type-h4-size:           16px;  --type-h4-weight:         500;
+  --type-body-l-size:       16px;  --type-body-l-weight:     400;
+  --type-body-m-size:       14px;  --type-body-m-weight:     400;
+  --type-body-s-size:       12px;  --type-body-s-weight:     400;
+  --type-button-l-size:     16px;  --type-button-l-weight:   600;
+  --type-button-m-size:     14px;  --type-button-m-weight:   600;
+  --type-label-size:        12px;  --type-label-weight:      500;
+  --type-overline-size:     11px;  --type-overline-weight:   700;
+
+  /* Line heights — by category */
+  --lh-display: 1.2;
+  --lh-heading: 1.3;
+  --lh-body:    1.6;
+  --lh-ui:      1.4;
+
+  /* Legacy semantic aliases (kept) */
+  --leading-tight:   1.15;
+  --leading-snug:    1.3;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-label:  0.04em;     /* +0.5px @ 12px */
+  --tracking-overline: 0.09em;   /* +1px   @ 11px */
+
+  /* -----------------------------------------------------
+     SPACING (4px base)
+     ----------------------------------------------------- */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+
+  /* -----------------------------------------------------
+     RADII — generous, soft. Pebble-like.
+     ----------------------------------------------------- */
+  --radius-xs:   6px;
+  --radius-sm:   10px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-2xl:  36px;
+  --radius-pill: 999px;
+
+  /* -----------------------------------------------------
+     SHADOWS — gentle, warm-tinted. Never harsh.
+     ----------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(30, 42, 51, 0.04);
+  --shadow-sm: 0 2px 6px rgba(30, 42, 51, 0.05), 0 1px 2px rgba(30, 42, 51, 0.04);
+  --shadow-md: 0 6px 16px rgba(30, 42, 51, 0.07), 0 2px 4px rgba(30, 42, 51, 0.04);
+  --shadow-lg: 0 14px 32px rgba(30, 42, 51, 0.09), 0 4px 8px rgba(30, 42, 51, 0.05);
+  --shadow-xl: 0 24px 48px rgba(30, 42, 51, 0.12), 0 8px 16px rgba(30, 42, 51, 0.06);
+
+  /* Glow — used for breath/meditation pulse, focus rings */
+  --glow-biru: 0 0 0 6px color-mix(in oklab, var(--biru-400) 18%, transparent);
+  --glow-sage: 0 0 0 6px color-mix(in oklab, var(--sage-400) 18%, transparent);
+
+  /* -----------------------------------------------------
+     MOTION
+     ----------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-breath: cubic-bezier(0.45, 0, 0.55, 1);
+
+  --dur-fast:   180ms;
+  --dur-base:   280ms;
+  --dur-slow:   480ms;
+  --dur-breath: 4000ms; /* meditation inhale */
+
+  /* -----------------------------------------------------
+     LAYOUT
+     ----------------------------------------------------- */
+  --container-mobile: 390px;
+  --container-tablet: 768px;
+  --container-desktop: 1200px;
+  --touch-target: 44px; /* min hit target */
+}
+
+/* =========================================================
+   SEMANTIC TYPE STYLES — Mindra canonical scale
+   ========================================================= */
+
+/* ---- Display (Instrument Serif) ---- */
+.t-display-xl {
+  font-family: var(--font-display);
+  font-weight: var(--type-display-xl-weight);
+  font-size:   var(--type-display-xl-size);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+.t-display-l {
+  font-family: var(--font-display);
+  font-weight: var(--type-display-l-weight);
+  font-size:   var(--type-display-l-size);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+.t-display-m {
+  font-family: var(--font-display);
+  font-weight: var(--type-display-m-weight);
+  font-size:   var(--type-display-m-size);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-snug);
+  color: var(--fg-1);
+}
+
+/* ---- Heading (Plus Jakarta Sans) ---- */
+.t-h1 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h1-weight);
+  font-size:   var(--type-h1-size);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-snug);
+  color: var(--fg-1);
+}
+.t-h2 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h2-weight);
+  font-size:   var(--type-h2-size);
+  line-height: var(--lh-heading);
+  color: var(--fg-1);
+}
+.t-h3 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h3-weight);
+  font-size:   var(--type-h3-size);
+  line-height: var(--lh-heading);
+  color: var(--fg-1);
+}
+.t-h4 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h4-weight);
+  font-size:   var(--type-h4-size);
+  line-height: var(--lh-heading);
+  color: var(--fg-1);
+}
+
+/* ---- Body (Plus Jakarta Sans) ---- */
+.t-body-l {
+  font-family: var(--font-body);
+  font-weight: var(--type-body-l-weight);
+  font-size:   var(--type-body-l-size);
+  line-height: var(--lh-body);
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+.t-body-m {
+  font-family: var(--font-body);
+  font-weight: var(--type-body-m-weight);
+  font-size:   var(--type-body-m-size);
+  line-height: var(--lh-body);
+  color: var(--fg-3);
+}
+.t-body-s {
+  font-family: var(--font-body);
+  font-weight: var(--type-body-s-weight);
+  font-size:   var(--type-body-s-size);
+  line-height: var(--lh-body);
+  color: var(--fg-4);
+}
+
+/* ---- UI (Plus Jakarta Sans) ---- */
+.t-button-l {
+  font-family: var(--font-body);
+  font-weight: var(--type-button-l-weight);
+  font-size:   var(--type-button-l-size);
+  line-height: var(--lh-ui);
+}
+.t-button-m {
+  font-family: var(--font-body);
+  font-weight: var(--type-button-m-weight);
+  font-size:   var(--type-button-m-size);
+  line-height: var(--lh-ui);
+}
+.t-label {
+  font-family: var(--font-body);
+  font-weight: var(--type-label-weight);
+  font-size:   var(--type-label-size);
+  line-height: var(--lh-ui);
+  letter-spacing: var(--tracking-label);
+  color: var(--fg-2);
+}
+.t-overline {
+  font-family: var(--font-body);
+  font-weight: var(--type-overline-weight);
+  font-size:   var(--type-overline-size);
+  line-height: var(--lh-ui);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+/* ---- Legacy aliases — kept so existing UI keeps working ---- */
+
+.h1 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h1-weight);
+  font-size:   var(--type-h1-size);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-snug);
+  color: var(--fg-1);
+}
+.h2 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h2-weight);
+  font-size:   var(--type-h2-size);
+  line-height: var(--lh-heading);
+  color: var(--fg-1);
+}
+.h3 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h3-weight);
+  font-size:   var(--type-h3-size);
+  line-height: var(--lh-heading);
+  color: var(--fg-1);
+}
+.h4 {
+  font-family: var(--font-body);
+  font-weight: var(--type-h4-weight);
+  font-size:   var(--type-h4-size);
+  line-height: var(--lh-heading);
+  color: var(--fg-1);
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--type-overline-weight);
+  font-size:   var(--type-overline-size);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.p, p {
+  font-family: var(--font-body);
+  font-weight: var(--type-body-l-weight);
+  font-size:   var(--type-body-l-size);
+  line-height: var(--lh-body);
+  color: var(--fg-2);
+  text-wrap: pretty;
+}
+
+.p-lead {
+  font-size: var(--text-lg);
+  line-height: var(--lh-body);
+  color: var(--fg-2);
+}
+
+.p-sm {
+  font-size: var(--type-body-m-size);
+  line-height: var(--lh-body);
+  color: var(--fg-3);
+}
+
+.meta {
+  font-family: var(--font-body);
+  font-size: var(--type-body-s-size);
+  color: var(--fg-4);
+  letter-spacing: 0.01em;
+}
+
+.quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--type-display-m-size);
+  line-height: var(--lh-heading);
+  color: var(--fg-2);
+}
+
+.code, code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--neutral-100);
+  color: var(--biru-700);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+}
+
+/* =========================================================
+   BASELINE (apply to a wrapper if you want global look)
+   ========================================================= */
+.mindra-baseline {
+  background: var(--surface-canvas);
+  color: var(--fg-2);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================================================
+   WEB ADDITIONS — Mindra Web (Next.js)
+   Skala display lebih besar untuk layar lebar, ukuran layout web.
+   ========================================================= */
+:root {
+  --type-web-display-1: clamp(44px, 6.2vw, 76px);   /* hero landing */
+  --type-web-display-2: clamp(34px, 4.2vw, 52px);   /* judul section landing */
+  --type-web-display-3: clamp(28px, 3vw, 36px);     /* sapaan dashboard, skor hasil */
+  --type-web-h1: 28px;
+
+  --sidebar-w: 256px;
+  --topbar-h: 72px;
+  --content-max: 1120px;   /* dashboard */
+  --reading-max: 720px;    /* asesmen, artikel, chat */
+  --gutter: clamp(16px, 4vw, 40px);
+}

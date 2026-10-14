@@ -1,0 +1,99 @@
+# CI Mindra (monorepo): web (lint, tipe, format, build, tes unit termasuk penjaga hasil build, lalu e2e + axe) dan
+# aplikasi Flutter (analisis dan tes).
+#
+# CATATAN: berkas ini BELUM pernah dijalankan di GitHub sebelum push pertama (repositori baru dipublikasikan bersamaan).
+# Setiap perintah di bawah sudah dijalankan secara lokal; yang belum teruji hanya pembungkus Actions-nya. Hasil putaran
+# pertama dicatat di web/docs/TESTING.md.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Nilai kosong-bermakna: build dan tes tidak menghubungi Supabase. Rahasia sungguhan TIDAK dipakai di CI.
+  NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key-for-ci-only-0000000000
+  NEXT_PUBLIC_SITE_URL: http://localhost:3100
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  web:
+    name: Web, lint, tipe, build, tes unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+      # Setelah build: tes penjaga hasil build (rute dinamis, CSP, tanpa rahasia di bundel klien) ikut berjalan.
+      - run: pnpm test
+
+  web-e2e:
+    name: Web, e2e dan aksesibilitas (Playwright + axe)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: web
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      # playwright.config.ts memakai `pnpm build && pnpm start` bila CI=true.
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: web/playwright-report
+          retention-days: 7
+
+  flutter:
+    name: Flutter, analisis dan tes
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.1
+          channel: stable
+          cache: true
+      # `.env` dibundel sebagai aset dan tidak ada di repositori (diabaikan git); templatnya cukup untuk analisis dan tes.
+      - run: cp .env.example .env
+      - run: flutter pub get
+      # Info lint lama (115) tidak menggagalkan; galat dan peringatan menggagalkan.
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test

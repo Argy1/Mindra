@@ -1,0 +1,397 @@
+{
+  "label": "lokal",
+  "startedAt": "2026-10-14T11:56:23.167Z",
+  "tool": "load/node-load.mjs (bukan k6)",
+  "profile": {
+    "vus": 200,
+    "rampSeconds": 15,
+    "holdSeconds": 120,
+    "spoofIp": true,
+    "base": "http://localhost:3200"
+  },
+  "machine": {
+    "os": "win32 10.0.26300",
+    "node": "v24.13.1",
+    "cpu": "Intel(R) Core(TM) Ultra 7 255HX",
+    "cores": 20,
+    "memoryGb": 31.4,
+    "note": "Server dan penguji beban berjalan di mesin yang sama dan berbagi CPU."
+  },
+  "thresholds": [
+    {
+      "name": "p95 keseluruhan < 500 ms",
+      "value": "10.6 ms",
+      "pass": true
+    },
+    {
+      "name": "galat keseluruhan < 1%",
+      "value": "0%",
+      "pass": true
+    },
+    {
+      "name": "beranda: p95 < 500 ms",
+      "value": "11.6 ms",
+      "pass": true
+    },
+    {
+      "name": "beranda: galat < 1%",
+      "value": "0%",
+      "pass": true
+    },
+    {
+      "name": "developers: p95 < 500 ms",
+      "value": "15.1 ms",
+      "pass": true
+    },
+    {
+      "name": "developers: galat < 1%",
+      "value": "0%",
+      "pass": true
+    },
+    {
+      "name": "tentang: p95 < 500 ms",
+      "value": "11.7 ms",
+      "pass": true
+    },
+    {
+      "name": "tentang: galat < 1%",
+      "value": "0%",
+      "pass": true
+    },
+    {
+      "name": "instruments: p95 < 500 ms",
+      "value": "5.9 ms",
+      "pass": true
+    },
+    {
+      "name": "instruments: galat < 1%",
+      "value": "0%",
+      "pass": true
+    },
+    {
+      "name": "openapi: p95 < 500 ms",
+      "value": "8.4 ms",
+      "pass": true
+    },
+    {
+      "name": "openapi: galat < 1%",
+      "value": "0%",
+      "pass": true
+    }
+  ],
+  "overall": {
+    "requests": 25426,
+    "requestsPerSecond": 186.3,
+    "failed": 0,
+    "errorRate": 0,
+    "latencyMs": {
+      "count": 25426,
+      "avg": 4.3,
+      "min": 0.7,
+      "med": 3.4,
+      "p90": 8.3,
+      "p95": 10.6,
+      "p99": 16.2,
+      "max": 37
+    },
+    "statusCounts": {
+      "200": 25426
+    }
+  },
+  "byEndpoint": {
+    "beranda": {
+      "path": "/",
+      "count": 8546,
+      "avg": 5.2,
+      "min": 2,
+      "med": 4,
+      "p90": 9.5,
+      "p95": 11.6,
+      "p99": 17.3,
+      "max": 37,
+      "failed": 0,
+      "errorRate": 0
+    },
+    "developers": {
+      "path": "/developers",
+      "count": 2741,
+      "avg": 7.8,
+      "min": 3.6,
+      "med": 6.7,
+      "p90": 12.4,
+      "p95": 15.1,
+      "p99": 23.1,
+      "max": 33,
+      "failed": 0,
+      "errorRate": 0
+    },
+    "tentang": {
+      "path": "/tentang",
+      "count": 1403,
+      "avg": 4.7,
+      "min": 1.5,
+      "med": 3.4,
+      "p90": 9.1,
+      "p95": 11.7,
+      "p99": 17,
+      "max": 24.7,
+      "failed": 0,
+      "errorRate": 0
+    },
+    "instruments": {
+      "path": "/api/v1/instruments",
+      "count": 9797,
+      "avg": 2.3,
+      "min": 0.7,
+      "med": 1.6,
+      "p90": 4.6,
+      "p95": 5.9,
+      "p99": 9.4,
+      "max": 20.4,
+      "failed": 0,
+      "errorRate": 0
+    },
+    "openapi": {
+      "path": "/api/v1/openapi.json",
+      "count": 2939,
+      "avg": 4.6,
+      "min": 2.5,
+      "med": 3.9,
+      "p90": 6.8,
+      "p95": 8.4,
+      "p99": 11.8,
+      "max": 20.5,
+      "failed": 0,
+      "errorRate": 0
+    }
+  },
+  "limiterCheck": {
+    "concurrency": 200,
+    "requests": 600,
+    "statusCounts": {
+      "200": 60,
+      "429": 540
+    },
+    "allowed200": 60,
+    "blocked429": 540,
+    "otherErrors": 0,
+    "allowedLatencyMs": {
+      "count": 60,
+      "avg": 41.16669666666615,
+      "min": 12.980000000010477,
+      "med": 41.72239999999874,
+      "p90": 54.934700000012526,
+      "p95": 56.95709999999963,
+      "p99": 58.88990000000922,
+      "max": 58.88990000000922
+    },
+    "blockedLatencyMs": {
+      "count": 540,
+      "avg": 125.93541851851812,
+      "min": 59.638999999995576,
+      "med": 120.52919999998994,
+      "p90": 137.566599999991,
+      "p95": 205.5276999999769,
+      "p99": 276.49280000000726,
+      "max": 281.35999999998603
+    }
+  },
+  "series": [
+    {
+      "t": 0,
+      "rps": 41,
+      "p50": 3.8,
+      "p95": 8.3,
+      "errors": 0
+    },
+    {
+      "t": 5,
+      "rps": 106.6,
+      "p50": 3.5,
+      "p95": 9.4,
+      "errors": 0
+    },
+    {
+      "t": 10,
+      "rps": 171.4,
+      "p50": 4,
+      "p95": 11.8,
+      "errors": 0
+    },
+    {
+      "t": 15,
+      "rps": 199.2,
+      "p50": 3.8,
+      "p95": 12,
+      "errors": 0
+    },
+    {
+      "t": 20,
+      "rps": 197,
+      "p50": 3.6,
+      "p95": 11.5,
+      "errors": 0
+    },
+    {
+      "t": 25,
+      "rps": 196.8,
+      "p50": 3.8,
+      "p95": 11.4,
+      "errors": 0
+    },
+    {
+      "t": 30,
+      "rps": 202.2,
+      "p50": 3.8,
+      "p95": 12.2,
+      "errors": 0
+    },
+    {
+      "t": 35,
+      "rps": 196.6,
+      "p50": 3.3,
+      "p95": 10.8,
+      "errors": 0
+    },
+    {
+      "t": 40,
+      "rps": 198.8,
+      "p50": 3.7,
+      "p95": 12.7,
+      "errors": 0
+    },
+    {
+      "t": 45,
+      "rps": 194.6,
+      "p50": 3.6,
+      "p95": 10.2,
+      "errors": 0
+    },
+    {
+      "t": 50,
+      "rps": 196.8,
+      "p50": 3.8,
+      "p95": 12.8,
+      "errors": 0
+    },
+    {
+      "t": 55,
+      "rps": 197.8,
+      "p50": 4,
+      "p95": 11.5,
+      "errors": 0
+    },
+    {
+      "t": 60,
+      "rps": 199.4,
+      "p50": 3.6,
+      "p95": 11.1,
+      "errors": 0
+    },
+    {
+      "t": 65,
+      "rps": 200.8,
+      "p50": 3.5,
+      "p95": 12.4,
+      "errors": 0
+    },
+    {
+      "t": 70,
+      "rps": 199,
+      "p50": 3.5,
+      "p95": 10,
+      "errors": 0
+    },
+    {
+      "t": 75,
+      "rps": 198.4,
+      "p50": 3.4,
+      "p95": 11,
+      "errors": 0
+    },
+    {
+      "t": 80,
+      "rps": 199.6,
+      "p50": 3.4,
+      "p95": 9.4,
+      "errors": 0
+    },
+    {
+      "t": 85,
+      "rps": 200,
+      "p50": 3.8,
+      "p95": 11.8,
+      "errors": 0
+    },
+    {
+      "t": 90,
+      "rps": 197.8,
+      "p50": 3.6,
+      "p95": 11.7,
+      "errors": 0
+    },
+    {
+      "t": 95,
+      "rps": 197.2,
+      "p50": 3.2,
+      "p95": 8.4,
+      "errors": 0
+    },
+    {
+      "t": 100,
+      "rps": 197.8,
+      "p50": 3.1,
+      "p95": 8.8,
+      "errors": 0
+    },
+    {
+      "t": 105,
+      "rps": 201.4,
+      "p50": 3,
+      "p95": 7.8,
+      "errors": 0
+    },
+    {
+      "t": 110,
+      "rps": 198.4,
+      "p50": 2.9,
+      "p95": 8.1,
+      "errors": 0
+    },
+    {
+      "t": 115,
+      "rps": 199.2,
+      "p50": 3.1,
+      "p95": 8,
+      "errors": 0
+    },
+    {
+      "t": 120,
+      "rps": 199.6,
+      "p50": 3,
+      "p95": 8.9,
+      "errors": 0
+    },
+    {
+      "t": 125,
+      "rps": 201,
+      "p50": 2.8,
+      "p95": 7.3,
+      "errors": 0
+    },
+    {
+      "t": 130,
+      "rps": 196.8,
+      "p50": 2.6,
+      "p95": 6.5,
+      "errors": 0
+    },
+    {
+      "t": 135,
+      "rps": 0,
+      "p50": 0,
+      "p95": 0,
+      "errors": 0
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# next.js
+.next
+out
+next-env.d.ts
+
+# testing
+coverage
+playwright-report
+test-results
+
+# env — jangan pernah commit secret
+.env
+.env.*
+!.env.example
+
+# misc
+.DS_Store
+*.tsbuildinfo
+npm-debug.log*
+.vercel
+
+# uji pengguna: jawaban responden tidak masuk repositori publik (templat dan laporan agregat boleh)
+docs/uji-pengguna/respons*.csv
+!docs/uji-pengguna/template-respons.csv

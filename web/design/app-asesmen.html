@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mindra — Asesmen (pertanyaan &amp; hasil)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+  .state { min-height: 100vh; padding-bottom: 64px; }
+  .state + .state { border-top: 8px solid var(--neutral-100); }
+  .focus-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: var(--reading-max); margin: 0 auto; padding: 20px var(--gutter); }
+  .focus-bar .progress { flex: 1; max-width: 320px; }
+  .q-wrap { max-width: var(--reading-max); margin: 0 auto; padding: 40px var(--gutter) 0; }
+  .q-meta { font-size: 14px; color: var(--fg-4); margin-bottom: 12px; }
+  .q-text { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 3.4vw, 38px); line-height: 1.2; color: var(--fg-1); }
+  .q-hint { margin-top: 12px; color: var(--fg-3); }
+  .options { display: grid; gap: 12px; margin-top: 36px; border: 0; padding: 0; }
+  .option { position: relative; display: flex; align-items: center; gap: 16px; min-height: 64px; padding: 0 20px; border-radius: var(--radius-lg); background: var(--surface-raised); border: 1.5px solid var(--border-soft); cursor: pointer; font-weight: 500; color: var(--fg-1); }
+  .option input { position: absolute; opacity: 0; }
+  .option .dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border-strong); flex: none; display: grid; place-items: center; }
+  .option:hover { border-color: var(--biru-300); }
+  .option:has(input:checked) { border-color: var(--biru-500); background: var(--biru-50); }
+  .option:has(input:checked) .dot { border-color: var(--biru-500); }
+  .option:has(input:checked) .dot::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--biru-500); }
+  .option:has(input:focus-visible) { box-shadow: var(--glow-biru); }
+  .option kbd { margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--fg-4); border: 1px solid var(--border-soft); border-radius: 6px; padding: 2px 7px; }
+  .q-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; }
+
+  /* Hasil */
+  .res { max-width: 880px; margin: 0 auto; padding: 24px var(--gutter) 0; display: grid; gap: 20px; }
+  .res-top { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: center; }
+  .res-score b { font-family: var(--font-display); font-weight: 400; font-size: 96px; line-height: .9; color: var(--fg-1); }
+  .res-score span { display: block; color: var(--fg-4); margin-top: 6px; }
+  .scale { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 16px; }
+  .scale div { height: 10px; border-radius: var(--radius-pill); background: var(--neutral-100); }
+  .scale div.on { background: var(--warning-500); }
+  .scale-labels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; font-size: 12.5px; color: var(--fg-4); }
+  .scale-labels span.on { color: var(--warning-700); font-weight: 700; }
+  @media (max-width: 640px) { .res-top { grid-template-columns: 1fr; gap: 12px; } .res-score b { font-size: 72px; } }
+
+  .crisis-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .crisis-actions .btn--secondary { border-color: var(--danger-200); }
+
+  .reco { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+  .reco li { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-top: 1px solid var(--border-soft); }
+  .reco li:first-child { border-top: 0; }
+  .reco i { font-size: 24px; color: var(--sage-600); flex: none; margin-top: 2px; }
+  .reco p strong { color: var(--fg-1); display: block; }
+
+  .share-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--border-soft); }
+  .share-row:first-of-type { border-top: 0; padding-top: 0; }
+  .share-row .txt { flex: 1; }
+  .share-row .txt p { font-size: 14px; }
+  .share-row .txt strong { display: block; color: var(--fg-1); font-size: 15px; }
+</style>
+</head>
+<body>
+
+<p class="mock-note" style="margin-top:16px">STATE 1 — /asesmen/[tipe] · mode fokus tanpa sidebar · satu pertanyaan per layar · tombol 1–4 di keyboard memilih jawaban, Enter = Lanjut</p>
+
+<section class="state" aria-label="Contoh layar pertanyaan">
+  <header class="focus-bar">
+    <a class="btn btn--ghost btn--sm" href="app-beranda.html"><i class="ph ph-x"></i> Simpan dan keluar</a>
+    <div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="9" aria-valuenow="3" aria-label="Pertanyaan 3 dari 9"><span style="width:33%"></span></div>
+    <span class="meta num">3 / 9</span>
+  </header>
+  <main class="q-wrap">
+    <p class="q-meta">PHQ-9 · Dalam 2 minggu terakhir, seberapa sering kamu…</p>
+    <h1 class="q-text" id="q3">Sulit tidur, sering terbangun, atau justru tidur terlalu banyak?</h1>
+    <p class="q-hint">Tidak ada jawaban benar atau salah. Pilih yang paling dekat dengan yang kamu rasakan.</p>
+    <fieldset class="options" aria-labelledby="q3">
+      <label class="option"><input type="radio" name="q3"><span class="dot"></span>Tidak sama sekali<kbd>1</kbd></label>
+      <label class="option"><input type="radio" name="q3"><span class="dot"></span>Beberapa hari<kbd>2</kbd></label>
+      <label class="option"><input type="radio" name="q3" checked><span class="dot"></span>Lebih dari separuh waktu<kbd>3</kbd></label>
+      <label class="option"><input type="radio" name="q3"><span class="dot"></span>Hampir setiap hari<kbd>4</kbd></label>
+    </fieldset>
+    <div class="q-nav">
+      <button class="btn btn--secondary"><i class="ph ph-arrow-left"></i> Sebelumnya</button>
+      <button class="btn btn--primary">Lanjut</button>
+    </div>
+  </main>
+</section>
+
+<p class="mock-note" style="margin-top:16px">STATE 2 — /asesmen/hasil/[id] · di dalam AppShell (sidebar disembunyikan di mockup ini) · banner krisis HANYA muncul jika detektor krisis = true (contoh: PHQ-9 item 9 &gt; 0) · banner role="alert", fokus dipindah ke banner saat halaman dimuat</p>
+
+<section class="state" aria-label="Contoh layar hasil">
+  <main class="res">
+    <div class="alert alert--crisis" role="alert" tabindex="-1">
+      <i class="ph-duotone ph-lifebuoy"></i>
+      <div>
+        <h2 class="h2" style="color:var(--danger-900)">Kamu tidak harus menghadapinya sendirian.</h2>
+        <p style="margin-top:6px;color:var(--danger-900)">Kamu menjawab pernah terpikir lebih baik mati atau ingin menyakiti diri. Itu tanda kamu sedang memikul hal yang sangat berat. Bicara dengan seseorang sekarang bisa membantu.</p>
+        <div class="crisis-actions">
+          <a class="btn btn--crisis" href="tel:119,8"><i class="ph ph-phone"></i> Hubungi 119 ext. 8</a>
+          <a class="btn btn--secondary" href="#"><i class="ph ph-chat-circle-text"></i> Kabari Rina Sari, M.Psi.</a>
+          <a class="btn btn--secondary" href="#"><i class="ph ph-address-book"></i> Kontak daruratku</a>
+        </div>
+        <p class="meta" style="margin-top:12px;color:var(--danger-700)">Psikologmu sudah menerima pemberitahuan karena kamu mengizinkan peringatan krisis.</p>
+      </div>
+    </div>
+
+    <section class="card card--hero" aria-labelledby="h-hasil">
+      <p class="meta">PHQ-9 · 13 Oktober 2026</p>
+      <div class="res-top" style="margin-top:12px">
+        <div class="res-score"><b class="num">11</b><span>dari 27</span></div>
+        <div>
+          <h1 id="h-hasil" class="display-3">Gejala depresi tingkat sedang</h1>
+          <div class="scale" aria-hidden="true"><div class="on"></div><div class="on"></div><div class="on"></div><div></div></div>
+          <div class="scale-labels" aria-hidden="true"><span>Minimal</span><span>Ringan</span><span class="on">Sedang</span><span>Berat</span></div>
+        </div>
+      </div>
+      <p class="lead" style="margin-top:24px">Dua minggu terakhir terasa berat untukmu, terutama soal tidur dan energi. Perasaan ini bisa membaik dengan dukungan yang tepat, dan kamu sudah mengambil langkah pertama dengan mengisinya.</p>
+      <div class="alert alert--note" style="margin-top:20px;padding:14px 18px"><i class="ph ph-info" style="font-size:20px"></i><p class="body-m">Ini hasil skrining, bukan diagnosis. Hanya psikolog atau psikiater yang bisa menegakkan diagnosis.</p></div>
+    </section>
+
+    <div class="grid grid--2">
+      <section class="card" aria-labelledby="h-langkah">
+        <h2 id="h-langkah" class="h3" style="margin-bottom:12px">Langkah yang bisa kamu coba</h2>
+        <ul class="reco">
+          <li><i class="ph-duotone ph-calendar-heart"></i><p><strong>Bicarakan dengan psikolog</strong>Kamu punya jadwal Jumat. Hasil ini bisa jadi bahan obrolan.</p></li>
+          <li><i class="ph-duotone ph-moon-stars"></i><p><strong>Jaga jam tidur</strong>Coba tidur di jam yang sama tiga malam berturut-turut.</p></li>
+          <li><i class="ph-duotone ph-wind"></i><p><strong>Latihan napas 4-7-8</strong>Dua menit, kapan pun dadamu terasa sesak.</p></li>
+        </ul>
+      </section>
+
+      <section class="card" aria-labelledby="h-bagikan">
+        <h2 id="h-bagikan" class="h3" style="margin-bottom:16px">Siapa yang bisa melihat hasil ini</h2>
+        <div class="share-row"><span class="avatar avatar--biru">RS</span><div class="txt"><strong>Rina Sari, M.Psi.</strong><p class="meta">Psikolog, izin hasil skrining aktif</p></div><button class="switch" role="switch" aria-checked="true" aria-label="Bagikan ke Rina Sari"></button></div>
+        <div class="share-row"><span class="avatar">IB</span><div class="txt"><strong>Ibu</strong><p class="meta">Pendamping, hanya mood harian</p></div><button class="switch" role="switch" aria-checked="false" aria-label="Bagikan ke Ibu"></button></div>
+        <div class="share-row"><span class="avatar avatar--matahari"><i class="ph ph-first-aid"></i></span><div class="txt"><strong>SATUSEHAT</strong><p class="meta">Rekam kesehatan nasional. Belum dikirim.</p></div><button class="btn btn--secondary btn--sm">Kirim</button></div>
+      </section>
+    </div>
+
+    <div class="row" style="flex-wrap:wrap">
+      <a class="btn btn--primary" href="app-beranda.html">Kembali ke beranda</a>
+      <a class="btn btn--ghost" href="#">Lihat riwayat skrining</a>
+    </div>
+  </main>
+</section>
+</body>
+</html>

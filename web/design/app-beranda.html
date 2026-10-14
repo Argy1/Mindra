@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mindra — Beranda pengguna</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+  .greet { padding: 16px 0 28px; }
+  .greet p.lead { margin-top: 6px; }
+
+  /* Check-in mood: 7 kerikil */
+  .moods { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .mood {
+    display: grid; justify-items: center; gap: 6px; width: 84px; padding: 12px 4px 10px; border-radius: var(--radius-lg);
+    border: 1.5px solid transparent; background: var(--surface-raised); box-shadow: var(--shadow-xs); cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--fg-2); transition: transform var(--dur-fast) var(--ease-out-soft);
+  }
+  .mood img { width: 44px; height: auto; }
+  .mood:hover { transform: translateY(-2px); }
+  .mood[aria-pressed="true"] { border-color: var(--biru-400); background: var(--biru-50); }
+  @media (prefers-reduced-motion: reduce) { .mood:hover { transform: none; } }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+
+  /* Insight mingguan */
+  .insight-text { font-family: var(--font-display); font-size: 26px; line-height: 1.3; color: var(--fg-1); max-width: 30ch; }
+  .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 28px; }
+  .day { display: grid; justify-items: center; gap: 8px; }
+  .day__mood { width: 40px; height: 36px; display: grid; place-items: center; }
+  .day__mood img { width: 38px; }
+  .day__mood.empty { border: 1.5px dashed var(--border-medium); border-radius: 50%; width: 32px; height: 32px; }
+  .day__bar { width: 100%; max-width: 44px; height: 96px; border-radius: var(--radius-sm); background: var(--neutral-100); display: flex; align-items: flex-end; overflow: hidden; }
+  .day__bar span { display: block; width: 100%; background: var(--biru-300); border-radius: var(--radius-sm); }
+  .day__bar span.good { background: var(--sage-400); }
+  .day__h { font-size: 12px; color: var(--fg-3); font-variant-numeric: tabular-nums; }
+  .day__name { font-size: 13px; font-weight: 600; color: var(--fg-2); }
+  .day--today .day__name { color: var(--biru-600); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; font-size: 13px; color: var(--fg-4); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i.sw { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+  .stat { background: var(--surface-canvas); border-radius: var(--radius-md); padding: 14px 16px; }
+  .stat b { display: block; font-size: 22px; color: var(--fg-1); font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 13px; color: var(--fg-3); }
+
+  /* Skrining terakhir */
+  .score { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 12px; }
+  .score b { font-family: var(--font-display); font-weight: 400; font-size: 56px; line-height: 1; color: var(--fg-1); }
+  .score span { color: var(--fg-4); font-size: 14px; }
+  .spark { margin-top: 16px; }
+
+  .person { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border-soft); }
+  .person:first-of-type { border-top: 0; padding-top: 0; }
+  .person p { font-size: 14px; color: var(--fg-1); font-weight: 600; line-height: 1.3; }
+  .person small { display: block; font-size: 13px; color: var(--fg-4); font-weight: 400; }
+  .person .badge { margin-left: auto; }
+
+  .session { display: flex; gap: 14px; align-items: center; }
+  .session__date { width: 56px; text-align: center; border-radius: var(--radius-md); background: var(--sage-50); padding: 8px 0; color: var(--sage-800); }
+  .session__date b { display: block; font-size: 22px; line-height: 1.1; }
+  .session__date span { font-size: 12px; font-weight: 600; }
+  @media (max-width: 640px) {
+    .moods { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(var(--gutter) * -1); padding: 4px var(--gutter) 8px; }
+    .mood { flex: none; scroll-snap-align: start; width: 76px; }
+    .card--hero { padding: 20px; }
+    .card__head { flex-wrap: wrap; }
+    .insight-text { font-size: 22px; }
+    .week { gap: 4px; }
+    .day__mood img { width: 30px; }
+    .stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#isi">Langsung ke konten</a>
+<div class="shell">
+  <aside class="sidebar" aria-label="Navigasi utama">
+    <div class="sidebar__logo"><img src="assets/logo-mindra.svg" alt="Mindra"></div>
+    <a class="nav-item" href="#" aria-current="page"><i class="ph ph-house"></i> Beranda</a>
+    <a class="nav-item" href="app-asesmen.html"><i class="ph ph-clipboard-text"></i> Cek perasaan</a>
+    <a class="nav-item" href="#"><i class="ph ph-notebook"></i> Jurnal</a>
+    <a class="nav-item" href="app-teman-cerita.html"><i class="ph ph-chats-circle"></i> Teman cerita</a>
+    <a class="nav-item" href="#"><i class="ph ph-calendar-heart"></i> Konsultasi</a>
+    <a class="nav-item" href="app-privasi.html"><i class="ph ph-lock-key"></i> Privasi dan izin</a>
+    <div class="sidebar__foot">
+      <a class="sidebar__help" href="#"><i class="ph-duotone ph-lifebuoy"></i> Butuh bantuan sekarang</a>
+      <div class="sidebar__user"><span class="avatar avatar--biru">AF</span><div><p style="font-size:14px;font-weight:600;color:var(--fg-1);line-height:1.3">Argy</p><p class="meta">Pengguna</p></div></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <p class="body-m">Selasa, 13 Oktober</p>
+      <div class="topbar__actions">
+        <button class="icon-btn" aria-label="Notifikasi"><i class="ph ph-bell"></i></button>
+      </div>
+    </header>
+
+    <main id="isi" class="page">
+      <section class="greet" aria-labelledby="sapa">
+        <h1 id="sapa" class="display-3">Selamat sore, Argy.</h1>
+        <p class="lead">Bagaimana perasaanmu sekarang?</p>
+        <div class="moods" role="group" aria-label="Pilih perasaanmu">
+          <button class="mood" aria-pressed="false"><img src="assets/mood/tenang.svg" alt="">Tenang</button>
+          <button class="mood" aria-pressed="false"><img src="assets/mood/syukur.svg" alt="">Syukur</button>
+          <button class="mood" aria-pressed="false"><img src="assets/mood/bahagia.svg" alt="">Bahagia</button>
+          <button class="mood" aria-pressed="false"><img src="assets/mood/hangat.svg" alt="">Hangat</button>
+          <button class="mood" aria-pressed="true"><img src="assets/mood/lelah.svg" alt="">Lelah</button>
+          <button class="mood" aria-pressed="false"><img src="assets/mood/sedih.svg" alt="">Sedih</button>
+          <button class="mood" aria-pressed="false"><img src="assets/mood/cemas.svg" alt="">Cemas</button>
+        </div>
+      </section>
+
+      <div class="layout">
+        <section class="card card--hero" aria-labelledby="h-insight">
+          <div class="card__head">
+            <h2 id="h-insight" class="h3">Minggu ini</h2>
+            <div class="segmented" role="tablist" aria-label="Periode">
+              <button role="tab" aria-selected="true">7 hari</button>
+              <button role="tab" aria-selected="false">30 hari</button>
+            </div>
+          </div>
+          <p class="insight-text">Harimu terasa lebih ringan setiap kali kamu tidur lebih dari 7 jam.</p>
+
+          <div class="week" role="img" aria-label="Mood dan jam tidur 7 hari terakhir. Rabu tenang 7,5 jam, Kamis lelah 5 jam, Jumat cemas 4,5 jam, Sabtu bahagia 8 jam, Minggu syukur 8,5 jam, Senin lelah 6 jam, Selasa belum diisi 6,5 jam.">
+            <div class="day"><div class="day__mood"><img src="assets/mood/tenang.svg" alt=""></div><div class="day__bar"><span class="good" style="height:78%"></span></div><span class="day__h">7,5 j</span><span class="day__name">Rab</span></div>
+            <div class="day"><div class="day__mood"><img src="assets/mood/lelah.svg" alt=""></div><div class="day__bar"><span style="height:52%"></span></div><span class="day__h">5 j</span><span class="day__name">Kam</span></div>
+            <div class="day"><div class="day__mood"><img src="assets/mood/cemas.svg" alt=""></div><div class="day__bar"><span style="height:47%"></span></div><span class="day__h">4,5 j</span><span class="day__name">Jum</span></div>
+            <div class="day"><div class="day__mood"><img src="assets/mood/bahagia.svg" alt=""></div><div class="day__bar"><span class="good" style="height:83%"></span></div><span class="day__h">8 j</span><span class="day__name">Sab</span></div>
+            <div class="day"><div class="day__mood"><img src="assets/mood/syukur.svg" alt=""></div><div class="day__bar"><span class="good" style="height:88%"></span></div><span class="day__h">8,5 j</span><span class="day__name">Min</span></div>
+            <div class="day"><div class="day__mood"><img src="assets/mood/lelah.svg" alt=""></div><div class="day__bar"><span style="height:62%"></span></div><span class="day__h">6 j</span><span class="day__name">Sen</span></div>
+            <div class="day day--today"><div class="day__mood"><span class="day__mood empty"></span></div><div class="day__bar"><span style="height:68%"></span></div><span class="day__h">6,5 j</span><span class="day__name" title="Hari ini">Sel</span></div>
+          </div>
+          <div class="legend"><span><i class="sw" style="background:var(--sage-400)"></i>Tidur 7 jam atau lebih</span><span><i class="sw" style="background:var(--biru-300)"></i>Kurang dari 7 jam</span></div>
+
+          <div class="stats">
+            <div class="stat"><b>6 dari 7</b><span>hari kamu check-in</span></div>
+            <div class="stat"><b>6,6 jam</b><span>rata-rata tidur</span></div>
+            <div class="stat"><b>Jumat</b><span>hari paling berat</span></div>
+          </div>
+        </section>
+
+        <div class="stack" style="gap:20px">
+          <section class="card" aria-labelledby="h-skrining">
+            <div class="card__head"><h2 id="h-skrining" class="h3">Skrining terakhir</h2><span class="meta">PHQ-9, 6 Okt</span></div>
+            <div class="score"><b>11</b><span>dari 27</span><span class="badge badge--moderate">Sedang</span></div>
+            <p class="body-m">Turun 3 poin dari bulan lalu. Skrining berikutnya disarankan 20 Oktober.</p>
+            <svg class="spark" viewBox="0 0 280 56" role="img" aria-label="Tren skor PHQ-9: 16, 14, 14, 11">
+              <polyline points="10,12 100,22 190,22 270,36" fill="none" stroke="var(--biru-400)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <g fill="var(--surface-raised)" stroke="var(--biru-500)" stroke-width="2.5"><circle cx="10" cy="12" r="4"/><circle cx="100" cy="22" r="4"/><circle cx="190" cy="22" r="4"/><circle cx="270" cy="36" r="5" fill="var(--biru-500)"/></g>
+            </svg>
+            <a class="btn btn--secondary btn--sm btn--block" style="margin-top:16px" href="app-asesmen.html">Lihat riwayat skrining</a>
+          </section>
+
+          <section class="card" aria-labelledby="h-izin">
+            <div class="card__head"><h2 id="h-izin" class="h3">Yang menemanimu</h2><a class="meta" href="app-privasi.html">Atur izin</a></div>
+            <div class="person"><span class="avatar avatar--biru">RS</span><p>Rina Sari, M.Psi.<small>Psikolog</small></p><span class="badge badge--sage">Izin aktif</span></div>
+            <div class="person"><span class="avatar">IB</span><p>Ibu<small>Pendamping, hanya mood</small></p><span class="badge badge--sage">Izin aktif</span></div>
+          </section>
+
+          <section class="card" aria-labelledby="h-sesi">
+            <div class="card__head"><h2 id="h-sesi" class="h3">Konsultasi berikutnya</h2></div>
+            <div class="session">
+              <div class="session__date"><b>16</b><span>Okt</span></div>
+              <div><p style="font-weight:600;color:var(--fg-1)">Jumat, 15.00 WIB</p><p class="body-m">Bersama Rina Sari, M.Psi. (50 menit, video)</p></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<nav class="bottom-nav" aria-label="Navigasi utama">
+  <a href="#" aria-current="page"><i class="ph ph-house"></i>Beranda</a>
+  <a href="app-asesmen.html"><i class="ph ph-clipboard-text"></i>Cek</a>
+  <a href="#"><i class="ph ph-notebook"></i>Jurnal</a>
+  <a href="app-teman-cerita.html"><i class="ph ph-chats-circle"></i>Cerita</a>
+  <a href="app-privasi.html"><i class="ph ph-user"></i>Saya</a>
+</nav>
+</body>
+</html>
