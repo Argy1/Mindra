@@ -31,6 +31,10 @@ Terakhir diperbarui 14 Oktober 2026.
   di ujung 0 dan 100, nilai t untuk n besar, urutan prioritas butir, jawaban terbuka kosong) dan ditutup; satu setara
   perilaku (CRLF dihitung dua baris tak berpengaruh karena baris kosong memang dibuang). Penelusuran itu juga memperbaiki
   satu hal di kode: nilai t untuk df di atas 30 semula 1,96 (terlalu sempit), kini diambil dari tabel terdekat di bawahnya.
+- **CI GitHub Actions** (akar repositori, `.github/workflows/ci.yml`, Ubuntu): job web (format, lint, tipe, build, Vitest), e2e
+  (Playwright + axe terhadap build produksi), dan Flutter (`analyze`, `test`). Putaran kedua hijau seluruhnya
+  ([https://github.com/Argy1/Mindra/actions/runs/38585195586](https://github.com/Argy1/Mindra/actions/runs/38585195586)); putaran pertama gagal di job Flutter karena folder aset kosong yang tidak dilacak git, ditemukan dan diperbaiki.
+  CI tidak memakai rahasia sungguhan. Hasil ini tidak menggantikan ukuran terhadap URL demo (belum dideploy).
 - **Gelombang 1** (profil, admin, naskah hukum, statistik wilayah opt-in): `tests/db/region-admin.test.ts` (33 tes basis data
   untuk migrasi `…000600`), 6 tes kesetaraan daftar slot database dengan kode TypeScript, 135 tes unit untuk validasi profil,
   peninjauan admin, ekspor data, dan dua Server Action, serta `e2e/gelombang1.spec.ts` (profil, antrean admin, penjaga rute,

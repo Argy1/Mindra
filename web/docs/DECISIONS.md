@@ -1134,10 +1134,9 @@ lain tertangkap.
   (`docs/img/lighthouse/`) masuk.
 - `pnpm test:e2e` menerima `E2E_PORT` agar suite bisa dijalankan terhadap build produksi yang sudah berjalan.
 - `packageManager: pnpm@12.11.2` dipasang di `package.json` supaya CI memakai versi yang sama dengan mesin pengembangan.
-- `.github/workflows/ci.yml` (lint, tipe, format, build, tes, e2e) dan `uptime.yml` **belum pernah dijalankan di GitHub**
-  (belum ada repositori); semua perintah di dalamnya sudah dijalankan lokal. YAML-nya divalidasi sintaksnya saja.
-- Folder `.github` ditulis dengan asumsi repositori GitHub = folder `web/`. Bila repositorinya folder induk, pindahkan
-  (catatan di kepala `ci.yml`).
+- `.github/workflows/ci.yml` (lint, tipe, format, build, tes, e2e) dan `uptime.yml` ditulis sebelum ada repositori; semua
+  perintah di dalamnya dijalankan lokal. _(Diperbarui di Gelombang 2: repositori GitHub adalah folder induk, workflow dipindah ke
+  akar, dan CI sudah berjalan; lihat bagian Gelombang 2.)_
 - Contoh respons FHIR di landing memakai kode LOINC `44261-6` (PHQ-9), yang berasal dari aplikasi Flutter dan **belum
   diverifikasi ulang ke loinc.org** (catatan lama di ARCHITECTURE §6 tetap berlaku).
 
@@ -1434,7 +1433,11 @@ Root Directory = `web`. Konsekuensinya: `.github/` dipindah dari `web/` ke akar 
 ditambah job Flutter yang memakai `.env.example` sebagai `.env`), README lama di akar (sistem desain) dipindah ke
 `docs/design-system.md` dan README akar baru memperkenalkan proyek (`SKILL.md` diperbarui agar menunjuk ke sana). Repositori
 dimulai **tanpa riwayat lama**, jadi tidak ada rahasia yang tersisa di riwayat; pemindaian pola rahasia atas seluruh pohon
-dilakukan sebelum commit pertama. CI baru **belum pernah berjalan** di GitHub.
+dilakukan sebelum commit pertama. **CI putaran pertama** (commit `57a8d8b`): job web dan e2e + axe hijau di Ubuntu, job Flutter
+gagal. Penyebabnya `flutter analyze` memberi peringatan `asset_directory_does_not_exist`: `pubspec.yaml` mendaftarkan
+`assets/lottie/`, folder itu kosong, dan git tidak melacak folder kosong, jadi hanya klon bersih yang gagal (mesin pengembangan
+tidak). Ditemukan dengan mereproduksi klon bersih dari GitHub secara lokal, diperbaiki dengan `assets/lottie/.gitkeep`
+(commit `4751e0d`); **putaran kedua hijau seluruhnya** ([https://github.com/Argy1/Mindra/actions/runs/38585195586](https://github.com/Argy1/Mindra/actions/runs/38585195586)).
 
 ### Keputusan kecil
 
@@ -1458,6 +1461,7 @@ dilakukan sebelum commit pertama. CI baru **belum pernah berjalan** di GitHub.
 | `flutter analyze` | 0 galat, 0 peringatan, 115 info (sama dengan sebelumnya) |
 | `flutter test` | 160 lulus (137 sebelum Gelombang 2) |
 | Migrasi `…000600` di cloud | tabel di atas |
+| CI GitHub Actions (web, e2e + axe, Flutter) di Ubuntu | hijau pada putaran kedua ([https://github.com/Argy1/Mindra/actions/runs/38585195586](https://github.com/Argy1/Mindra/actions/runs/38585195586)); putaran pertama menemukan satu cacat konfigurasi Flutter, lihat keputusan 5 |
 
 ### Yang belum ada (jujur)
 
@@ -1465,7 +1469,7 @@ dilakukan sebelum commit pertama. CI baru **belum pernah berjalan** di GitHub.
 - **Kunci Anthropic lama belum dicabut** (F7 tinggal ini).
 - **Teman cerita di mobile belum dicoba di perangkat** dan belum pernah memanggil model sungguhan (web juga belum); yang diuji
   adalah pembaca SSE, layanan dengan klien tiruan, dan server yang sudah ada.
-- **CI GitHub belum pernah berjalan**; spec berakun Gelombang 1 belum dijalankan; templat email belum dipasang.
+- Spec berakun Gelombang 1 belum dijalankan; templat email belum dipasang.
 - Lighthouse belum mengukur `/profil`, `/admin/*`, `/syarat-penggunaan`; ukur ulang terhadap URL demo setelah deploy.
 
 ### Perlu tindakan Anda

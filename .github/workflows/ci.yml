@@ -1,9 +1,8 @@
 # CI Mindra (monorepo): web (lint, tipe, format, build, tes unit termasuk penjaga hasil build, lalu e2e + axe) dan
 # aplikasi Flutter (analisis dan tes).
 #
-# CATATAN: berkas ini BELUM pernah dijalankan di GitHub sebelum push pertama (repositori baru dipublikasikan bersamaan).
-# Setiap perintah di bawah sudah dijalankan secara lokal; yang belum teruji hanya pembungkus Actions-nya. Hasil putaran
-# pertama dicatat di web/docs/TESTING.md.
+# Putaran pertama (14 Okt 2026): web dan e2e hijau, Flutter gagal karena folder aset kosong assets/lottie/ yang tidak
+# dilacak git; diperbaiki dan putaran kedua hijau seluruhnya. Rincian di web/docs/TESTING.md bagian 1.
 name: CI
 
 on:

@@ -302,5 +302,6 @@ Cabut di console.anthropic.com, lalu buat kunci baru khusus server (variabel Ver
   model, balasan krisis tetap (tanpa model), batas 20 pesan per jam (pesan krisis dikecualikan), dan perintah sistem tanpa
   emoji. Konsekuensinya: Teman cerita di mobile tidak berfungsi sampai web dideploy dan `WEB_API_BASE_URL` diisi (dinonaktifkan
   dengan pesan yang jelas, bukan gagal diam-diam). Deteksi krisis lokal di aplikasi tetap menyalakan lapisan bantuan seketika.
-- **CI baru belum pernah dijalankan di GitHub** (`.github/workflows/ci.yml`: web, e2e web, Flutter). Semua perintahnya sudah
-  dijalankan lokal; hasil putaran pertama dicatat di `web/docs/TESTING.md`.
+- **CI di GitHub berjalan hijau** (`.github/workflows/ci.yml`: web, e2e web, Flutter; [putaran 2](https://github.com/Argy1/Mindra/actions/runs/38585195586)). Putaran pertama
+  menemukan cacat bukan-keamanan: folder aset Flutter kosong yang tidak dilacak git membuat `flutter analyze` gagal di klon bersih
+  (diperbaiki). CI tidak memakai rahasia sungguhan: variabel Supabase berisi nilai tiruan dan `.env` Flutter berasal dari `.env.example`.
