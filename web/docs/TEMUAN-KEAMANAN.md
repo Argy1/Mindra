@@ -328,3 +328,15 @@ Cabut di console.anthropic.com, lalu buat kunci baru khusus server (variabel Ver
   bisa menunjuk ke id yang tidak ada pada ±5% pemuatan dalam pengujian. Sudah ada sebelum Gelombang 3 (dibuktikan pada commit
   `ce7ea70`). Dampaknya pada pembaca layar: galat kolom atau nama dialog tidak terbaca sampai halaman dimuat ulang; fungsi formulir
   tetap jalan. Mitigasi: satu ulangan di tes; perbaikan yang diusulkan (id stabil dari properti) ada di DECISIONS Gelombang 3.
+
+## Temuan tambahan (pemeriksaan situs live, 14-15 Okt 2026)
+
+- **Tautan email dan sitemap mengarah ke localhost saat `NEXT_PUBLIC_SITE_URL` terlewat.** Ditemukan pada situs Vercel yang
+  baru dideploy: `sitemap.xml`, `robots.txt`, dan tautan email Auth memakai `http://localhost:3000`. Bukan kebocoran data,
+  tetapi email konfirmasi akan membawa pengguna ke alamat yang salah. Ditutup dengan cadangan alamat produksi Vercel (hanya di
+  produksi dan hanya bila variabel kosong; host divalidasi), diuji dan diukur ulang di situs live. Detail di DECISIONS
+  ("Deploy dan pemeriksaan situs live").
+- **Terkonfirmasi di situs live (tanpa akun):** guard rute (307 ke `/masuk`), API tanpa token 401, `/dev/*` 404, CSP tanpa
+  `unsafe-eval`, HSTS, `X-Frame-Options: DENY`; `/api/health` menyentuh database dan menjawab ok.
+- **Masih bergantung pada pemilik:** Site URL dan Redirect URLs Supabase (tujuan tautan email), pencabutan kunci Anthropic lama
+  (F7), SMTP kustom, pemasangan TOTP pada akun psikolog, admin faskes, dan admin, serta verifikasi nomor krisis.

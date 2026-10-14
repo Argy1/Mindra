@@ -25,7 +25,7 @@ Kalau sebuah fase molor lebih dari 1 hari, potong dari Lapis 3 dulu, lalu Lapis 
 - [ ] Konfirmasi ke CP maksimal 1×24 jam setelah daftar, format `UINIC8#2026_WEBDEV_[Nama TIM]_[Nama Instansi]`
 - [ ] Surat Pernyataan Orisinalitas (bermeterai 10.000, ditandatangani ketua)
 - [ ] Repo GitHub **publik** dan tetap aktif sampai lomba selesai
-- [ ] Demo online (Vercel) — akun demo per role tercantum di README & proposal
+- [x] Demo online (Vercel) — <https://web-omega-one-69.vercel.app>, diperiksa 14-15 Okt 2026 (akun demo per role tercantum di README; tinggal di proposal)
 - [ ] Siapkan kredensial: Supabase (sudah), Anthropic API key **baru** (rotasi yang lama), Upstash (gratis), Vercel, SATUSEHAT sandbox (jika bisa didapat), Cloudflare Turnstile
 
 ---
@@ -186,14 +186,18 @@ Hasil telaah kesenjangan web + aplikasi mobile sebelum deploy; keputusan dan ala
 - [x] Migrasi `…000600` diterapkan di cloud dan diverifikasi (14 Okt 2026); akun admin dan calon psikolog ditambahkan (`pnpm seed --yes --add-accounts`)
 - [ ] Bangun ulang aplikasi Flutter dan coba di perangkat
 - [x] Flutter memakai `POST /api/v1/companion/chat` (kunci Anthropic dihapus dari aplikasi); templat email Indonesia (`docs/email-templates/`); panduan deploy (`docs/DEPLOY.md`); CI di akar repositori
-- [ ] **(pemilik)** Vercel + Upstash + kunci Anthropic baru + SMTP; cabut kunci lama (F7); isi `WEB_API_BASE_URL` di aplikasi mobile
-- [ ] Uji berakun dari awal ke akhir (`*.auth.spec.ts`, termasuk `gelombang1.auth.spec.ts` yang baru), Lighthouse terhadap URL demo, monitor uptime
+- [x] Vercel dibuat pemilik dan diperiksa (14-15 Okt 2026): halaman publik, `/api/health` (menyentuh Supabase), guard rute, header, Lighthouse produksi
+- [ ] **(pemilik)** Upstash + kunci Anthropic baru + SMTP + URL Auth Supabase; cabut kunci lama (F7); migrasi `…000700`; isi `WEB_API_BASE_URL` di aplikasi mobile
+- [x] Lighthouse terhadap URL demo (20 pengukuran, `docs/lighthouse/produksi/`)
+- [ ] Uji berakun dari awal ke akhir (`*.auth.spec.ts`, termasuk `gelombang1.auth.spec.ts` yang baru), monitor uptime
 
 ## Gelombang 3 — Opsional
 
 - [x] `/bantuan` (napas terpandu, grounding, kontak krisis, panduan menemani orang lain), `/layanan-terdekat` (publik; lokasi hanya di perangkat), ringkasan penggunaan Teman cerita untuk psikolog (`ai_summary`, tanpa isi percakapan), panduan awal di Beranda. Migrasi `…000700` ditulis dan diuji; **belum diterapkan di cloud**
 
-## Fase 6 — Proposal (24–29 Okt, di chat bersama Claude)
+## Fase 6 — Proposal (24–29 Okt, di Claude Cowork)
+
+Bahan serah terima lengkap: [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md).
 
 Struktur wajib guidebook (a–o): anggota tim, judul, latar belakang, tujuan & manfaat, analisis
 (target pengguna, batasan produk, platform), metodologi (Agile/Scrum 2-mingguan dengan sprint

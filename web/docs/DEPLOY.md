@@ -1,5 +1,10 @@
 # Panduan deploy Mindra Web
 
+> **Status 15 Okt 2026:** situs sudah berjalan di <https://web-omega-one-69.vercel.app> (proyek Vercel `web`, Root Directory
+> `web`, deploy otomatis dari `main`). Langkah 1-3 selesai. Yang masih menunggu pemilik: bagian 4 (URL Auth Supabase),
+> bagian 5 (SMTP dan templat), bagian 6 (kunci Anthropic baru dan pencabutan kunci lama), migrasi `…000700`, bagian 7
+> (aplikasi mobile), dan bagian 9 (uptime, k6). Hasil pemeriksaan live ada di [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 13.
+
 Urutan kerja dari repositori kosong sampai demo online. Yang ditandai **(kamu)** hanya bisa dilakukan pemilik akun
 (membuat akun layanan, menyalin rahasia); sisanya sudah disiapkan di repositori. Rahasia **tidak pernah** ditulis ke
 repositori, ke chat, atau ke berkas yang di-commit: tempel langsung di dasbor layanan terkait.
@@ -44,9 +49,10 @@ kunci `sk-ant-`, JWT, atau kunci pribadi di berkas yang dilacak).
 
 1. Vercel > Add New > Project > impor `Argy1/Mindra`.
    **Nama proyek menentukan alamat** (`<nama>.vercel.app`, siapa cepat dia dapat). Per 14 Okt 2026 `mindra.vercel.app` **sudah
-   dipakai proyek lain** (bukan milik kita), jadi pakai nama lain yang masih kosong, mis. `mindra-web`
-   (`mindra-web.vercel.app`; `mindra-id` dan `mindra-sehat` juga masih kosong saat dicek). Alamat final = nilai
-   `NEXT_PUBLIC_SITE_URL`. Konektor Vercel di sesi pengembangan hanya-baca (membuat proyek ditolak 403), jadi proyek dibuat
+   dipakai proyek lain** (bukan milik kita). Proyek kita diberi nama `web` dan Vercel menetapkan alamat
+   `web-omega-one-69.vercel.app`. Bila ingin alamat lebih rapi (mis. `mindra-web.vercel.app`, kosong saat dicek), tambahkan
+   di Settings > Domains, lalu ubah `NEXT_PUBLIC_SITE_URL` dan Site URL serta Redirect URLs di Supabase. Alamat final =
+   nilai `NEXT_PUBLIC_SITE_URL`. Konektor Vercel di sesi pengembangan hanya-baca (membuat proyek ditolak 403), jadi proyek dibuat
    pemilik lewat dasbor.
 2. **Root Directory: `web`**. Framework Next.js terdeteksi otomatis. Install command bawaan (`pnpm install`) dan build
    command bawaan (`next build`) sudah benar; Node.js 24.
@@ -56,7 +62,7 @@ kunci `sk-ant-`, JWT, atau kunci pribadi di berkas yang dilacak).
 | ------------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`      | tidak   | Supabase > Settings > API > Project URL                                                        |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | tidak   | Supabase > Settings > API > kunci `anon` (publik; RLS yang menjaga)                            |
-| `NEXT_PUBLIC_SITE_URL`          | tidak   | Alamat produksi, mis. `https://mindra-web.vercel.app` (lihat catatan di bawah)                     |
+| `NEXT_PUBLIC_SITE_URL`          | tidak   | Alamat produksi, mis. `https://web-omega-one-69.vercel.app` (lihat catatan di bawah)               |
 | `SUPABASE_SERVICE_ROLE_KEY`     | **ya**  | Supabase > Settings > API > `service_role`. Hanya dipakai kode server (API mitra); jangan bagikan |
 | `UPSTASH_REDIS_REST_URL`        | tidak   | Dari Upstash                                                                                   |
 | `UPSTASH_REDIS_REST_TOKEN`      | **ya**  | Dari Upstash                                                                                   |
@@ -66,7 +72,9 @@ kunci `sk-ant-`, JWT, atau kunci pribadi di berkas yang dilacak).
 | `ENABLE_DEV_PAGES`              | tidak   | **Kosongkan** di produksi (halaman `/dev/*` mati)                                              |
 | `MFA_ENFORCEMENT`               | tidak   | **Kosongkan** (MFA wajib). Lihat bagian 8 untuk demo juri                                      |
 
-Catatan `NEXT_PUBLIC_SITE_URL`: nilai `NEXT_PUBLIC_*` ditanam saat build. Deploy pertama menghasilkan alamat
+Catatan `NEXT_PUBLIC_SITE_URL`: bila terlewat, di deployment **produksi** web memakai `VERCEL_PROJECT_PRODUCTION_URL` sebagai
+cadangan (ditemukan saat pemeriksaan live: sitemap dan tautan email sempat mengarah ke localhost). Itu jaring pengaman; tetap
+isi variabelnya. Nilai `NEXT_PUBLIC_*` ditanam saat build. Deploy pertama menghasilkan alamat
 `*.vercel.app`; isi variabel ini dengan alamat itu lalu **redeploy** supaya tautan di email (konfirmasi dan atur ulang sandi)
 mengarah ke situs yang benar.
 

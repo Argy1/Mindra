@@ -10,7 +10,7 @@ Interconnected Web Solutions to Empower Digital Ecosystems_, subtema Kesehatan (
 |                      |                                                                                                    |
 | -------------------- | -------------------------------------------------------------------------------------------------- |
 | **Aplikasi web**     | [`web/`](web/README.md): fitur, arsitektur, keamanan, bukti pengujian, akun demo                   |
-| **Demo online**      | _Belum dideploy._ Alamatnya dicantumkan di [`web/README.md`](web/README.md) setelah deploy ke Vercel |
+| **Demo online**      | <https://web-omega-one-69.vercel.app> (Vercel; akun demo dan keterbatasannya di [`web/README.md`](web/README.md)) |
 | **Aplikasi mobile**  | Flutter, folder `lib/`, `android/`, `ios/` di akar repositori ini                                  |
 | **Database bersama** | [`supabase/migrations/`](supabase/migrations): migrasi aplikasi mobile dan web (urut, additive)    |
 | **Panduan deploy**   | [`web/docs/DEPLOY.md`](web/docs/DEPLOY.md)                                                         |
@@ -52,7 +52,7 @@ sesi pengguna. Berkas `.env` mobile dibundel ke aplikasi, jadi hanya nilai yang 
 
 ## Catatan jujur
 
-Hasil pengujian dan yang **belum** terbukti (belum dideploy, SATUSEHAT hanya simulasi, uji pengguna belum dilaksanakan,
+Hasil pengujian dan yang **belum** terbukti (uptime belum dipantau, SATUSEHAT hanya simulasi, uji pengguna belum dilaksanakan,
 k6 asli belum dijalankan) dicatat apa adanya di [`web/docs/TESTING.md`](web/docs/TESTING.md) dan
 [`web/README.md`](web/README.md#status-dan-keterbatasan).
 

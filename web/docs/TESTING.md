@@ -1,15 +1,17 @@
 # Bukti pengujian
 
 Semua angka di sini berasal dari proses yang bisa diulang di repositori ini, dengan perintahnya. Yang belum bisa diukur
-(demo online, k6 asli, uji pengguna, uptime) ditulis terang-terangan di bagian [Yang belum terbukti](#yang-belum-terbukti).
+(k6 asli, uji pengguna, uptime, alur berakun di situs live) ditulis terang-terangan di bagian [Yang belum terbukti](#yang-belum-terbukti).
 Terakhir diperbarui 14 Oktober 2026.
 
 | Bukti | Hasil | Cara mengulang |
 | ----- | ----- | -------------- |
-| Tes unit, komponen, dan basis data (Vitest) | **2235 lulus**, 116 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
+| Tes unit, komponen, dan basis data (Vitest) | **2250 lulus**, 116 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
 | Tes e2e + aksesibilitas (Playwright, desktop 1440 dan mobile 390) | **614 lulus**, 68 dilewati (spec yang butuh akun sungguhan), 0 gagal, terhadap build produksi | `E2E_PORT=3200 pnpm test:e2e` (server produksi di port itu) |
 | Audit aksesibilitas (axe, WCAG 2.2 AA) | 33 rute x 2 viewport, **0 pelanggaran**; ditambah keadaan yang berubah (dialog hapus akun dan persetujuan admin terbuka, napas berjalan dan selesai, grounding, lokasi aktif, daftar kosong dan gagal, panduan awal setelah galat) di `e2e/gelombang1.spec.ts` dan `e2e/gelombang3.spec.ts` | `e2e/fase5.spec.ts` |
 | Lighthouse (12.8.2) | Aksesibilitas **100** di semua 48 pengukuran; halaman publik P 93-100, BP 100, SEO 100 | `pnpm lighthouse` |
+| Lighthouse **di produksi** (Vercel, 14/15 Okt 2026) | 10 halaman publik x mobile dan desktop = 20 pengukuran: Performa 98-100, Aksesibilitas **100**, Praktik terbaik **100**, SEO **100** | `node scripts/lighthouse-audit.mjs --base https://web-omega-one-69.vercel.app --summary docs/lighthouse/produksi` |
+| Pemeriksaan situs live (tanpa akun) | Halaman publik 200; `/api/health` ok (menyentuh Supabase); guard rute 307 ke `/masuk`; API tanpa token 401; `/dev/*` 404; header keamanan lengkap; sitemap dan robots memakai alamat produksi | bagian 3a |
 | Uji beban lokal, 200 pengguna virtual | **25.426 permintaan, 0 galat, p95 10,6 ms** (bukan k6; lihat catatan) | `pnpm load` |
 | Pembatas laju di bawah beban | Satu IP, 200 koneksi paralel, 600 permintaan: tepat **60 lolos, 540 ditolak 429** | `pnpm load --limiter-check` |
 | Uji mutasi | Perusakan sengaja pada logika inti; semua tertangkap kecuali yang setara perilaku | lihat [DECISIONS.md](DECISIONS.md) |
@@ -17,7 +19,7 @@ Terakhir diperbarui 14 Oktober 2026.
 
 ## 1. Tes otomatis
 
-- **Vitest** (2235 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
+- **Vitest** (2250 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
   slot konsultasi, SUS), kerangka API, komponen, dan **aturan RLS di Postgres sungguhan** (PGlite dengan peran dan klaim JWT
   yang meniru Supabase). Tes penjaga hasil build memastikan rute yang memuat data per pengguna tidak ikut diprerender (data satu orang tak boleh
   masuk cache CDN) dan halaman marketing tetap statis; tes itu hanya aktif setelah `pnpm build`.
@@ -34,7 +36,7 @@ Terakhir diperbarui 14 Oktober 2026.
 - **CI GitHub Actions** (akar repositori, `.github/workflows/ci.yml`, Ubuntu): job web (format, lint, tipe, build, Vitest), e2e
   (Playwright + axe terhadap build produksi), dan Flutter (`analyze`, `test`). Putaran kedua hijau seluruhnya
   ([https://github.com/Argy1/Mindra/actions/runs/38585195586](https://github.com/Argy1/Mindra/actions/runs/38585195586)); putaran pertama gagal di job Flutter karena folder aset kosong yang tidak dilacak git, ditemukan dan diperbaiki.
-  CI tidak memakai rahasia sungguhan. Hasil ini tidak menggantikan ukuran terhadap URL demo (belum dideploy).
+  CI tidak memakai rahasia sungguhan. Ukuran terhadap URL demo ada di bagian 3 (Lighthouse produksi) dan bagian 3a.
 - **Gelombang 1** (profil, admin, naskah hukum, statistik wilayah opt-in): `tests/db/region-admin.test.ts` (33 tes basis data
   untuk migrasi `…000600`), 6 tes kesetaraan daftar slot database dengan kode TypeScript, 135 tes unit untuk validasi profil,
   peninjauan admin, ekspor data, dan dua Server Action, serta `e2e/gelombang1.spec.ts` (profil, antrean admin, penjaga rute,
@@ -127,6 +129,30 @@ Tangkapan layar laporan (skor, dari `docs/img/lighthouse/`):
 Laporan lengkap (JSON + HTML, ±800 KB per halaman) tidak disimpan di repositori; ringkasan mesin ada di
 [`lighthouse/summary.json`](lighthouse/summary.json) dan [`lighthouse/summary.md`](lighthouse/summary.md).
 
+### Lighthouse di produksi
+
+Diukur 14/15 Okt 2026 terhadap <https://web-omega-one-69.vercel.app> (Vercel, sertifikat sah, tanpa proxy), dari komputer
+pengembang, Lighthouse 12.8.2 dengan throttling bawaan (simulasi). Hanya halaman publik; halaman berlogin tidak bisa diaudit
+tanpa akun dan `/dev/*` mati di produksi, jadi keduanya tetap diwakili tabel lokal di atas. Ringkasan mesin:
+[`lighthouse/produksi/summary.json`](lighthouse/produksi/summary.json) dan [`summary.md`](lighthouse/produksi/summary.md).
+
+| Rute | Mobile (P / A / BP / SEO) | Desktop (P / A / BP / SEO) | LCP mobile | TBT mobile |
+| ---- | ------------------------- | -------------------------- | ---------: | ---------: |
+| `/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 1.8 dtk | 27 ms |
+| `/tentang` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 1.7 dtk | 50 ms |
+| `/bantuan` | 99 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 2.0 dtk | 59 ms |
+| `/layanan-terdekat` | 99 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 1.9 dtk | 49 ms |
+| `/syarat-penggunaan` | 99 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 1.8 dtk | 70 ms |
+| `/kebijakan-privasi` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 1.8 dtk | 47 ms |
+| `/developers` | 99 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 2.1 dtk | 85 ms |
+| `/masuk` | 99 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 2.0 dtk | 49 ms |
+| `/daftar` | 99 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 2.0 dtk | 70 ms |
+| `/lupa-sandi` | 98 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 2.0 dtk | 120 ms |
+
+Semua 20 pengukuran memenuhi target CLAUDE.md (P >= 90, A >= 95, BP >= 95, SEO >= 90); CLS paling tinggi 0,016 (`/developers`
+desktop). Angkanya lebih tinggi daripada hasil lokal karena CDN Vercel melayani halaman statis. Batas: satu komputer dan satu
+jaringan, nilai bisa berfluktuasi beberapa poin antar-putaran.
+
 ### Yang di bawah target dan alasannya
 
 | Temuan | Alasan | Tindakan |
@@ -146,8 +172,31 @@ Laporan lengkap (JSON + HTML, ±800 KB per halaman) tidak disimpan di repositori
 2. **Build produksi lewat HTTP biasa memberi galat konsol palsu (dijelaskan).** Di pratinjau, tautan navigasi ke halaman
    berlogin dialihkan ke `/masuk`; `upgrade-insecure-requests` menaikkan pengalihan itu ke `https://localhost`, yang gagal. Ini
    hanya muncul bila build produksi dibuka lewat HTTP. Lewat HTTPS galat itu hilang (diukur ulang di atas), jadi
-   angka di tabel adalah angka lewat proxy HTTPS. **Ukur ulang terhadap URL demo setelah deploy**:
-   `node scripts/lighthouse-audit.mjs --base https://<url-demo>`.
+   angka di tabel adalah angka lewat proxy HTTPS. Sudah diukur ulang terhadap produksi (bagian "Lighthouse di produksi"):
+   di HTTPS Vercel galat itu tidak muncul. Perintah: `node scripts/lighthouse-audit.mjs --base https://web-omega-one-69.vercel.app --summary docs/lighthouse/produksi`
+   (di Windows jalankan lewat PowerShell dan beri `--out` folder sederhana bila `--out` bawaan bermasalah di Bash).
+
+## 3a. Pemeriksaan situs live (tanpa akun)
+
+Dilakukan 14 Okt 2026 malam dan diulang 15 Okt 2026 dini hari setelah perbaikan alamat situs, terhadap
+<https://web-omega-one-69.vercel.app>. Hanya permintaan baca tanpa kredensial; tidak ada data yang ditulis dan tidak ada
+kata sandi atau kunci yang dimasukkan. Alatnya `curl` terhadap daftar rute di bawah.
+
+| Pemeriksaan | Hasil |
+| ----------- | ----- |
+| Halaman publik (`/`, `/tentang`, `/bantuan`, `/layanan-terdekat`, `/syarat-penggunaan`, `/kebijakan-privasi`, `/developers`, `/masuk`, `/daftar`, `/lupa-sandi`) | 200 semuanya |
+| `/robots.txt`, `/sitemap.xml`, `/api/v1/instruments`, `/api/v1/openapi.json` | 200 |
+| `/api/health` | `{"data":{"status":"ok",...},"error":null}` (kueri `head` ke database: **koneksi Supabase berfungsi**) |
+| `/layanan-terdekat` | Memuat 20 faskes dari tabel `facilities` (pembacaan publik lewat RLS) dan menyatakan "Daftar ini masih contoh" |
+| Rute berlogin (11 rute) | 307 ke `/masuk?next=...` |
+| `/dev/ui` | 404 (pratinjau mati di produksi) |
+| `POST /api/v1/assessments` dan `POST /api/v1/companion/chat` tanpa token | 401 |
+| Header di `/` | CSP (tanpa `unsafe-eval`), HSTS 2 tahun + includeSubDomains, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy` |
+| `sitemap.xml` dan `robots.txt` | **Awalnya mengarah ke `http://localhost:3000`** (`NEXT_PUBLIC_SITE_URL` belum diisi di Vercel). Diperbaiki di commit `0bc57bd` dengan cadangan `VERCEL_PROJECT_PRODUCTION_URL`; setelah deploy: 7 alamat berawalan `https://web-omega-one-69.vercel.app`, 0 `localhost` |
+
+**Yang tidak diperiksa dan tidak boleh diklaim:** daftar dan masuk dengan akun nyata, email konfirmasi dan atur ulang sandi,
+Teman cerita dengan model asli, MFA TOTP, portal psikolog, faskes, dan admin. Itu butuh akun atau rahasia yang hanya
+pemilik pegang (lihat [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 15).
 
 ## 4. Uji beban
 
@@ -220,7 +269,8 @@ Setelah dijalankan: lampirkan `p(95)` dan `http_req_failed` dari ringkasan k6 di
 - **Monitor eksternal (belum terpasang, butuh URL demo):** UptimeRobot gratis, jenis "Keyword", URL `https://<url-demo>/api/health`,
   kata kunci `"status":"ok"`, interval 5 menit, beri notifikasi email. Setelah aktif beberapa hari, tangkap layar halaman
   statusnya ke `docs/img/uptime.png` untuk proposal.
-- **Status: belum aktif.** Aplikasi belum dideploy; tidak ada angka uptime untuk dilaporkan.
+- **Status: belum aktif.** Aplikasi sudah dideploy (<https://web-omega-one-69.vercel.app>) tetapi monitor eksternal belum dipasang
+  dan variabel repositori `DEMO_URL` belum diisi; tidak ada angka uptime untuk dilaporkan.
 
 ## 6. Uji pengguna (SUS)
 
@@ -231,18 +281,18 @@ Protokol, persetujuan, tugas, kuesioner SUS, dan alat rekap sudah siap: [UJI-PEN
 
 | Klaim yang bisa muncul di proposal | Status | Yang dibutuhkan |
 | ---------------------------------- | ------ | --------------- |
-| Aplikasi berjalan online | Belum dideploy | Deploy ke Vercel, isi `NEXT_PUBLIC_SITE_URL`, tambahkan URL ke Redirect URLs Supabase |
+| Aplikasi berjalan online | **Terbukti tanpa akun** (bagian 3a). Alur berakun belum | Tambahkan URL ke Site URL dan Redirect URLs Supabase, SMTP, lalu coba daftar dan masuk di peramban |
 | Hasil k6 | Skrip siap, belum dijalankan | Pasang k6, jalankan terhadap lokal dan demo |
-| Performa di produksi (Lighthouse, beban) | Hanya lokal | Ulangi `pnpm lighthouse --base https://<url-demo> --insecure` hanya bila sertifikatnya swatandatangani; untuk URL Vercel cukup `--base` setelah deploy |
+| Performa di produksi (beban) | Lighthouse produksi **sudah** (bagian 3); beban belum (hanya lokal) | Ulangi `pnpm lighthouse --base https://<url-demo> --insecure` hanya bila sertifikatnya swatandatangani; untuk URL Vercel cukup `--base` setelah deploy |
 | Uptime | Belum terpasang | URL demo + UptimeRobot |
 | SUS | Belum ada responden | Sesi uji 24-26 Okt |
 | Teman cerita dengan model sungguhan | Belum pernah dijalankan dengan kunci Anthropic asli | Isi `ANTHROPIC_API_KEY` di lingkungan demo, coba beberapa percakapan (termasuk jalur krisis) |
 | Pengiriman ke SATUSEHAT | Hanya mode simulasi lokal | Kredensial staging Kemenkes dan nomor IHS pasien |
 | Alur dengan akun sungguhan (`*.auth.spec.ts`) | 56 kasus dilewati; alur Gelombang 1 (profil dan admin dengan akun nyata) belum punya spec berakun | Akun uji + variabel `E2E_*` (petunjuk di PANDUAN-PENGEMBANG) |
-| Migrasi `…000600` di proyek cloud | Teruji di Postgres tiruan (PGlite), **belum diterapkan di cloud** | Pemilik menempelkan berkasnya di SQL Editor; lalu verifikasi terhadap cloud dan `pnpm seed --yes` |
+| Migrasi `…000600` di proyek cloud | **Sudah diterapkan dan diverifikasi** (14 Okt 2026); akun admin dan calon psikolog ditambahkan lewat `pnpm seed --yes --add-accounts` | - |
 | Fungsi baru dari aplikasi Flutter di perangkat | Teruji pemetaan, logika, dan analisis statis; belum dijalankan di perangkat atau emulator | Bangun ulang aplikasi setelah migrasi diterapkan, coba pesan konsultasi, ubah profil, hapus akun |
 | Migrasi `…000700` di proyek cloud | Teruji di Postgres tiruan, **belum diterapkan di cloud** | Pemilik menempelkan berkasnya di SQL Editor; lalu verifikasi di cloud |
 | Latihan napas dan grounding dengan pembaca layar sungguhan | Belum (struktur, wilayah live, dan axe terbukti) | NVDA, TalkBack, VoiceOver |
-| Lighthouse untuk `/profil`, `/admin/*`, `/syarat-penggunaan`, `/bantuan`, `/layanan-terdekat` | Belum diukur (halaman baru) | `pnpm lighthouse` setelah menambah rute; halaman berlogin lewat pratinjau `/dev/profil` dan `/dev/admin` |
+| Lighthouse untuk `/profil` dan `/admin/*` | `/syarat-penggunaan`, `/bantuan`, `/layanan-terdekat` sudah diukur di produksi; halaman berlogin belum | Lewat pratinjau lokal `/dev/profil` dan `/dev/admin` (`pnpm lighthouse`) |
 | Login admin faskes memakai TOTP asli | Hanya diuji di database dan komponen | Pasang TOTP di aplikasi autentikator sungguhan sekali |
 | Uji pembaca layar | Belum | NVDA/TalkBack/VoiceOver |

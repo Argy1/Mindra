@@ -1629,3 +1629,54 @@ berlebih: pembatas dihapus karena `ceil` dari angka positif selalu 1 atau lebih.
    `lib/domain/crisis/resources.ts`.
 3. Bila punya data layanan kesehatan jiwa yang sungguhan (puskesmas, rumah sakit, biro psikologi di wilayah demo), muat ke tabel
    `facilities`, periksa, lalu ubah `FACILITY_DIRECTORY_VERIFIED` menjadi `true`.
+
+---
+
+## Deploy dan pemeriksaan situs live (14-15 Okt 2026)
+
+Pemilik membuat proyek Vercel (`web`, Root Directory `web`, deploy otomatis dari `main`); alamatnya
+<https://web-omega-one-69.vercel.app>. Konektor Vercel di sesi pengembangan hanya-baca, jadi variabel lingkungan tidak bisa
+dibaca dan isinya disimpulkan dari perilaku situs. Pemeriksaan dilakukan tanpa akun dan tanpa memasukkan rahasia apa pun.
+
+### Apa yang diperiksa dan hasilnya
+
+| Pemeriksaan | Hasil |
+| ----------- | ----- |
+| Halaman publik, `robots.txt`, `sitemap.xml`, API publik | 200 |
+| `/api/health` | ok; kueri `head` ke database, jadi URL dan kunci anon Supabase terpasang benar |
+| `/layanan-terdekat` | memuat 20 faskes dari tabel `facilities` lewat RLS |
+| 11 rute berlogin | 307 ke `/masuk?next=...` |
+| `/dev/*` | 404 (sengaja) |
+| API tanpa token | 401 |
+| Header | CSP tanpa `unsafe-eval`, HSTS 2 tahun, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` |
+| Lighthouse produksi (20 pengukuran) | Performa 98-100, Aksesibilitas 100, Praktik terbaik 100, SEO 100 |
+
+### Satu temuan: alamat situs mengarah ke localhost
+
+`NEXT_PUBLIC_SITE_URL` belum diisi di Vercel. Akibatnya `sitemap.xml`, baris `Sitemap:` di `robots.txt`, dan (lewat
+`readPublicEnv`) tautan email konfirmasi dan atur ulang sandi memakai `http://localhost:3000`. Tidak ada yang rusak secara
+fungsi, tetapi email pendaftaran akan membawa pengguna ke alamat yang salah.
+
+**Keputusan.** Perbaiki di kode, bukan hanya mengingatkan pemilik: pada deployment **produksi** (`VERCEL_ENV=production`) dan
+**hanya bila** `NEXT_PUBLIC_SITE_URL` kosong, `siteUrl()` dan `readPublicEnv()` memakai `VERCEL_PROJECT_PRODUCTION_URL` (host
+divalidasi: huruf, angka, titik, tanda hubung, wajib mengandung titik; selalu `https`). Nilai yang diisi pemilik selalu menang;
+preview dan development tidak terpengaruh. Variabel `NEXT_PUBLIC_VERCEL_*` ikut dibaca agar nilainya tertanam di bundel klien.
+
+**Mengapa aman.** Host yang tidak wajar ditolak (jatuh ke localhost seperti sebelumnya, tidak pernah ke alamat karangan), dan
+cadangan tidak berlaku di luar produksi sehingga alamat preview tidak bocor ke tautan email produksi.
+
+**Bukti.** 15 tes baru di `lib/env/env.test.ts` (Vitest sekarang **2250 dari 2250 lulus**, 116 berkas), 9 uji mutasi semuanya
+tertangkap, dan pemeriksaan live setelah deploy `0bc57bd`: `sitemap.xml` memuat 7 alamat berawalan alamat Vercel dan tidak ada
+`localhost`. Ini jaring pengaman; pemilik tetap sebaiknya mengisi `NEXT_PUBLIC_SITE_URL`.
+
+### Alat: `--summary` pada `scripts/lighthouse-audit.mjs`
+
+Ukuran produksi ditulis ke `docs/lighthouse/produksi/` agar tidak menimpa hasil lokal di `docs/lighthouse/`. Dua jebakan yang
+ditemui: `--out` dengan jalur absolut bergaris miring di Bash membuat berkas kosong bernama `C` dan skrip berhenti saat
+membaca laporan yang tidak ada; jalankan lewat PowerShell dengan `--out` folder sederhana.
+
+### Yang belum diverifikasi (butuh pemilik)
+
+Daftar dan masuk dengan akun nyata, email (SMTP dan templat), Site URL dan Redirect URLs Supabase, Teman cerita dengan kunci
+Anthropic asli, MFA TOTP, dan portal psikolog, faskes, serta admin. Daftar tindakan lengkap dengan urutan prioritas ada di
+[`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 15.

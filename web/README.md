@@ -9,7 +9,7 @@ Interconnected Web Solutions to Empower Digital Ecosystems_, subtema Kesehatan (
 
 |                      |                                                                                                         |
 | -------------------- | ------------------------------------------------------------------------------------------------------- |
-| **Demo online**      | _Belum dideploy._ Alamatnya dicantumkan di sini setelah deploy ke Vercel.                               |
+| **Demo online**      | <https://web-omega-one-69.vercel.app> (Vercel, deploy otomatis dari `main`)                             |
 | **Aplikasi mobile**  | Flutter, folder induk repositori ini (`../`), memakai proyek Supabase yang sama; Teman cerita lewat web |
 | **Deploy**           | [`docs/DEPLOY.md`](docs/DEPLOY.md): Vercel, Supabase Auth, Upstash, SMTP, daftar periksa                |
 | **Bukti pengujian**  | [`docs/TESTING.md`](docs/TESTING.md): Lighthouse, aksesibilitas, beban, tes                             |
@@ -178,16 +178,16 @@ mobile). Rinciannya: [`docs/TEMUAN-KEAMANAN.md`](docs/TEMUAN-KEAMANAN.md).
 
 ## Pengujian
 
-| Bukti                       | Hasil                                                                                                                                 |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Vitest                      | **2235 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                     |
-| Playwright + axe            | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop dan mobile                                                        |
-| Aksesibilitas               | **0 pelanggaran axe WCAG 2.2 AA** di 33 rute x 2 viewport; audit keyboard otomatis; Lighthouse Aksesibilitas **100** di semua halaman |
-| Lighthouse (halaman publik) | Performa 93-100, Aksesibilitas 100, Praktik terbaik 100, SEO 100                                                                      |
-| Uji beban lokal             | 200 pengguna virtual, 25 ribu permintaan, **0 galat, p95 10,6 ms** (satu mesin, bukan k6)                                             |
-| Uji mutasi                  | Lebih dari seratus perusakan sengaja pada migrasi dan logika inti; yang lolos diperbaiki atau terbukti setara                         |
+| Bukti                       | Hasil                                                                                                                                  |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Vitest                      | **2250 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                      |
+| Playwright + axe            | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop dan mobile                                                         |
+| Aksesibilitas               | **0 pelanggaran axe WCAG 2.2 AA** di 33 rute x 2 viewport; audit keyboard otomatis; Lighthouse Aksesibilitas **100** di semua halaman  |
+| Lighthouse (halaman publik) | Lokal: Performa 93-100, Aksesibilitas 100, Praktik terbaik 100, SEO 100. **Di produksi (Vercel): Performa 98-100, ketiganya lain 100** |
+| Uji beban lokal             | 200 pengguna virtual, 25 ribu permintaan, **0 galat, p95 10,6 ms** (satu mesin, bukan k6)                                              |
+| Uji mutasi                  | Lebih dari seratus perusakan sengaja pada migrasi dan logika inti; yang lolos diperbaiki atau terbukti setara                          |
 
-Angka dan keterbatasannya (apa yang **belum** terbukti: demo online, k6 asli, uptime, uji pengguna) ada di
+Angka dan keterbatasannya (apa yang **belum** terbukti: k6 asli, uptime, uji pengguna, alur berakun di situs live) ada di
 [`docs/TESTING.md`](docs/TESTING.md). Protokol uji pengguna SUS: [`docs/UJI-PENGGUNA.md`](docs/UJI-PENGGUNA.md).
 
 ## Tangkapan layar
@@ -238,7 +238,9 @@ docs/                 PLAN, ARCHITECTURE, DESIGN, DECISIONS, TEMUAN-KEAMANAN, TE
 
 Yang berjalan dan teruji ada di atas. Yang **belum**, ditulis terang:
 
-- **Belum dideploy**, jadi belum ada demo online, ukuran performa di produksi, atau uptime.
+- **Sudah dideploy dan diperiksa tanpa akun** (14-15 Okt 2026: halaman publik, `/api/health` menyentuh Supabase, guard rute,
+  header keamanan, Lighthouse produksi). **Belum**: alur berakun di situs live (daftar, email, MFA, Teman cerita), uptime
+  terpantau, dan k6.
 - **SATUSEHAT hanya simulasi lokal.** Pemeta FHIR dan alur persetujuan teruji, tetapi belum ada kredensial staging Kemenkes;
   tidak ada data yang keluar dari server pada mode ini.
 - **Teman cerita belum pernah dijalankan dengan kunci Anthropic asli.** Kodenya diuji dengan model tiruan, termasuk jalur krisis
@@ -258,4 +260,5 @@ Yang berjalan dan teruji ada di atas. Yang **belum**, ditulis terang:
 - [`docs/DECISIONS.md`](docs/DECISIONS.md): keputusan dan alasannya · [`docs/TEMUAN-KEAMANAN.md`](docs/TEMUAN-KEAMANAN.md): temuan keamanan
 - [`docs/TESTING.md`](docs/TESTING.md): bukti pengujian · [`docs/UJI-PENGGUNA.md`](docs/UJI-PENGGUNA.md): protokol SUS
 - [`docs/PANDUAN-PENGEMBANG.md`](docs/PANDUAN-PENGEMBANG.md): menjalankan, migrasi, MFA, API, akun demo, struktur terperinci
+- [`docs/HANDOFF-FASE-6.md`](docs/HANDOFF-FASE-6.md): serah terima lengkap (tujuan, fitur, arsitektur, bukti, batas) untuk penulisan proposal
 - `/developers` dan `/api/v1/openapi.json`: dokumentasi dan spesifikasi API publik (saat server berjalan)
