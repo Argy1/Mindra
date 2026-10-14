@@ -16,6 +16,7 @@
  *   --forms <a,b>     mobile, desktop, atau keduanya (bawaan mobile,desktop)
  *   --insecure        terima sertifikat swatandatangani (proxy HTTPS lokal); jangan dipakai untuk situs asli
  *   --setup <teks>    keterangan lingkungan yang ditulis ke summary.json
+ *   --summary <dir>   folder ringkasan (bawaan docs/lighthouse); pakai folder lain agar hasil lokal tidak tertimpa
  *
  * Hasil ringkas (skor + metrik utama) ditulis ke docs/lighthouse/summary.json dan summary.md.
  * Laporan lengkap TIDAK dimasukkan ke repo (masing-masing ±800 KB).
@@ -83,6 +84,7 @@ function parseArgs(argv) {
     forms: ['mobile', 'desktop'],
     insecure: false,
     setup: null,
+    summary: 'docs/lighthouse',
   };
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i];
@@ -91,6 +93,7 @@ function parseArgs(argv) {
     else if (flag === '--forms') args.forms = argv[(i += 1)].split(',');
     else if (flag === '--insecure') args.insecure = true;
     else if (flag === '--setup') args.setup = argv[(i += 1)];
+    else if (flag === '--summary') args.summary = argv[(i += 1)];
     else if (flag === '--only') {
       args.only = [];
       while (argv[i + 1] !== undefined && !argv[i + 1].startsWith('--')) {
@@ -168,7 +171,7 @@ for (const route of routes) {
   }
 }
 
-const docsDir = resolve('docs/lighthouse');
+const docsDir = resolve(args.summary);
 mkdirSync(docsDir, { recursive: true });
 const ok = results.filter((r) => !r.error);
 const summary = {
@@ -199,7 +202,7 @@ const misses = ok.flatMap((r) =>
     .map(([key, min]) => `${r.form} ${r.route}: ${key} ${r[key]} < ${min}`),
 );
 console.log(
-  `\n${ok.length}/${results.length} halaman diaudit. Ringkasan: docs/lighthouse/summary.{json,md}`,
+  `\n${ok.length}/${results.length} halaman diaudit. Ringkasan: ${args.summary}/summary.{json,md}`,
 );
 console.log(
   misses.length

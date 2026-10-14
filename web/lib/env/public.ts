@@ -22,6 +22,25 @@ const supabaseUrl = z.url({ error: 'harus berupa URL, mis. https://abcdefgh.supa
   { error: 'harus memakai https (http hanya untuk localhost)' },
 );
 
+/**
+ * Alamat produksi bawaan Vercel (tanpa protokol), mis. `mindra-web.vercel.app` atau domain khusus bila ada. Dipakai HANYA
+ * di deployment produksi dan HANYA bila `NEXT_PUBLIC_SITE_URL` tidak diisi, supaya sitemap dan tautan di email (konfirmasi
+ * pendaftaran, atur ulang sandi) tidak mengarah ke localhost ketika variabel itu terlewat. Nilai yang bukan nama host yang
+ * wajar ditolak. `NEXT_PUBLIC_VERCEL_*` (otomatis dari Vercel) ikut dibaca agar nilainya tertanam di bundel klien.
+ */
+function vercelProductionUrl(): string | undefined {
+  const isProduction =
+    (process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV) === 'production';
+  const host =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL ||
+    '';
+  if (!isProduction || !/^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$/i.test(host) || !host.includes('.')) {
+    return undefined;
+  }
+  return `https://${host}`;
+}
+
 const publicEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z
@@ -42,7 +61,7 @@ export function readPublicEnv(): PublicEnvResult {
   const parsed = publicEnvSchema.safeParse({
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || undefined,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || undefined,
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || vercelProductionUrl(),
   });
 
   if (parsed.success) return { ok: true, env: parsed.data };
@@ -60,7 +79,7 @@ const DEFAULT_SITE_URL = 'http://localhost:3000';
  * valid jatuh ke localhost, bukan ke alamat karangan.
  */
 export function siteUrl(): string {
-  const parsed = z.url().safeParse(process.env.NEXT_PUBLIC_SITE_URL || undefined);
+  const parsed = z.url().safeParse(process.env.NEXT_PUBLIC_SITE_URL || vercelProductionUrl());
   return (parsed.success ? parsed.data : DEFAULT_SITE_URL).replace(/\/+$/, '');
 }
 
