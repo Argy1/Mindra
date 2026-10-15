@@ -10,6 +10,15 @@ import {
   type SusBand,
   type SusSummary,
 } from './sus';
+import {
+  UEQ_BAND_LABEL,
+  UEQ_MIN_RESPONDENTS,
+  UEQ_SCALE_LABEL,
+  UEQ_S_ITEMS,
+  summarizeUeqS,
+  type UeqScale,
+  type UeqSummary,
+} from './ueq';
 
 /**
  * Laporan uji pengguna dalam Markdown (bahasa Indonesia) dari respons yang sudah diparse. Fungsi murni:
@@ -18,12 +27,50 @@ import {
 
 const PEOPLE = 'responden';
 const fmt = (value: number) => String(value).replace('.', ',');
+/** UEQ dilaporkan selalu dengan dua desimal (konvensi UEQ), termasuk tanda minus. */
+const fmtUeq = (value: number) => value.toFixed(2).replace('.', ',');
+
+const UEQ_SCALES: readonly UeqScale[] = ['pragmatic', 'hedonic', 'overall'];
+
+function ueqLines(summary: UeqSummary): string[] {
+  const out = [
+    `${summary.n} ${PEOPLE} mengisi UEQ-S. Skala -3 (kutub negatif) sampai +3 (kutub positif); 0 = netral.`,
+    '',
+    '| Skala | Rata-rata | Simpangan baku | Selang 95% rata-rata | Kategori benchmark |',
+    '| ----- | --------: | -------------: | -------------------- | ------------------ |',
+  ];
+  for (const scale of UEQ_SCALES) {
+    const row = summary[scale];
+    const ci = row.ci95
+      ? `${fmtUeq(row.ci95.low)} sampai ${fmtUeq(row.ci95.high)}`
+      : 'tidak dihitung (n = 1)';
+    out.push(
+      `| ${UEQ_SCALE_LABEL[scale]} | ${fmtUeq(row.mean)} | ${fmtUeq(row.sd)} | ${ci} | ${UEQ_BAND_LABEL[row.band]} |`,
+    );
+  }
+  if (summary.belowRecommendedSample) {
+    out.push(
+      '',
+      `Catatan: n = ${summary.n}, di bawah ${UEQ_MIN_RESPONDENTS} responden yang dianjurkan untuk UEQ. Kategori benchmark hanya indikatif.`,
+    );
+  }
+  out.push(
+    '',
+    '| Butir | Kutub kiri (-3) | Kutub kanan (+3) | Rata-rata |',
+    '| ----: | --------------- | ---------------- | --------: |',
+    ...UEQ_S_ITEMS.map(
+      (item, index) =>
+        `| ${index + 1} | ${cell(item.negative)} | ${cell(item.positive)} | ${fmtUeq(summary.itemMeans[index]!)} |`,
+    ),
+  );
+  return out;
+}
 
 function summaryLine(label: string, summary: SusSummary): string {
   const ci = summary.ci95
     ? `${fmt(summary.ci95.low)} sampai ${fmt(summary.ci95.high)}`
     : 'tidak dihitung (n = 1)';
-  return `| ${label} | ${summary.n} | ${fmt(summary.mean)} | ${fmt(summary.median)} | ${fmt(summary.sd)} | ${summary.min} sampai ${summary.max} | ${ci} | ${summary.aboveBenchmark.count} (${fmt(summary.aboveBenchmark.percent)}%) |`;
+  return `| ${label} | ${summary.n} | ${fmt(summary.mean)} | ${fmt(summary.median)} | ${fmt(summary.sd)} | ${fmt(summary.min)} sampai ${fmt(summary.max)} | ${ci} | ${summary.aboveBenchmark.count} (${fmt(summary.aboveBenchmark.percent)}%) |`;
 }
 
 const SUMMARY_HEADER = [
@@ -36,7 +83,7 @@ const cell = (text: string) => text.replaceAll('|', '\\|').replace(/\s+/g, ' ').
 
 export function renderUsabilityReport(parsed: ParsedResponses): string {
   const { respondents, rejected } = parsed;
-  const out: string[] = ['# Hasil uji pengguna (SUS)', ''];
+  const out: string[] = ['# Hasil uji pengguna (SUS dan UEQ-S)', ''];
 
   if (respondents.length === 0) {
     out.push('Belum ada respons yang valid.');
@@ -62,6 +109,14 @@ export function renderUsabilityReport(parsed: ParsedResponses): string {
     out.push('', '| Kategori penerimaan | Jumlah |', '| ------------------- | -----: |');
     for (const band of Object.keys(all.bands) as SusBand[]) {
       out.push(`| ${SUS_BAND_LABEL[band]} | ${all.bands[band]} |`);
+    }
+
+    const ueqSummary = summarizeUeqS(respondents.flatMap((r) => (r.ueq === null ? [] : [r.ueq])));
+    out.push('', '## Skor UEQ-S', '');
+    if (ueqSummary === null) {
+      out.push('Belum ada data UEQ-S pada berkas ini (kolom ueq1 sampai ueq8 kosong).');
+    } else {
+      out.push(...ueqLines(ueqSummary));
     }
 
     // Tugas pengguna dan profesional berbeda (kolom t1..t6 dipakai bersama), jadi dihitung per peran.
@@ -145,6 +200,8 @@ export function renderUsabilityReport(parsed: ParsedResponses): string {
     '- Sampel kemudahan (bukan acak), jadi hasil menggambarkan responden ini, bukan seluruh pengguna.',
     '- Selang kepercayaan memakai distribusi t dan melebar tajam bila n kecil.',
     '- SUS mengukur kesan kemudahan pakai, bukan manfaat klinis.',
+    '- Butir SUS memakai adaptasi bahasa Indonesia (Sharfina dan Santoso, 2016); butir UEQ-S memakai versi Indonesia resmi dari ueq-online.org.',
+    '- Kategori benchmark UEQ-S (Hinderks, Schrepp, dan Thomaschewski, 2018) diturunkan dari benchmark UEQ penuh, bukan dari data UEQ-S langsung, dan hanya bermakna untuk rata-rata sampel, bukan satu responden.',
   );
   return `${out.join('\n')}\n`;
 }

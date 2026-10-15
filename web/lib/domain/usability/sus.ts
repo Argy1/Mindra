@@ -1,7 +1,10 @@
 import { z } from 'zod';
+import { mean as average, round1, sampleSd, tCritical95 } from './stats';
+import { scoreUeqS, UEQ_S_ITEM_COUNT, type UeqScore } from './ueq';
 
 /**
- * System Usability Scale (SUS; Brooke, 1996) untuk uji pengguna Fase 5. Fungsi murni tanpa I/O.
+ * System Usability Scale (SUS; Brooke, 1996) untuk uji pengguna Fase 5, memakai adaptasi bahasa Indonesia
+ * (Sharfina dan Santoso, 2016). Fungsi murni tanpa I/O.
  *
  * Skor satu responden: butir ganjil (positif) = jawaban - 1, butir genap (negatif) = 5 - jawaban,
  * dijumlahkan lalu dikali 2,5, sehingga 0 sampai 100. Skor BUKAN persentase.
@@ -9,25 +12,29 @@ import { z } from 'zod';
  * Patokan tafsir (verifikasi sumbernya sebelum dikutip di proposal):
  *   - 68 = rata-rata dari banyak studi SUS (Sauro, 2011).
  *   - < 50 tidak dapat diterima, 50 sampai 70 marginal, > 70 dapat diterima (Bangor, Kortum, Miller, 2008).
+ *
+ * Asal butir: Z. Sharfina dan H. B. Santoso, "An Indonesian adaptation of the System Usability Scale (SUS)",
+ * ICACSIS 2016. Teks di bawah disalin dari kutipan sekunder yang menyebut makalah itu; butir tidak boleh
+ * diubah tanpa membandingkannya dengan makalah aslinya.
  */
 
 export const SUS_ITEMS = [
-  'Saya rasa saya akan sering menggunakan sistem ini.',
-  'Saya merasa sistem ini terlalu rumit, padahal sebenarnya bisa dibuat lebih sederhana.',
-  'Saya merasa sistem ini mudah digunakan.',
-  'Saya rasa saya akan membutuhkan bantuan orang yang paham teknis untuk dapat menggunakan sistem ini.',
-  'Saya merasa fungsi-fungsi dalam sistem ini terpadu dengan baik.',
-  'Saya merasa ada terlalu banyak hal yang tidak konsisten dalam sistem ini.',
-  'Saya membayangkan kebanyakan orang akan cepat belajar menggunakan sistem ini.',
-  'Saya merasa sistem ini sangat merepotkan untuk digunakan.',
-  'Saya merasa sangat percaya diri saat menggunakan sistem ini.',
-  'Saya perlu belajar banyak hal sebelum bisa menggunakan sistem ini dengan baik.',
+  'Saya berpikir akan menggunakan sistem ini lagi',
+  'Saya merasa sistem ini rumit untuk digunakan',
+  'Saya merasa sistem ini mudah digunakan',
+  'Saya membutuhkan bantuan dari orang lain atau teknisi dalam menggunakan sistem ini',
+  'Saya merasa fitur-fitur sistem ini berjalan dengan semestinya',
+  'Saya merasa ada banyak hal yang tidak konsisten (tidak serasi pada sistem ini)',
+  'Saya merasa orang lain akan memahami cara menggunakan sistem ini dengan cepat',
+  'Saya merasa sistem ini membingungkan',
+  'Saya merasa tidak ada hambatan dalam menggunakan sistem ini',
+  'Saya perlu membiasakan diri terlebih dahulu sebelum menggunakan sistem ini',
 ] as const;
 
 export const SUS_SCALE_LABELS = [
   'Sangat tidak setuju',
   'Tidak setuju',
-  'Netral',
+  'Ragu-ragu',
   'Setuju',
   'Sangat setuju',
 ] as const;
@@ -79,27 +86,6 @@ export function scoreSus(answers: readonly number[]): SusScoreResult {
 // Ringkasan beberapa responden
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Nilai kritis t dua sisi 95% untuk df 1..30. */
-const T_CRITICAL_95 = [
-  12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179, 2.16, 2.145,
-  2.131, 2.12, 2.11, 2.101, 2.093, 2.086, 2.08, 2.074, 2.069, 2.064, 2.06, 2.056, 2.052, 2.048,
-  2.045, 2.042,
-] as const;
-
-/** Di atas df 30 dipakai nilai df tabel terdekat di bawahnya (sedikit lebih lebar, jadi konservatif). */
-const T_CRITICAL_95_LARGE: ReadonlyArray<readonly [number, number]> = [
-  [120, 1.98],
-  [60, 2.0],
-  [40, 2.021],
-];
-
-function tCritical(degreesOfFreedom: number): number {
-  if (degreesOfFreedom < 1) return Number.NaN;
-  const tabulated = T_CRITICAL_95[degreesOfFreedom - 1];
-  if (tabulated !== undefined) return tabulated;
-  return T_CRITICAL_95_LARGE.find(([df]) => degreesOfFreedom >= df)?.[1] ?? T_CRITICAL_95[29]!;
-}
-
 export interface SusSummary {
   n: number;
   mean: number;
@@ -114,19 +100,16 @@ export interface SusSummary {
   bands: Record<SusBand, number>;
 }
 
-const round1 = (value: number) => Math.round(value * 10) / 10;
-
 export function summarizeSus(scores: readonly number[]): SusSummary | null {
   const n = scores.length;
   if (n === 0) return null;
   const sorted = [...scores].sort((a, b) => a - b);
-  const mean = scores.reduce((sum, score) => sum + score, 0) / n;
+  const mean = average(scores);
   const middle = Math.floor(n / 2);
   const median = n % 2 === 1 ? sorted[middle]! : (sorted[middle - 1]! + sorted[middle]!) / 2;
   // Simpangan baku sampel (n - 1); untuk n = 1 tidak terdefinisi, dilaporkan 0.
-  const variance = n > 1 ? scores.reduce((sum, s) => sum + (s - mean) ** 2, 0) / (n - 1) : 0;
-  const sd = Math.sqrt(variance);
-  const margin = n > 1 ? tCritical(n - 1) * (sd / Math.sqrt(n)) : null;
+  const sd = sampleSd(scores);
+  const margin = n > 1 ? tCritical95(n - 1) * (sd / Math.sqrt(n)) : null;
   const bands: Record<SusBand, number> = {
     tidak_dapat_diterima: 0,
     marginal: 0,
@@ -176,23 +159,31 @@ export function itemPenalty(mean: number, index: number): number {
 /**
  * Kolom berkas respons. `id` anonim (mis. R01); JANGAN menulis nama atau kontak responden.
  * `peran`: pengguna atau profesional. `t1..t6`: 1 = tugas selesai tanpa bantuan, 0 = tidak/dibantu,
- * kosong = tidak dikerjakan. `q1..q10`: jawaban SUS 1 sampai 5. `buka1..buka3`: jawaban terbuka.
+ * kosong = tidak dikerjakan. `q1..q10`: jawaban SUS 1 sampai 5. `ueq1..ueq8`: jawaban UEQ-S 1 sampai 7
+ * apa adanya dari Google Form (1 = kutub kiri/negatif, 7 = kutub kanan/positif); boleh dikosongkan seluruhnya
+ * untuk responden yang tidak mengisi UEQ-S. `buka1..buka3`: jawaban terbuka.
  */
 export const RESPONSE_COLUMNS = [
   'id',
   'peran',
   ...Array.from({ length: 6 }, (_, i) => `t${i + 1}`),
   ...Array.from({ length: SUS_ITEM_COUNT }, (_, i) => `q${i + 1}`),
+  ...Array.from({ length: UEQ_S_ITEM_COUNT }, (_, i) => `ueq${i + 1}`),
   'buka1',
   'buka2',
   'buka3',
 ] as const;
+
+/** Kolom yang boleh tidak ada di berkas (berkas lama hanya SUS tetap terbaca). */
+export const OPTIONAL_COLUMN_PREFIXES = ['ueq', 'buka'] as const;
 
 export interface SusRespondent {
   id: string;
   role: string;
   score: number;
   answers: number[];
+  /** Hasil UEQ-S, atau null bila responden tidak mengisinya. */
+  ueq: UeqScore | null;
   /** Hasil per tugas: true/false, null bila tidak dikerjakan. Panjang 6. */
   tasks: (boolean | null)[];
   open: [string, string, string];
@@ -238,12 +229,31 @@ export function parseResponses(rows: readonly Record<string, string>[]): ParsedR
       else return void rejected.push({ line, reason: `${id}: t${i} harus 1, 0, atau kosong` });
     }
 
+    // UEQ-S: terisi lengkap atau dikosongkan seluruhnya. Terisi sebagian ditolak, bukan ditebak.
+    const ueqRaw = Array.from({ length: UEQ_S_ITEM_COUNT }, (_, i) =>
+      (row[`ueq${i + 1}`] ?? '').trim(),
+    );
+    let ueq: UeqScore | null = null;
+    if (ueqRaw.some((value) => value !== '')) {
+      const emptyAt = ueqRaw.findIndex((value) => value === '');
+      if (emptyAt !== -1) {
+        return void rejected.push({
+          line,
+          reason: `ueq${emptyAt + 1} kosong (UEQ-S harus terisi lengkap atau dikosongkan seluruhnya)`,
+        });
+      }
+      const ueqScored = scoreUeqS(ueqRaw.map(Number));
+      if (!ueqScored.ok) return void rejected.push({ line, reason: `${id}: ${ueqScored.reason}` });
+      ueq = ueqScored.score;
+    }
+
     seenIds.add(id);
     respondents.push({
       id,
       role: (row.peran ?? '').trim() || 'pengguna',
       score: scored.score,
       answers,
+      ueq,
       tasks,
       open: [(row.buka1 ?? '').trim(), (row.buka2 ?? '').trim(), (row.buka3 ?? '').trim()],
     });

@@ -1690,3 +1690,42 @@ pada tautan demo sengaja tetap mati; nyalakan lewat `/privasi` bila ingin mendem
 Daftar dan masuk dengan akun nyata, email (SMTP dan templat), Site URL dan Redirect URLs Supabase, Teman cerita dengan kunci
 Anthropic asli, MFA TOTP, dan portal psikolog, faskes, serta admin. Daftar tindakan lengkap dengan urutan prioritas ada di
 [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 15.
+
+---
+
+## UEQ-S berdampingan dengan SUS, dan SUS versi Indonesia (15 Okt 2026)
+
+Permintaan dari riset proposal: tambahkan UEQ-S ke protokol dan alat rekap, pakai butir Indonesia resmi, dan pakai SUS
+versi Indonesia (Sharfina dan Santoso, 2016). Target responden naik menjadi minimal 30.
+
+### Keputusan
+
+| Keputusan | Alasan |
+| --------- | ------ |
+| **Butir UEQ-S disalin persis** dari berkas resmi `UEQS_Items.pdf` (bagian "Indonesian version", halaman 3, dibaca 15 Okt 2026), dan dijaga tes yang membandingkan delapan pasangan kata | Permintaan "jangan menerjemahkan sendiri"; tes mencegah butir berubah diam-diam |
+| **Butir SUS diganti** dari terjemahan bebas saya sebelumnya ke adaptasi Indonesia (Sharfina dan Santoso, 2016), label skala "Ragu-ragu" menggantikan "Netral" | Permintaan eksplisit; terjemahan bebas tidak teruji sebagai instrumen. Cara menilai tidak berubah (butir ganjil positif, genap negatif) |
+| **Jawaban UEQ-S di CSV adalah angka formulir 1-7**, bukan -3..+3; alat mengubahnya (nilai - 4) | Google Form tidak bisa skala negatif, dan menerima kedua bentuk akan ambigu (1, 2, 3 ada di kedua rentang). Nilai di luar 1-7, termasuk -3, ditolak dengan alasan |
+| **Kutub kiri = negatif = titik 1** | Begitu berkas resmi UEQ-S menyusunnya (kiri selalu negatif); bila polaritas diacak, penilaian harus diubah |
+| **Kolom `ueq1`-`ueq8` opsional**: kosong seluruhnya = responden tanpa UEQ-S; terisi sebagian = ditolak | Berkas lama (hanya SUS) tetap terbaca; data setengah jadi tidak ditebak |
+| **Kategori benchmark dihitung dari rata-rata yang dibulatkan ke dua desimal** | Tabel di makalah memakai dua desimal tanpa celah; tanpa pembulatan rata-rata 1,545 jatuh di celah antara "1,54" dan "1,55" |
+| **n di bawah 20 diberi catatan "indikatif"** | UEQ memerlukan sekitar 20-30 responden; angka kecil jangan terbaca seolah pasti |
+| Tabel nilai t dipindah ke `stats.ts` dan dipakai bersama SUS dan UEQ-S | Satu sumber untuk selang kepercayaan 95% (t, bukan normal), tes SUS lama tetap lulus |
+
+### Yang diverifikasi ke sumber
+
+- **Patokan UEQ-S** dibaca langsung dari makalah (Hinderks, Schrepp, dan Thomaschewski, 2018, WEBIST, hlm. 373-377, bagian 4):
+  semua 15 ambang sama dengan yang diminta. Penulisnya menyebut benchmark itu **diturunkan dari benchmark UEQ penuh** (9.905
+  responden, 246 produk) karena data UEQ-S langsung belum cukup, jadi dicatat sebagai batas di laporan dan di dokumen.
+- **Butir Indonesia UEQ-S**: lihat atas. Atribusi penerjemah (Harry B. Santoso) **tidak tertulis di berkas itu**, jadi tidak
+  dicantumkan sebagai fakta.
+- **Butir SUS Indonesia**: tersedia di satu kutipan sekunder (blog metodologi) yang menyebut Sharfina dan Santoso; butir 1 dan
+  2 cocok dengan sumber kedua. Makalah aslinya (IEEE Xplore) tidak bisa diakses otomatis, jadi **belum dibandingkan kata demi
+  kata**. Ditandai di kode, di protokol, dan di daftar periksa.
+
+### Bukti
+
+151 tes di `lib/domain/usability` (hitungan tangan; ambang tepat, satu langkah di atas, dan satu langkah di bawah untuk ketiga
+skala; penolakan jawaban di luar skala; kesamaan butir dokumen dengan kode; templat CSV sama dengan kolom yang dibaca) dan 27
+perusakan sengaja, semuanya tertangkap. Dicoba juga ujung ke ujung dengan CSV sintetis bertitik koma lewat
+`pnpm usability:report`. Perbaikan kecil sepanjang jalan: rentang skor SUS di laporan sebelumnya ditulis "92.5" (titik), kini
+"92,5". **Belum ada responden dan belum ada skor.**

@@ -135,7 +135,7 @@ akun demo. Langkah lengkap (migrasi, MFA, variabel lingkungan, e2e dengan akun s
 | `pnpm test:e2e`           | Playwright + axe, desktop 1440 dan mobile 390                                                 |
 | `pnpm lighthouse`         | Audit Lighthouse semua halaman utama (server produksi)                                        |
 | `pnpm load`               | Uji beban lokal 200 pengguna virtual                                                          |
-| `pnpm usability:report`   | Rekap uji pengguna SUS dari CSV                                                               |
+| `pnpm usability:report`   | Rekap uji pengguna SUS dan UEQ-S dari CSV                                                     |
 
 ## Akun demo
 
@@ -180,7 +180,7 @@ mobile). Rinciannya: [`docs/TEMUAN-KEAMANAN.md`](docs/TEMUAN-KEAMANAN.md).
 
 | Bukti                       | Hasil                                                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Vitest                      | **2250 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                      |
+| Vitest                      | **2356 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                      |
 | Playwright + axe            | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop dan mobile                                                         |
 | Aksesibilitas               | **0 pelanggaran axe WCAG 2.2 AA** di 33 rute x 2 viewport; audit keyboard otomatis; Lighthouse Aksesibilitas **100** di semua halaman  |
 | Lighthouse (halaman publik) | Lokal: Performa 93-100, Aksesibilitas 100, Praktik terbaik 100, SEO 100. **Di produksi (Vercel): Performa 98-100, ketiganya lain 100** |
@@ -188,7 +188,7 @@ mobile). Rinciannya: [`docs/TEMUAN-KEAMANAN.md`](docs/TEMUAN-KEAMANAN.md).
 | Uji mutasi                  | Lebih dari seratus perusakan sengaja pada migrasi dan logika inti; yang lolos diperbaiki atau terbukti setara                          |
 
 Angka dan keterbatasannya (apa yang **belum** terbukti: k6 asli, uptime, uji pengguna, alur berakun di situs live) ada di
-[`docs/TESTING.md`](docs/TESTING.md). Protokol uji pengguna SUS: [`docs/UJI-PENGGUNA.md`](docs/UJI-PENGGUNA.md).
+[`docs/TESTING.md`](docs/TESTING.md). Protokol uji pengguna SUS dan UEQ-S: [`docs/UJI-PENGGUNA.md`](docs/UJI-PENGGUNA.md).
 
 ## Tangkapan layar
 
@@ -245,7 +245,7 @@ Yang berjalan dan teruji ada di atas. Yang **belum**, ditulis terang:
   tidak ada data yang keluar dari server pada mode ini.
 - **Teman cerita belum pernah dijalankan dengan kunci Anthropic asli.** Kodenya diuji dengan model tiruan, termasuk jalur krisis
   yang tidak memanggil model.
-- **Uji pengguna (SUS) belum dilaksanakan**; alat dan protokolnya siap. **k6** belum dijalankan (ada padanan Node, lihat
+- **Uji pengguna (SUS dan UEQ-S) belum dilaksanakan**; alat dan protokolnya siap. **k6** belum dijalankan (ada padanan Node, lihat
   [TESTING.md](docs/TESTING.md)).
 - Belum ada: CAPTCHA (Turnstile) di daftar dan masuk, verifikasi STR otomatis (admin memeriksa manual), verifikasi usia
   (hanya pernyataan sendiri), uji dengan pembaca layar sungguhan.
@@ -258,7 +258,7 @@ Yang berjalan dan teruji ada di atas. Yang **belum**, ditulis terang:
 - [`CLAUDE.md`](CLAUDE.md): aturan proyek · [`docs/PLAN.md`](docs/PLAN.md): urutan kerja per fase
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): data, API, keamanan · [`docs/DESIGN.md`](docs/DESIGN.md): sistem desain
 - [`docs/DECISIONS.md`](docs/DECISIONS.md): keputusan dan alasannya · [`docs/TEMUAN-KEAMANAN.md`](docs/TEMUAN-KEAMANAN.md): temuan keamanan
-- [`docs/TESTING.md`](docs/TESTING.md): bukti pengujian · [`docs/UJI-PENGGUNA.md`](docs/UJI-PENGGUNA.md): protokol SUS
+- [`docs/TESTING.md`](docs/TESTING.md): bukti pengujian · [`docs/UJI-PENGGUNA.md`](docs/UJI-PENGGUNA.md): protokol SUS dan UEQ-S
 - [`docs/PANDUAN-PENGEMBANG.md`](docs/PANDUAN-PENGEMBANG.md): menjalankan, migrasi, MFA, API, akun demo, struktur terperinci
 - [`docs/HANDOFF-FASE-6.md`](docs/HANDOFF-FASE-6.md): serah terima lengkap (tujuan, fitur, arsitektur, bukti, batas) untuk penulisan proposal
 - `/developers` dan `/api/v1/openapi.json`: dokumentasi dan spesifikasi API publik (saat server berjalan)

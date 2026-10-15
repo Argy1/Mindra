@@ -58,7 +58,7 @@ Tiga langkah yang ditawarkan, dan **pengguna selalu memegang kuncinya**:
 | Instrumen skrining | 4 (PHQ-9, GAD-7, PSS-10, SRQ-20; 46 butir), hasil identik di web, mobile, dan database | [TERBUKTI] |
 | Rute API | 14 (13 di `/api/v1` + `/api/health`); OpenAPI 3.1 + dokumentasi `/developers` | [TERBUKTI] |
 | Migrasi database | 13 (5 dari aplikasi mobile + 8 dari web). Additive, kecuali dua migrasi yang menghapus policy lama yang bocor atau tak berfungsi (`…000100` dan `…000400`), atas izin pemilik; tabel, kolom, dan data tidak dihapus | [TERBUKTI] |
-| Tes Vitest | **2250 lulus**, 116 berkas (domain murni, API, komponen, RLS di Postgres sungguhan via PGlite) | [TERBUKTI] |
+| Tes Vitest | **2356 lulus**, 118 berkas (domain murni, API, komponen, RLS di Postgres sungguhan via PGlite) | [TERBUKTI] |
 | Tes Playwright | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop 1440 dan mobile 390 | [TERBUKTI] |
 | Aksesibilitas (axe, WCAG 2.2 AA) | **0 pelanggaran** di 33 rute x 2 viewport | [TERBUKTI] |
 | Tes Flutter | **160 lulus**; `flutter analyze` 0 galat dan 0 peringatan (115 info) | [TERBUKTI] |
@@ -67,7 +67,7 @@ Tiga langkah yang ditawarkan, dan **pengguna selalu memegang kuncinya**:
 | Temuan keamanan pada aplikasi mobile yang sudah ada | 8 (F1-F8): 7 ditutup di kode dan teruji, 1 menunggu pemilik (cabut kunci lama) | [TERBUKTI] / [PEMILIK] |
 | Ukuran kode (kira-kira) | web 34,7 ribu baris TS/TSX (termasuk tipe database hasil generate) + 27,6 ribu baris tes; Flutter 41,4 ribu baris Dart; SQL 4,2 ribu baris | [TERBUKTI] |
 
-**Yang belum terbukti, dan tidak boleh ditulis sebagai fakta** (rincian di bagian 11 dan 14): uji pengguna SUS belum ada
+**Yang belum terbukti, dan tidak boleh ditulis sebagai fakta** (rincian di bagian 11 dan 14): uji pengguna (SUS dan UEQ-S) belum ada
 responden; k6 asli belum dijalankan; uptime belum terpasang; Teman cerita belum pernah dicoba dengan kunci Anthropic asli
 oleh saya; pengiriman ke SATUSEHAT hanya simulasi; alur berakun (daftar, masuk, email, MFA) di situs live belum saya uji;
 aplikasi Flutter belum dijalankan di perangkat setelah perubahan 14 Okt; uji pembaca layar sungguhan belum ada.
@@ -80,8 +80,8 @@ aplikasi Flutter belum dijalankan di perangkat setelah perubahan 14 Okt; uji pem
 | --- | --- | --- | --- |
 | 1 | Inovasi dan relevansi solusi | 30% | Dua aplikasi satu backend; izin ditegakkan di database; peringatan krisis realtime; agregat anonim + FHIR (6.4, 7) |
 | 2 | Kesesuaian dengan kebutuhan pengguna | 20% | Masalah I-NAMHS, kendali di pengguna, bantuan tanpa login, bahasa Indonesia hangat (3, 4, 10) |
-| 3 | Kualitas teknis: validasi input, autentikasi, kode modular dan maintainable | 20% | Zod di semua batas, RLS, MFA di database, domain murni + tes, 2250 tes, audit F1-F8 (7, 9, 11) |
-| 4 | UI/UX: konsistensi, usability, accessibility | 15% | Sistem desain, WCAG 2.2 AA 0 pelanggaran, Lighthouse A 100 (10). **Usability (SUS) belum terukur** |
+| 3 | Kualitas teknis: validasi input, autentikasi, kode modular dan maintainable | 20% | Zod di semua batas, RLS, MFA di database, domain murni + tes, 2356 tes, audit F1-F8 (7, 9, 11) |
+| 4 | UI/UX: konsistensi, usability, accessibility | 15% | Sistem desain, WCAG 2.2 AA 0 pelanggaran, Lighthouse A 100 (10). **Usability (SUS dan UEQ-S) belum terukur** |
 | 5 | Dokumentasi dan kelengkapan proposal | 15% | README, ARCHITECTURE, DECISIONS, TESTING, TEMUAN-KEAMANAN, dokumen ini (16) |
 
 Babak final: **tanya jawab bobotnya 40%**. Pemilik harus bisa menjelaskan setiap keputusan teknis; bagian 17 memuat
@@ -107,7 +107,7 @@ Usulan anggaran halaman (jumlah maksimal 30, termasuk sampul dan daftar isi):
 | i | User flow | 2,5 | Bagian 8 |
 | j | Fitur unggulan | 4 | Bagian 6.4 |
 | k | UI/UX preview | 3 | Bagian 10 + tangkapan layar di `web/docs/img/` |
-| l | Hasil pengujian | 4 | Bagian 11 (SUS dan k6 hanya bila sudah dikerjakan) |
+| l | Hasil pengujian | 4 | Bagian 11 (SUS, UEQ-S, dan k6 hanya bila sudah dikerjakan) |
 | m | Kesimpulan | 1 | Bagian 14 (batas dan proyeksi) |
 | n | Daftar pustaka | 1 | Bagian 18 |
 | o | Lampiran | 2 | Lampiran A-F |
@@ -599,7 +599,7 @@ Sumber: `web/docs/TESTING.md` (lengkap dengan perintah untuk mengulang). Ringkas
 
 | Bukti | Hasil | Status |
 | --- | --- | --- |
-| Vitest (unit, komponen, RLS di Postgres via PGlite) | **2250 lulus**, 116 berkas; `pnpm build && pnpm test` | [TERBUKTI] |
+| Vitest (unit, komponen, RLS di Postgres via PGlite) | **2356 lulus**, 118 berkas; `pnpm build && pnpm test` | [TERBUKTI] |
 | Playwright + axe (desktop 1440, mobile 390) terhadap build produksi lokal | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan); 1 ulangan lokal untuk kegagalan hidrasi acak | [TERBUKTI] |
 | Aksesibilitas axe WCAG 2.2 AA | 0 pelanggaran, 33 rute x 2 viewport | [TERBUKTI] |
 | Flutter | `flutter analyze` 0 galat dan 0 peringatan; `flutter test` 160 lulus | [TERBUKTI] |
@@ -611,7 +611,7 @@ Sumber: `web/docs/TESTING.md` (lengkap dengan perintah untuk mengulang). Ringkas
 | Uji mutasi (perusakan sengaja lalu memastikan suite gagal) | Fase 1: 11 (pengerasan pendamping) + 12 (integritas asesmen); Fase 2: 12 SQL + 12 server; Fase 4: 25 SQL; Fase 5: 42; Gelombang 1: 33 SQL + 84 logika web; Gelombang 3: 139; perbaikan alamat situs: 9. Yang lolos pada putaran pertama diperbaiki (celah tes) atau terbukti setara perilaku (tiga: G06, Q03, K21) | [TERBUKTI] |
 | Pemeriksaan live 14/15 Okt 2026 | Bagian 13 | [TERBUKTI] |
 | Migrasi `…000700` di cloud (ringkasan penggunaan Teman cerita) | Diterapkan pemilik, diverifikasi 15 Okt 2026 dengan simulasi JWT yang dibatalkan: pemilik dan psikolog aal2 berizin berhasil; izin mati, aal1, pendamping, tanpa tautan, `null`, dan `anon` ditolak (42501); psikolog melihat 0 baris di `ai_conversations`. Rincian: `docs/TESTING.md` bagian 3b | [TERBUKTI] |
-| **Uji pengguna SUS** | Protokol, persetujuan, tugas, kuesioner, dan alat rekap siap (`web/docs/UJI-PENGGUNA.md`, `pnpm usability:report`). **Belum ada responden dan belum ada skor.** Jadwal 24-26 Okt | **[BELUM] [PEMILIK]** |
+| **Uji pengguna SUS dan UEQ-S** | Protokol, persetujuan, tugas, kuesioner gabungan siap salin ke Google Form (`web/docs/uji-pengguna/kuesioner-gabungan.md`), dan alat rekap siap (`web/docs/UJI-PENGGUNA.md`, `pnpm usability:report`): SUS versi Indonesia (Sharfina dan Santoso, 2016), UEQ-S versi Indonesia resmi, kategori benchmark Hinderks dkk. (2018), target minimal 30 responden. **Belum ada responden dan belum ada skor.** Jadwal 24-26 Okt | **[BELUM] [PEMILIK]** |
 | **k6 asli** | Skrip siap (`web/load/read-endpoints.js`), **belum dijalankan** (k6 tidak terpasang). Jangan menulis angka padanan Node sebagai hasil k6 | **[BELUM] [PEMILIK]** |
 | Uptime | `/api/health` dan `uptime.yml` siap; monitor eksternal **belum terpasang** | **[BELUM] [PEMILIK]** |
 | Teman cerita dengan model asli | Belum dicoba | **[BELUM] [PEMILIK]** |
@@ -688,7 +688,7 @@ dari perilaku (service role, Upstash, Anthropic). Lihat bagian 15.
 | --- | --- |
 | SATUSEHAT hanya simulasi lokal | Pemeta FHIR dan alur persetujuan teruji; belum ada kredensial staging atau nomor IHS; LOINC belum diverifikasi ke loinc.org; belum divalidasi HL7 |
 | Teman cerita belum dicoba dengan model asli | Diuji dengan model tiruan, termasuk jalur krisis |
-| Uji pengguna (SUS), k6, uptime belum ada | Alat siap; menunggu pemilik |
+| Uji pengguna (SUS dan UEQ-S), k6, uptime belum ada | Alat siap; menunggu pemilik |
 | Tidak ada CAPTCHA di daftar dan masuk | Pertahanan yang ada: batas laju Supabase Auth dan web |
 | Verifikasi STR psikolog manual | Admin memeriksa nomor; otomatis adalah proyeksi |
 | Verifikasi usia hanya pernyataan sendiri | |
@@ -736,7 +736,7 @@ layar dan uji dengan pengguna disabilitas.
 8. Variabel repositori GitHub `DEMO_URL` (mengaktifkan `uptime.yml`) dan monitor UptimeRobot (langkah di `TESTING.md` bagian 5);
    tangkap layar status ke `docs/img/uptime.png`.
 9. Verifikasi nomor krisis (SEJIWA 119 ext. 8, 112, dan nomor di data bawaan Flutter) ke sumber resmi.
-10. **Uji pengguna SUS 24-26 Okt**; jalankan **k6** terhadap lokal dan demo (hasil k6 saja yang boleh disebut k6).
+10. **Uji pengguna (SUS dan UEQ-S) 24-26 Okt, minimal 30 responden**; jalankan **k6** terhadap lokal dan demo (hasil k6 saja yang boleh disebut k6).
 
 **Administrasi lomba (bagian 2) dan keputusan**
 
@@ -755,7 +755,7 @@ layar dan uji dengan pengguna disabilitas.
 | `docs/TEMUAN-KEAMANAN.md` | F1-F8 dan temuan tambahan | j, l |
 | `docs/TESTING.md` | Bukti pengujian dan "yang belum terbukti" | l |
 | `docs/lighthouse/summary.md`, `docs/lighthouse/produksi/summary.md` | Lighthouse lokal dan produksi | l |
-| `docs/UJI-PENGGUNA.md` | Protokol SUS | l |
+| `docs/UJI-PENGGUNA.md`, `docs/uji-pengguna/kuesioner-gabungan.md` | Protokol SUS dan UEQ-S, kuesioner untuk Google Form | l |
 | `docs/DESIGN.md`, `design/*.html` | Sistem desain dan mockup | k |
 | `docs/DEPLOY.md` | Langkah deploy, SMTP, demo untuk juri, daftar periksa | lampiran, operasional |
 | `docs/PANDUAN-PENGEMBANG.md` | Menjalankan, migrasi, MFA, API, struktur kode | lampiran |
@@ -775,7 +775,7 @@ layar dan uji dengan pengguna disabilitas.
 | Mengapa deteksi krisis tidak memakai AI? | Keselamatan tidak boleh bergantung pada pihak ketiga atau pada model yang bisa keliru; aturan deterministik berjalan sebelum model dan jawabannya tetap | DECISIONS Fase 4 |
 | Bagaimana anonimitas dijamin? | k >= 10 dihitung di fungsi database, kelompok kecil disembunyikan seluruhnya, hanya pengguna opt-in dihitung, tidak ada data individu di dasbor atau API mitra | `facility_aggregate()` |
 | Apakah data sungguhan masuk ke SATUSEHAT? | Tidak. Modenya simulasi lokal; tidak ada byte keluar. Mode staging sudah ditulis tetapi menunggu kredensial dan nomor IHS | ARCHITECTURE 6 |
-| Apa yang belum Anda buktikan? | Uji pengguna SUS, k6 asli, uptime, pembaca layar sungguhan, Teman cerita dengan model asli (bagian 11 dan 14) | TESTING |
+| Apa yang belum Anda buktikan? | Uji pengguna (SUS dan UEQ-S), k6 asli, uptime, pembaca layar sungguhan, Teman cerita dengan model asli (bagian 11 dan 14) | TESTING |
 | Bagaimana Anda tahu tesnya tidak palsu? | Uji mutasi (perusakan sengaja harus membuat suite gagal) dan kontrol negatif pada axe | DECISIONS, TESTING |
 | Mengapa lokasi pengguna aman di "layanan terdekat"? | Jarak dihitung di peramban; e2e merekam semua permintaan jaringan dan tidak ada yang memuat koordinat | `e2e/gelombang3.spec.ts` |
 | Apa yang Anda temukan pada aplikasi mobile? | 8 celah (F1-F8) termasuk pengambilalihan undangan pendamping dan kunci AI yang dibundel; 7 ditutup dan teruji | TEMUAN-KEAMANAN |
@@ -798,6 +798,9 @@ dari berkas di repositori, kecuali butir pertama.
 10. Kementerian Kesehatan RI. Platform SATUSEHAT (dokumentasi integrasi).
 11. Dokumentasi Supabase (Row Level Security, Auth MFA, Realtime) dan Next.js 15.
 12. OWASP. _Application Security Verification Standard_ / _Top 10_.
+13. Sharfina Z, Santoso HB. An Indonesian adaptation of the System Usability Scale (SUS). _ICACSIS_ 2016 (adaptasi bahasa Indonesia yang dipakai).
+14. Schrepp M, Hinderks A, Thomaschewski J. Design and evaluation of a short version of the User Experience Questionnaire (UEQ-S). _Int J Interact Multimed Artif Intell_ 2017;4(6):103.
+15. Hinderks A, Schrepp M, Thomaschewski J. A benchmark for the short version of the User Experience Questionnaire. _WEBIST_ 2018:373-377. DOI 10.5220/0007188303730377. Butir Indonesia UEQ-S: <https://www.ueq-online.org/Material/UEQS_Items.pdf>.
 
 ## 19. Glosarium
 
@@ -815,6 +818,7 @@ dari berkas di repositori, kecuali butir pertama.
 | PHQ-9 / GAD-7 / PSS-10 / SRQ-20 | Kuesioner skrining depresi, kecemasan, stres, dan gangguan jiwa umum |
 | SEJIWA | Layanan konseling Kemenkes: 119 lalu tekan 8 (belum diverifikasi manusia) |
 | SUS | System Usability Scale, kuesioner 10 butir (skor 0-100; patokan 68) |
+| UEQ-S | Versi pendek User Experience Questionnaire: 8 pasang kata sifat, skala -3 sampai +3; pragmatic (butir 1-4), hedonic (butir 5-8), overall (rata-rata semua); kategori benchmark Hinderks dkk. (2018) |
 | PGlite | Postgres sungguhan yang berjalan di memori, dipakai untuk menguji RLS tanpa menyentuh cloud |
 | Uji mutasi | Merusak kode atau migrasi dengan sengaja untuk memastikan tes benar-benar gagal |
 | WIB | Waktu Indonesia Barat (UTC+7) |

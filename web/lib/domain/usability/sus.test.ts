@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  OPTIONAL_COLUMN_PREFIXES,
+  RESPONSE_COLUMNS,
   SUS_BENCHMARK,
   SUS_ITEMS,
+  SUS_SCALE_LABELS,
   itemMeans,
   itemPenalty,
   parseResponses,
@@ -67,6 +70,28 @@ describe('scoreSus', () => {
   it('punya tepat 10 butir dan tidak memuat kata klinis terlarang', () => {
     expect(SUS_ITEMS).toHaveLength(10);
     expect(SUS_ITEMS.join(' ')).not.toMatch(/gangguan|diagnosa|pasien|!/i);
+  });
+
+  it('butir sama dengan adaptasi bahasa Indonesia (Sharfina dan Santoso, 2016), bukan terjemahan sendiri', () => {
+    expect([...SUS_ITEMS]).toEqual([
+      'Saya berpikir akan menggunakan sistem ini lagi',
+      'Saya merasa sistem ini rumit untuk digunakan',
+      'Saya merasa sistem ini mudah digunakan',
+      'Saya membutuhkan bantuan dari orang lain atau teknisi dalam menggunakan sistem ini',
+      'Saya merasa fitur-fitur sistem ini berjalan dengan semestinya',
+      'Saya merasa ada banyak hal yang tidak konsisten (tidak serasi pada sistem ini)',
+      'Saya merasa orang lain akan memahami cara menggunakan sistem ini dengan cepat',
+      'Saya merasa sistem ini membingungkan',
+      'Saya merasa tidak ada hambatan dalam menggunakan sistem ini',
+      'Saya perlu membiasakan diri terlebih dahulu sebelum menggunakan sistem ini',
+    ]);
+    expect([...SUS_SCALE_LABELS]).toEqual([
+      'Sangat tidak setuju',
+      'Tidak setuju',
+      'Ragu-ragu',
+      'Setuju',
+      'Sangat setuju',
+    ]);
   });
 });
 
@@ -191,10 +216,66 @@ describe('parseResponses', () => {
         role: 'pengguna',
         score: 100,
         answers: [5, 1, 5, 1, 5, 1, 5, 1, 5, 1],
+        ueq: null,
         tasks: [true, true, false, null, null, null],
         open: ['mudah', '', ''],
       },
     ]);
+  });
+
+  it('kolom berkas: UEQ-S di antara SUS dan jawaban terbuka; ueq dan buka boleh tidak ada', () => {
+    expect(RESPONSE_COLUMNS).toHaveLength(2 + 6 + 10 + 8 + 3);
+    expect(RESPONSE_COLUMNS.indexOf('ueq1')).toBe(RESPONSE_COLUMNS.indexOf('q10') + 1);
+    expect(RESPONSE_COLUMNS.indexOf('ueq8')).toBe(RESPONSE_COLUMNS.indexOf('buka1') - 1);
+    expect([...OPTIONAL_COLUMN_PREFIXES]).toEqual(['ueq', 'buka']);
+  });
+
+  describe('UEQ-S pada berkas respons', () => {
+    const ueqCells = (values: string[]) =>
+      Object.fromEntries(values.map((value, i) => [`ueq${i + 1}`, value]));
+    const sevens = Array(8).fill('7') as string[];
+
+    it('terisi lengkap: skor dihitung dari jawaban formulir 1-7 (7 = kutub positif = +3)', () => {
+      const { respondents, rejected } = parseResponses([row(ueqCells(sevens))]);
+      expect(rejected).toEqual([]);
+      expect(respondents[0]?.ueq).toEqual({
+        raw: [7, 7, 7, 7, 7, 7, 7, 7],
+        values: [3, 3, 3, 3, 3, 3, 3, 3],
+        pragmatic: 3,
+        hedonic: 3,
+        overall: 3,
+      });
+    });
+
+    it('dikosongkan seluruhnya atau kolomnya tidak ada: responden tetap sah, UEQ-S null', () => {
+      expect(parseResponses([row(ueqCells(Array(8).fill('')))]).respondents[0]?.ueq).toBeNull();
+      expect(parseResponses([row()]).respondents[0]?.ueq).toBeNull();
+    });
+
+    it('terisi sebagian ditolak dengan alasan, tidak ditebak', () => {
+      const partial = [...sevens];
+      partial[2] = '';
+      expect(parseResponses([row({ id: 'R02', ...ueqCells(partial) })])).toEqual({
+        respondents: [],
+        rejected: [
+          {
+            line: 2,
+            reason: 'ueq3 kosong (UEQ-S harus terisi lengkap atau dikosongkan seluruhnya)',
+          },
+        ],
+      });
+    });
+
+    it.each(['0', '8', '-3', '3,5', 'tujuh'])(
+      'jawaban %s ditolak: skala formulir 1 sampai 7 (bukan -3 sampai +3)',
+      (bad) => {
+        const values = [...sevens];
+        values[5] = bad;
+        expect(parseResponses([row({ id: 'R09', ...ueqCells(values) })]).rejected).toEqual([
+          { line: 2, reason: 'R09: setiap jawaban UEQ-S harus bilangan bulat 1 sampai 7' },
+        ]);
+      },
+    );
   });
 
   it('peran kosong dianggap pengguna', () => {

@@ -1,5 +1,5 @@
 /**
- * Rekap uji pengguna: baca berkas respons CSV, hitung skor SUS dan penyelesaian tugas, tulis laporan Markdown.
+ * Rekap uji pengguna: baca berkas respons CSV, hitung skor SUS, skor UEQ-S, dan penyelesaian tugas, tulis laporan Markdown.
  *
  *   pnpm usability:report docs/uji-pengguna/respons.csv
  *   pnpm usability:report docs/uji-pengguna/respons.csv --out docs/uji-pengguna/hasil.md
@@ -11,7 +11,11 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { renderUsabilityReport } from '../lib/domain/usability/report';
-import { parseResponses, RESPONSE_COLUMNS } from '../lib/domain/usability/sus';
+import {
+  OPTIONAL_COLUMN_PREFIXES,
+  parseResponses,
+  RESPONSE_COLUMNS,
+} from '../lib/domain/usability/sus';
 import { csvRecords, parseCsv } from '../lib/utils/csv';
 
 const [input, flag, output] = process.argv.slice(2);
@@ -23,7 +27,8 @@ if (!input || (flag !== undefined && flag !== '--out') || (flag === '--out' && !
 const text = readFileSync(resolve(input), 'utf8');
 const header = (parseCsv(text)[0] ?? []).map((name) => name.trim());
 const missing = RESPONSE_COLUMNS.filter(
-  (name) => !header.includes(name) && !name.startsWith('buka'),
+  (name) =>
+    !header.includes(name) && !OPTIONAL_COLUMN_PREFIXES.some((prefix) => name.startsWith(prefix)),
 );
 if (missing.length > 0) {
   console.error(`Kolom wajib tidak ada di ${input}: ${missing.join(', ')}`);

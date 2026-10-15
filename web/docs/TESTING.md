@@ -6,7 +6,7 @@ Terakhir diperbarui 14 Oktober 2026.
 
 | Bukti | Hasil | Cara mengulang |
 | ----- | ----- | -------------- |
-| Tes unit, komponen, dan basis data (Vitest) | **2250 lulus**, 116 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
+| Tes unit, komponen, dan basis data (Vitest) | **2356 lulus**, 118 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
 | Tes e2e + aksesibilitas (Playwright, desktop 1440 dan mobile 390) | **614 lulus**, 68 dilewati (spec yang butuh akun sungguhan), 0 gagal, terhadap build produksi | `E2E_PORT=3200 pnpm test:e2e` (server produksi di port itu) |
 | Audit aksesibilitas (axe, WCAG 2.2 AA) | 33 rute x 2 viewport, **0 pelanggaran**; ditambah keadaan yang berubah (dialog hapus akun dan persetujuan admin terbuka, napas berjalan dan selesai, grounding, lokasi aktif, daftar kosong dan gagal, panduan awal setelah galat) di `e2e/gelombang1.spec.ts` dan `e2e/gelombang3.spec.ts` | `e2e/fase5.spec.ts` |
 | Lighthouse (12.8.2) | Aksesibilitas **100** di semua 48 pengukuran; halaman publik P 93-100, BP 100, SEO 100 | `pnpm lighthouse` |
@@ -19,7 +19,7 @@ Terakhir diperbarui 14 Oktober 2026.
 
 ## 1. Tes otomatis
 
-- **Vitest** (2250 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
+- **Vitest** (2356 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
   slot konsultasi, SUS), kerangka API, komponen, dan **aturan RLS di Postgres sungguhan** (PGlite dengan peran dan klaim JWT
   yang meniru Supabase). Tes penjaga hasil build memastikan rute yang memuat data per pengguna tidak ikut diprerender (data satu orang tak boleh
   masuk cache CDN) dan halaman marketing tetap statis; tes itu hanya aktif setelah `pnpm build`.
@@ -295,10 +295,19 @@ Setelah dijalankan: lampirkan `p(95)` dan `http_req_failed` dari ringkasan k6 di
 - **Status: belum aktif.** Aplikasi sudah dideploy (<https://web-omega-one-69.vercel.app>) tetapi monitor eksternal belum dipasang
   dan variabel repositori `DEMO_URL` belum diisi; tidak ada angka uptime untuk dilaporkan.
 
-## 6. Uji pengguna (SUS)
+## 6. Uji pengguna (SUS dan UEQ-S)
 
-Protokol, persetujuan, tugas, kuesioner SUS, dan alat rekap sudah siap: [UJI-PENGGUNA.md](UJI-PENGGUNA.md), `pnpm usability:report`.
-**Belum ada responden dan belum ada skor.** Jadwalnya 24-26 Oktober; skor SUS di proposal hanya boleh dari sesi nyata.
+Protokol, persetujuan, tugas, kuesioner gabungan, dan alat rekap sudah siap: [UJI-PENGGUNA.md](UJI-PENGGUNA.md),
+[`uji-pengguna/kuesioner-gabungan.md`](uji-pengguna/kuesioner-gabungan.md) (siap disalin ke Google Form), `pnpm usability:report`.
+Dua instrumen: **SUS** versi Indonesia (Sharfina dan Santoso, 2016; patokan rata-rata 68) dan **UEQ-S** versi Indonesia resmi
+dari ueq-online.org (pragmatic, hedonic, overall; skala -3 sampai +3; kategori benchmark Hinderks, Schrepp, dan Thomaschewski,
+2018). Target **minimal 30 responden** (patokan umum SUS 12-14, UEQ 20-30). Alat dan tesnya: 151 tes di `lib/domain/usability`
+(hitungan tangan, batas kategori tepat di tiap ambang, penolakan jawaban di luar skala, kesamaan butir dokumen dengan kode) dan
+27 perusakan sengaja yang semuanya tertangkap.
+
+**Belum ada responden dan belum ada skor.** Jadwalnya 24-26 Oktober; skor SUS dan UEQ-S di proposal hanya boleh dari sesi nyata.
+Batas yang harus ditulis: benchmark UEQ-S diturunkan dari benchmark UEQ penuh (bukan dihitung dari data UEQ-S langsung) dan
+hanya bermakna untuk rata-rata sampel; teks butir SUS disalin dari kutipan sekunder dan perlu dibandingkan dengan makalah aslinya.
 
 ## Yang belum terbukti
 
@@ -308,7 +317,7 @@ Protokol, persetujuan, tugas, kuesioner SUS, dan alat rekap sudah siap: [UJI-PEN
 | Hasil k6 | Skrip siap, belum dijalankan | Pasang k6, jalankan terhadap lokal dan demo |
 | Performa di produksi (beban) | Lighthouse produksi **sudah** (bagian 3); beban belum (hanya lokal) | Ulangi `pnpm lighthouse --base https://<url-demo> --insecure` hanya bila sertifikatnya swatandatangani; untuk URL Vercel cukup `--base` setelah deploy |
 | Uptime | Belum terpasang | URL demo + UptimeRobot |
-| SUS | Belum ada responden | Sesi uji 24-26 Okt |
+| SUS dan UEQ-S | Belum ada responden | Sesi uji 24-26 Okt, minimal 30 responden |
 | Teman cerita dengan model sungguhan | Belum pernah dijalankan dengan kunci Anthropic asli | Isi `ANTHROPIC_API_KEY` di lingkungan demo, coba beberapa percakapan (termasuk jalur krisis) |
 | Pengiriman ke SATUSEHAT | Hanya mode simulasi lokal | Kredensial staging Kemenkes dan nomor IHS pasien |
 | Alur dengan akun sungguhan (`*.auth.spec.ts`) | 56 kasus dilewati; alur Gelombang 1 (profil dan admin dengan akun nyata) belum punya spec berakun | Akun uji + variabel `E2E_*` (petunjuk di PANDUAN-PENGEMBANG) |

@@ -30,7 +30,7 @@ menjawab bahwa layanan belum dikonfigurasi.
 | `pnpm lighthouse` | Audit Lighthouse semua halaman utama (server produksi; lihat [`TESTING.md`](TESTING.md)) |
 | `pnpm load`      | Uji beban lokal 200 pengguna virtual tanpa dependensi (padanan `load/read-endpoints.js`) |
 | `pnpm load:k6`   | Uji beban k6 asli (butuh k6 terpasang)                                  |
-| `pnpm usability:report` | Rekap uji pengguna SUS dari CSV ([`UJI-PENGGUNA.md`](UJI-PENGGUNA.md)) |
+| `pnpm usability:report` | Rekap uji pengguna SUS dan UEQ-S dari CSV ([`UJI-PENGGUNA.md`](UJI-PENGGUNA.md)) |
 
 Tes e2e lokal memakai Google Chrome yang sudah terpasang. Di CI, pasang Chromium Playwright:
 `pnpm exec playwright install --with-deps chromium`. Tes e2e **tidak** mengirim formulir pendaftaran
@@ -214,7 +214,7 @@ e2e/  tests/      Playwright · tes token, middleware, RLS (PGlite), seed
 - [`docs/DECISIONS.md`](DECISIONS.md) — keputusan dan alasannya (bahan tanya jawab juri)
 - [`docs/TEMUAN-KEAMANAN.md`](TEMUAN-KEAMANAN.md) — temuan keamanan pada skema aplikasi Flutter
 - [`docs/TESTING.md`](TESTING.md) — bukti pengujian: Lighthouse, aksesibilitas, beban, uptime
-- [`docs/UJI-PENGGUNA.md`](UJI-PENGGUNA.md) — protokol uji pengguna dan kuesioner SUS
+- [`docs/UJI-PENGGUNA.md`](UJI-PENGGUNA.md) — protokol uji pengguna dan kuesioner SUS + UEQ-S
 - `/developers` dan `/api/v1/openapi.json` — dokumentasi dan spesifikasi API publik (saat server berjalan)
 
 ## Menjalankan spec berakun terhadap situs yang sudah dideploy
