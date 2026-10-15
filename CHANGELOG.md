@@ -18,6 +18,14 @@ Alignment with Mindra Web (one account, one backend). Details: `web/docs/DECISIO
   the server. `ClaudeApiService` and `AppConstants.claudeApiKey` were removed; set `WEB_API_BASE_URL` instead
   (see `.env.example`). The old key must still be revoked at console.anthropic.com.
 
+### Changed
+- The 119 ext. 8 hotline is now labelled **Healing119.id (Kemenkes)**, verified against the official Kemenkes page on
+  2026-10-15. That page says the service runs "from morning to night", not 24 hours, so every "24 jam" claim for this
+  hotline was removed (112 and hospital emergency rooms remain the 24-hour fallback).
+- FHIR: the PSS-10 total score now uses LOINC `106860-0` (SRQ-20 stays a Mindra-local code).
+- Terms and Privacy 1.1.1: adds a reference to Government Regulation (PP) 33/2026, the implementing regulation of the
+  Personal Data Protection Law (in force 16 January 2027). No other change in substance.
+
 ### Fixed
 - **Booking a consultation now works against the real database.** The app read a `psychologist_slots` table that
   never existed, so no schedule ever loaded. It now uses the server functions `psychologist_available_slots` and

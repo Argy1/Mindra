@@ -573,7 +573,7 @@ class _CrisisBanner extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Beberapa jawabanmu menunjukkan pikiran yang sulit. Bantuan tersedia 24 jam — tekan untuk lihat.',
+                    'Beberapa jawabanmu menunjukkan pikiran yang sulit. Bantuan tersedia — tekan untuk lihat.',
                     style: AppTextStyles.bodyS.copyWith(
                       color: const Color(0xFF7F1D1D),
                       height: 1.45,

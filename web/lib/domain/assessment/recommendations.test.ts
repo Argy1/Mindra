@@ -16,7 +16,7 @@ describe('rekomendasi (port AssessmentClinical.recommendationsFor)', () => {
     const crisis = recommendationsFor('phq9', 25).find((rec) => rec.id === 'crisis-line');
     expect(crisis?.cta?.href).toBe(PRIMARY_CRISIS_RESOURCE.telHref);
     expect(crisis?.description).toContain(PRIMARY_CRISIS_RESOURCE.displayNumber);
-    // Flutter melabeli 119 ext. 8 sebagai "Into The Light"; itu keliru (layanan SEJIWA).
+    // Flutter melabeli 119 ext. 8 sebagai "Into The Light"; itu keliru (layanan Healing119.id).
     expect(crisis?.description).not.toMatch(/into the light/i);
   });
 

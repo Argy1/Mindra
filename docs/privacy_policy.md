@@ -1,7 +1,7 @@
 # Kebijakan Privasi Mindra
 
-**Berlaku efektif:** 14 Oktober 2026
-**Versi:** 1.1.0
+**Berlaku efektif:** 15 Oktober 2026
+**Versi:** 1.1.1
 
 Mindra ("kami", "aplikasi") adalah aplikasi mobile dan situs web kesehatan mental digital yang memakai satu akun
 dan satu basis data. Kebijakan
@@ -11,7 +11,8 @@ yang sangat sensitif — adalah prioritas utama kami.
 
 Dengan menggunakan Mindra, Anda menyetujui praktik yang dijelaskan dalam
 kebijakan ini. Kami berkomitmen mematuhi **Undang-Undang No. 27 Tahun 2022
-tentang Pelindungan Data Pribadi (UU PDP)**.
+tentang Pelindungan Data Pribadi (UU PDP)** dan peraturan pelaksanaannya, yaitu
+**Peraturan Pemerintah No. 33 Tahun 2026** (berlaku mulai 16 Januari 2027).
 
 ---
 

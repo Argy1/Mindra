@@ -57,5 +57,5 @@ k6 asli belum dijalankan) dicatat apa adanya di [`web/docs/TESTING.md`](web/docs
 [`web/README.md`](web/README.md#status-dan-keterbatasan).
 
 Mindra adalah teman digital untuk kesehatan mental, **bukan layanan darurat** dan bukan pengganti psikolog atau
-psikiater. Bila kamu atau seseorang yang kamu kenal dalam keadaan darurat, hubungi **119 lalu tekan 8** (SEJIWA,
-Kementerian Kesehatan).
+psikiater. Bila kamu atau seseorang yang kamu kenal dalam keadaan darurat, hubungi **119 lalu tekan 8** (Healing119.id,
+Kementerian Kesehatan; pagi hingga malam hari) atau **112** untuk bahaya yang sedang terjadi.

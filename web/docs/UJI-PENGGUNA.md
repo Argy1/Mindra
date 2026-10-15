@@ -39,7 +39,8 @@ Prinsip: **tidak ada data sungguhan yang dimasukkan, tidak ada nama yang dicatat
 - Responden hanya diberi id anonim (R01, R02, …). Daftar id ↔ orang **tidak** dicatat. Berkas hasil tidak memuat nama,
   email, atau kontak.
 - Bila responden tampak tertekan oleh isi skrining atau percakapan: **hentikan sesi**, tanyakan kabarnya dengan tenang,
-  dan tawarkan kontak bantuan yang tampil di aplikasi (SEJIWA 119 ext. 8; sumber tunggalnya
+  dan tawarkan kontak bantuan yang tampil di aplikasi (Healing119.id 119 ext. 8, pagi hingga malam hari, dan 112 untuk
+  bahaya yang sedang terjadi; sumber tunggalnya
   `lib/domain/crisis/resources.ts`, verifikasi nomornya sebelum hari pertama). Catat di lembar pengamat "sesi dihentikan",
   tanpa rincian.
 - Teman cerita memanggil layanan AI pihak ketiga (Anthropic). Pada akun demo, minta responden **tidak** menulis hal
@@ -229,7 +230,7 @@ Menentukan tiga masalah teratas:
 ## 11. Daftar periksa
 
 - [ ] URL demo hidup dan akun demo tiap peran berfungsi
-- [ ] Nomor krisis diverifikasi (`lib/domain/crisis/resources.ts`)
+- [ ] Nomor 112 diverifikasi (Healing119.id sudah, 15 Okt 2026; `lib/domain/crisis/resources.ts`)
 - [ ] Persetujuan dicetak atau siap dibacakan
 - [ ] Google Form gabungan (SUS + UEQ-S + tiga pertanyaan terbuka) dibuat dari `uji-pengguna/kuesioner-gabungan.md`
 - [ ] Butir SUS dibandingkan dengan makalah Sharfina dan Santoso (2016) aslinya

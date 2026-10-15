@@ -105,7 +105,8 @@ Layanan email bawaan Supabase hanya untuk uji (jumlahnya sangat dibatasi). Untuk
 | Change email      | `ganti-email.html`             | `Konfirmasi alamat email barumu`     |
 
 Templat memakai variabel Supabase (`{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .NewEmail }}`), sapaan "kamu", tanpa tanda
-seru atau emoji, dan mencantumkan SEJIWA (119 ext. 8) di email pendaftaran. Tautan mengarah ke
+seru atau emoji, dan mencantumkan Healing119.id (119 ext. 8, pagi hingga malam hari) dan 112 di email pendaftaran. **Bila templat lama sudah
+ditempel di Supabase, tempel ulang versi terbaru.** Tautan mengarah ke
 `<Site URL>/auth/callback` (PKCE), yang sudah ditangani web.
 
 ## 6. Anthropic dan kunci lama (F7) **(kamu)**

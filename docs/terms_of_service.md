@@ -1,7 +1,7 @@
 # Ketentuan Layanan Mindra
 
-**Berlaku efektif:** 14 Oktober 2026
-**Versi:** 1.1.0
+**Berlaku efektif:** 15 Oktober 2026
+**Versi:** 1.1.1
 
 Selamat datang di Mindra. Ketentuan Layanan ("Ketentuan") ini mengatur
 penggunaan Anda atas aplikasi mobile dan situs web Mindra (keduanya memakai satu akun dan satu basis data, jadi

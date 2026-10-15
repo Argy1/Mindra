@@ -12,7 +12,7 @@ export const FACILITY_TYPE_LABEL: Readonly<Record<string, string>> = {
 
 /**
  * Apakah isi direktori sudah dikurasi dari sumber resmi. Selama `false`, halaman menampilkan catatan bahwa daftar ini contoh
- * dan menyarankan SEJIWA atau IGD. Ubah ke `true` hanya setelah data layanan sungguhan dimuat dan diperiksa manusia.
+ * dan menyarankan Healing119.id atau IGD. Ubah ke `true` hanya setelah data layanan sungguhan dimuat dan diperiksa manusia.
  */
 export const FACILITY_DIRECTORY_VERIFIED = false;
 

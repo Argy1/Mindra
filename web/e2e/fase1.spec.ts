@@ -114,7 +114,7 @@ test.describe('runner skrining (/dev/asesmen)', () => {
     for (let n = 1; n <= 8; n += 1) await answer(page, '1');
     await page.keyboard.press('3');
     const note = page.getByRole('status');
-    await expect(note).toContainText('SEJIWA');
+    await expect(note).toContainText('Healing119.id');
     await expect(note.getByRole('link', { name: /Hubungi/ })).toHaveAttribute('href', /^tel:/);
     await expect(alerts(page)).toHaveCount(0);
     await expectNoViolations(page);

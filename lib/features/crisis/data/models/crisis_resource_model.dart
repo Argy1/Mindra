@@ -22,15 +22,16 @@ class CrisisResourceModel extends CrisisResource {
 
   static List<CrisisResourceModel> get seeds => const [
         CrisisResourceModel(
-          // 119 ext. 8 adalah SEJIWA (layanan kesehatan jiwa Kementerian Kesehatan), BUKAN Into The Light.
-          // Sumber tunggal di web: web/lib/domain/crisis/resources.ts. Nomor di daftar ini belum diverifikasi
-          // ulang ke sumber resmi; verifikasi sebelum rilis.
-          id: 'sejiwa',
-          name: 'SEJIWA (Kemenkes)',
+          // 119 ext. 8 adalah Healing119.id (Kementerian Kesehatan), BUKAN Into The Light. Diverifikasi ke halaman
+          // resmi Kemenkes pada 2026-10-15: https://kesprimkom.kemkes.go.id/konten/158/151/0/cegah-bunuh-diri-dukung-kesehatan-jiwa-kenali-layanan-healing119-id
+          // Layanan beroperasi pagi hingga malam hari, BUKAN 24 jam (isAvailable24h harus false).
+          // Sumber tunggal di web: web/lib/domain/crisis/resources.ts. Nomor lain di daftar ini belum diverifikasi.
+          id: 'healing119',
+          name: 'Healing119.id (Kemenkes)',
           phone: '119 ext 8',
           description:
-              'Layanan telepon kesehatan jiwa dari Kementerian Kesehatan.',
-          isAvailable24h: true,
+              'Dukungan psikologis awal dari konselor lewat telepon 119 ext. 8 atau WhatsApp di healing119.id. Gratis, pagi hingga malam hari.',
+          isAvailable24h: false,
         ),
         CrisisResourceModel(
           id: 'yayasan-pulih',

@@ -8,13 +8,14 @@ import type { InstrumentId } from '@/lib/domain/assessment/instruments';
  *
  * Fungsi murni: tidak membaca jam (`issuedAt` diberikan pemanggil), tidak melakukan I/O.
  *
- * Catatan kode LOINC:
- *   - PHQ-9 total score  = 44261-6  ("Patient Health Questionnaire 9 item total score [Reported]")
- *   - GAD-7 total score  = 70274-6  ("Generalized anxiety disorder 7 item total score [Reported.PHQ]")
- *   - PSS-10 dan SRQ-20 tidak punya satu kode LOINC total-skor yang disepakati: memakai sistem lokal Mindra
- *     sampai kode terverifikasi ada. Ini DISENGAJA dan harus ditulis jujur di proposal.
- * Kode LOINC di atas berasal dari aplikasi Flutter ("confirmed against the LOINC database"); verifikasi ulang
- * ke loinc.org sebelum dikutip sebagai fakta di proposal (docs/ARCHITECTURE.md §6).
+ * Kode LOINC (ketiganya diverifikasi 15 Okt 2026: status ACTIVE di LOINC 2.82, lewat server terminologi publik
+ * tx.fhir.org karena loinc.org menolak akses otomatis; riset proposal memeriksanya di loinc.org):
+ *   - PHQ-9 total score  = 44261-6   ("Patient Health Questionnaire 9 item (PHQ-9) total score [Reported]")
+ *   - GAD-7 total score  = 70274-6   ("Generalized anxiety disorder 7 item (GAD-7) total score [Reported.PHQ]")
+ *   - PSS-10 total score = 106860-0  ("Perceived stress scale-10 total score [PSS-10]"), https://loinc.org/106860-0
+ *   - SRQ-20 tidak punya kode LOINC total-skor: memakai sistem lokal Mindra, dan `Observation.code.text` selalu
+ *     terisi. Ini DISENGAJA dan harus ditulis jujur di proposal.
+ * Bundel belum divalidasi dengan validator HL7 resmi (docs/ARCHITECTURE.md §6).
  */
 
 export const FHIR_SYSTEM = {
@@ -46,9 +47,9 @@ export const INSTRUMENT_CODING: Readonly<Record<InstrumentId, InstrumentCoding>>
     display: 'Generalized anxiety disorder 7 item (GAD-7) total score',
   },
   pss10: {
-    system: FHIR_SYSTEM.mindraInstrument,
-    code: 'pss10-total',
-    display: 'Perceived Stress Scale 10 item (PSS-10) total score',
+    system: FHIR_SYSTEM.loinc,
+    code: '106860-0',
+    display: 'Perceived stress scale-10 total score [PSS-10]',
   },
   srq20: {
     system: FHIR_SYSTEM.mindraInstrument,

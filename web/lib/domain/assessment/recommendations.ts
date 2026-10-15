@@ -10,7 +10,7 @@ import { tierFor, type Tier } from './scoring';
  *   * Tombol ajakan (`cta`) hanya ada bila rutenya SUDAH ada di web. Fitur yang belum ada (teman
  *     cerita, konsultasi, latihan CBT) tampil sebagai saran tanpa tombol, bukan tautan mati.
  *   * Nomor layanan krisis diambil dari lib/domain/crisis/resources.ts. Flutter menuliskannya
- *     langsung sebagai "119 ext. 8 (Into The Light)", yang keliru: itu layanan SEJIWA (Kemenkes).
+ *     langsung sebagai "119 ext. 8 (Into The Light)", yang keliru: itu layanan Healing119.id (Kemenkes).
  */
 
 export type RecommendationIcon =

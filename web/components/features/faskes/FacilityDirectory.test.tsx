@@ -131,7 +131,7 @@ describe('FacilityDirectory', () => {
     expect(
       screen.getByRole('heading', { name: 'Tidak ada layanan yang cocok' }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/SEJIWA di 119 ext\. 8/)).toBeInTheDocument();
+    expect(screen.getByText(/Healing119\.id di 119 ext\. 8/)).toBeInTheDocument();
   });
 
   it('kartu: jenis, alamat, telepon sebagai tautan tel:, peta hanya bila ada koordinat', () => {
@@ -305,7 +305,7 @@ describe('FacilityDirectory', () => {
     expect(names()).toHaveLength(20);
   });
 
-  it('gagal memuat: pesan peringatan dengan jalan keluar ke SEJIWA, tanpa daftar kosong yang menyesatkan', () => {
+  it('gagal memuat: pesan peringatan dengan jalan keluar ke Healing119.id, tanpa daftar kosong yang menyesatkan', () => {
     render(<FacilityDirectory facilities={[]} verified loadFailed />);
     expect(screen.getByRole('alert')).toHaveTextContent('Daftar layanan belum bisa dimuat');
     expect(screen.getByRole('alert')).toHaveTextContent('119 ext. 8');

@@ -35,6 +35,50 @@ Disusun 14-15 Oktober 2026, setelah situs dideploy ke Vercel dan diperiksa.
 5. Sumber rinci tiap topik ada di bagian 16 (peta sumber). Alasan setiap keputusan teknis ada di `docs/DECISIONS.md`
    (dibuat untuk latihan tanya jawab babak final, yang bobotnya 40%).
 
+## 0a. Koreksi dan keputusan sesudah riset proposal (15 Okt 2026): baca sebelum menulis
+
+Riset proposal (Claude Cowork) meminta tiga perubahan di kode dan penambahan UEQ-S di uji pengguna. **Semuanya sudah
+dikerjakan, lalu diperiksa ulang ke sumbernya.** Pemeriksaan itu menemukan beberapa tempat di mana hasilnya **berbeda dari
+bahan riset awal**. Proposal harus mengikuti tabel di bawah ini, bukan bahan riset awal. Alasan tiap keputusan ada di
+`docs/DECISIONS.md` (bagian "Revisi dari riset proposal").
+
+### Perbedaan antara bahan riset awal dan hasil verifikasi
+
+| Topik | Bahan riset awal | Hasil verifikasi ke sumber | Yang boleh dan tidak boleh ditulis |
+| ----- | ---------------- | -------------------------- | ---------------------------------- |
+| **Jam layanan Healing119.id** | "24 jam, gratis" | Halaman resmi Kemenkes yang dikutip (Ditjen Kesehatan Primer dan Komunitas, 7 Agustus 2025) menulis: layanan "akan beroperasi dari pagi hingga malam hari". Ia **tidak menyebut 24 jam**. Gratis: benar | Tulis **"pagi hingga malam hari"**. **Jangan menulis 24 jam untuk Healing119.id.** Yang 24 jam di desain Mindra adalah cadangannya: 112 dan IGD terdekat (balasan krisis Teman cerita kini menyebut keduanya) |
+| **Hubungan dengan SEJIWA** | "119 ext. 8 kini bernama Healing119.id" | Halaman itu mengonfirmasi bahwa **119 ext. 8 adalah akses telepon Healing119.id** (juga WhatsApp lewat healing119.id), tetapi **tidak menyebut SEJIWA sama sekali**. Penghubungnya hanya media dan direktori (Kontan September 2026, Media Asuransi Oktober 2026, TherapyRoute); pengumuman resmi pergantian nama tidak ditemukan. SEJIWA diluncurkan 29 April 2020 (Kominfo, Kemenkes, KemenPPPA) | Tulis **"Healing119.id (119 ext. 8)"**. Bila ingin menyebut SEJIWA, tulis dengan atribusi: "sebelumnya dikenal sebagai SEJIWA menurut sejumlah media; pergantian nama belum diumumkan resmi". **Jangan menulis "berganti nama" sebagai fakta resmi** |
+| **Sifat layanan** | "pertolongan pertama psikologis, bukan terapi" | Halaman menyebut **"dukungan psikologis awal"** dan "tindak lanjut dan rujukan ke layanan profesional jika dibutuhkan". Frasa "bukan terapi" tidak tertulis | Pakai **"dukungan psikologis awal"** (padanan "psychological first aid" boleh disebut sebagai istilah umum, bukan kutipan Kemenkes) |
+| **LOINC PSS-10** | `106860-0` | Cocok: "Perceived stress scale-10 total score [PSS-10]", status **ACTIVE** di LOINC 2.82. `loinc.org` menolak akses otomatis dari lingkungan pengembangan, jadi diperiksa lewat **server terminologi publik tx.fhir.org**; `44261-6` (PHQ-9) dan `70274-6` (GAD-7) juga ACTIVE di versi yang sama | Tulis ketiganya sebagai kode LOINC aktif. SRQ-20 **tetap kode lokal** (tidak ada kode LOINC total skor) dengan teks `Observation.code.text`. LOINC mencatat hak cipta RST Assessments, LLC pada entri PSS-10; periksa ketentuan bila proposal memuat **teks butir** PSS-10 (kodenya sendiri bebas dipakai). **Bundel belum divalidasi dengan validator HL7** |
+| **PP 33/2026** | "pelaksana UU PDP, berlaku 16 Januari 2027" | Cocok dengan ulasan media dan firma hukum (Meridian Hukum, Katadata, Bisnis.com, Veritask): **PP No. 33 Tahun 2026 tentang Peraturan Pelaksanaan UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi**, ditetapkan dan diundangkan 16 Juli 2026, **berlaku 16 Januari 2027**, LN 2026 No. 88. **Naskah resmi (JDIH Setneg) belum dibuka** | Tulis **"akan berlaku 16 Januari 2027"**. Mindra "**dirancang dengan memperhatikan**" UU PDP dan PP ini; **jangan menulis "mematuhi" atau "sesuai PP 33/2026"** (belum berlaku, naskah hukum belum ditinjau ahli hukum). Buka naskah resmi sebelum mencetak nomor pasal |
+| **SUS bahasa Indonesia** | "Sharfina & Santoso, 2016" | Butir lama di kode adalah terjemahan bebas; kini diganti adaptasi Sharfina dan Santoso (ICACSIS 2016). Teksnya diambil dari **satu kutipan sekunder**; makalah aslinya (IEEE) tidak bisa dibuka, jadi **belum dibandingkan kata demi kata** | Sitasi makalahnya, tetapi **bandingkan butir dengan makalah aslinya** sebelum mencetak butir di proposal |
+| **Butir UEQ-S Indonesia** | "terjemahan Harry B. Santoso" | Berkas resmi `UEQS_Items.pdf` (ueq-online.org, halaman 3) memuat versi Indonesia, tetapi **tidak menyebut penerjemahnya**. Butir disalin persis | Sitasi berkas ueq-online.org. **Jangan menyebut nama penerjemah** kecuali ada sumber lain yang memuatnya |
+| **Benchmark UEQ-S** | ambang Hinderks dkk. (2018) | Semua 15 ambang cocok dengan tabel di makalah. Makalah itu menyebut benchmark UEQ-S **diturunkan dari benchmark UEQ penuh** (9.905 responden, 246 produk), bukan dihitung dari data UEQ-S langsung | Tulis kategorinya **dengan catatan itu**. Kategori hanya untuk rata-rata sampel, dan **indikatif bila n di bawah 20** |
+
+### Yang berubah di aplikasi (semuanya teruji; Vitest dan Flutter hijau)
+
+- **Kontak krisis, web dan mobile:** label **Healing119.id** (Kementerian Kesehatan RI), `verified: true`, `verifiedAt` 2026-10-15,
+  `sourceUrl` ke halaman Kemenkes di atas; jam layanan "pagi hingga malam hari"; deskripsi "dukungan psikologis awal ... gratis".
+  **112 tetap `verified: false`**. Frasa "24 jam" untuk hotline ini dihapus di semua layar. Balasan krisis tetap Teman cerita kini
+  menyebut jam layanan apa adanya **dan** cadangan 24 jam (112 atau IGD). Templat email pendaftaran ikut diperbarui.
+- **FHIR:** PSS-10 memakai LOINC `106860-0` di web dan Flutter (sebelumnya kode lokal `pss10-total`). PHQ-9 dan GAD-7 tidak berubah.
+- **Naskah hukum:** versi **1.1.0 menjadi 1.1.1** (15 Oktober 2026), hanya menambah rujukan PP 33/2026 di kebijakan privasi
+  (web dan dokumen mobile). Substansi lain tidak berubah; pengguna lama tidak diminta setuju ulang.
+- **Uji pengguna:** SUS versi Indonesia + **UEQ-S** (pragmatic, hedonic, overall) berdampingan, kuesioner gabungan siap salin ke
+  Google Form, target **minimal 30 responden** (`docs/UJI-PENGGUNA.md`, `docs/uji-pengguna/kuesioner-gabungan.md`). **Belum ada
+  responden dan belum ada skor.**
+
+### Temuan baru yang harus dipertimbangkan penulis: batas usia 17 tahun
+
+Pendaftaran meminta pernyataan berusia **17 tahun ke atas** (diwarisi dari ketentuan aplikasi mobile; tidak ada verifikasi usia).
+Dalam hukum Indonesia "anak" umumnya berarti **di bawah 18 tahun** (UU Perlindungan Anak; periksa), dan ulasan media tentang
+PP 33/2026 menyebut pemrosesan data anak memerlukan persetujuan orang tua atau wali (Pasal 38 menurut Katadata; **pasal belum
+diperiksa pada naskah resmi**). Pengguna berusia 17 tahun karena itu bisa termasuk "anak". Ini **risiko kepatuhan yang belum
+ditelaah ahli hukum** dan **belum diubah di kode** karena keputusannya ada pada pemilik: menaikkan batas menjadi 18 tahun
+(perubahan kecil di web dan Flutter) atau menambah alur persetujuan orang tua (besar). **Jangan menulis "sesuai UU PDP" atau
+"sesuai PP 33/2026" tanpa menyebut batas ini**; tulis sebagai keterbatasan dan proyeksi (bagian 14). Uji pengguna sudah
+mengecualikan responden di bawah 18 tahun.
+
 ## 1. Ringkasan satu halaman
 
 **Mindra** adalah ekosistem kesehatan mental digital untuk masyarakat Indonesia. Tagline: **"Ruang aman untuk perasaanmu,
@@ -58,7 +102,7 @@ Tiga langkah yang ditawarkan, dan **pengguna selalu memegang kuncinya**:
 | Instrumen skrining | 4 (PHQ-9, GAD-7, PSS-10, SRQ-20; 46 butir), hasil identik di web, mobile, dan database | [TERBUKTI] |
 | Rute API | 14 (13 di `/api/v1` + `/api/health`); OpenAPI 3.1 + dokumentasi `/developers` | [TERBUKTI] |
 | Migrasi database | 13 (5 dari aplikasi mobile + 8 dari web). Additive, kecuali dua migrasi yang menghapus policy lama yang bocor atau tak berfungsi (`…000100` dan `…000400`), atas izin pemilik; tabel, kolom, dan data tidak dihapus | [TERBUKTI] |
-| Tes Vitest | **2356 lulus**, 118 berkas (domain murni, API, komponen, RLS di Postgres sungguhan via PGlite) | [TERBUKTI] |
+| Tes Vitest | **2370 lulus**, 119 berkas (domain murni, API, komponen, RLS di Postgres sungguhan via PGlite) | [TERBUKTI] |
 | Tes Playwright | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop 1440 dan mobile 390 | [TERBUKTI] |
 | Aksesibilitas (axe, WCAG 2.2 AA) | **0 pelanggaran** di 33 rute x 2 viewport | [TERBUKTI] |
 | Tes Flutter | **160 lulus**; `flutter analyze` 0 galat dan 0 peringatan (115 info) | [TERBUKTI] |
@@ -80,7 +124,7 @@ aplikasi Flutter belum dijalankan di perangkat setelah perubahan 14 Okt; uji pem
 | --- | --- | --- | --- |
 | 1 | Inovasi dan relevansi solusi | 30% | Dua aplikasi satu backend; izin ditegakkan di database; peringatan krisis realtime; agregat anonim + FHIR (6.4, 7) |
 | 2 | Kesesuaian dengan kebutuhan pengguna | 20% | Masalah I-NAMHS, kendali di pengguna, bantuan tanpa login, bahasa Indonesia hangat (3, 4, 10) |
-| 3 | Kualitas teknis: validasi input, autentikasi, kode modular dan maintainable | 20% | Zod di semua batas, RLS, MFA di database, domain murni + tes, 2356 tes, audit F1-F8 (7, 9, 11) |
+| 3 | Kualitas teknis: validasi input, autentikasi, kode modular dan maintainable | 20% | Zod di semua batas, RLS, MFA di database, domain murni + tes, 2370 tes, audit F1-F8 (7, 9, 11) |
 | 4 | UI/UX: konsistensi, usability, accessibility | 15% | Sistem desain, WCAG 2.2 AA 0 pelanggaran, Lighthouse A 100 (10). **Usability (SUS dan UEQ-S) belum terukur** |
 | 5 | Dokumentasi dan kelengkapan proposal | 15% | README, ARCHITECTURE, DECISIONS, TESTING, TEMUAN-KEAMANAN, dokumen ini (16) |
 
@@ -185,7 +229,7 @@ tanpa melihat nama siapa pun.
 ### 4.2 Batasan produk (scope yang disengaja)
 
 - **Bukan layanan darurat, bukan diagnosis, bukan pengganti psikolog atau psikiater.** Hasil skrining selalu disertai
-  catatan itu. Dalam keadaan darurat pengguna diarahkan ke SEJIWA (119 ext. 8) dan 112.
+  catatan itu. Dalam keadaan darurat pengguna diarahkan ke Healing119.id (119 ext. 8, pagi hingga malam hari) dan 112 (24 jam).
 - Hanya Indonesia dan Bahasa Indonesia; pengguna 17 tahun ke atas (pernyataan sendiri, **tidak ada verifikasi usia**).
 - Statistik wilayah **opt-in** (bawaan mati). Data individu tidak pernah keluar ke faskes atau API mitra.
 - Panggilan video, voice journal, dan latihan CBT lengkap ada di aplikasi mobile tetapi **tidak** di web (proyeksi).
@@ -233,7 +277,7 @@ Prinsip yang mengatur semua keputusan:
 | `/tentang` | Tentang Mindra, prinsip, batas layanan |
 | `/bantuan` | **Napas terpandu**, **grounding 5-4-3-2-1**, kontak krisis (sumber tunggal `lib/domain/crisis/resources.ts`), panduan menemani orang lain. Tidak memakai cookie atau penyimpanan |
 | `/layanan-terdekat` | Direktori layanan dari database; **jarak dihitung di perangkat**, lokasi pengguna tidak dikirim ke mana pun; filter provinsi dan pencarian. Menyatakan bahwa daftar ini **masih contoh** |
-| `/syarat-penggunaan`, `/kebijakan-privasi` | Naskah v1.1.0 (disatukan dengan aplikasi mobile); **belum ditinjau ahli hukum** |
+| `/syarat-penggunaan`, `/kebijakan-privasi` | Naskah v1.1.1 (disatukan dengan aplikasi mobile; menyebut UU 27/2022 dan PP 33/2026); **belum ditinjau ahli hukum** |
 | `/developers`, `/api/v1/openapi.json` | Dokumentasi API interaktif (halaman server) dan spesifikasi OpenAPI 3.1 |
 | `/masuk`, `/daftar`, `/lupa-sandi`, `/atur-sandi`, `/auth/callback`, `/akun-bermasalah` | Autentikasi (Supabase Auth + PKCE). Pendaftaran meminta pernyataan 17+ dan persetujuan atas syarat dan kebijakan |
 
@@ -293,7 +337,7 @@ Dibangun lebih dulu dan kini disejajarkan dengan web (perubahan 14 Okt 2026 dica
 | Laporan | Ekspor PDF ringkasan skrining, mood, tidur |
 | Aksesibilitas | Ukuran teks 4 tingkat, kontras tinggi, gaya bahasa formal atau santai, kurangi gerak |
 | Notifikasi | Notifikasi lokal adaptif (check-in, refleksi malam, insight, pengingat asesmen dan konsultasi) |
-| Baru 14 Okt | Pemesanan lewat `book_consultation`, edit profil (kota, provinsi, opt-in statistik), hapus akun nyata (`delete_my_account`), pendaftaran 17+ dengan persetujuan, label hotline SEJIWA diperbaiki |
+| Baru 14 Okt | Pemesanan lewat `book_consultation`, edit profil (kota, provinsi, opt-in statistik), hapus akun nyata (`delete_my_account`), pendaftaran 17+ dengan persetujuan, label hotline diperbaiki (kini Healing119.id, lihat bagian 0a) |
 
 Status: `flutter analyze` 0 galat dan 0 peringatan, `flutter test` **160 lulus** **[TERBUKTI]**. Aplikasi **belum
 dijalankan di perangkat atau emulator setelah perubahan 14 Okt** dan Teman cerita di mobile baru bekerja setelah
@@ -425,10 +469,12 @@ sequenceDiagram
 
 ### 7.5 Interoperabilitas: FHIR dan SATUSEHAT
 
-- `GET /api/v1/fhir/Observation?patient=me` mengembalikan **FHIR R4 Bundle** hasil skrining (PHQ-9 = LOINC `44261-6`, GAD-7 =
-  LOINC `70274-6`; PSS-10 dan SRQ-20 memakai coding lokal). Bundel **tidak memuat jawaban per butir** (butir 9 PHQ-9 tidak
-  keluar). **Kode LOINC belum diverifikasi ulang ke loinc.org dan bundel belum divalidasi dengan validator HL7 resmi** (hanya
-  diperiksa strukturnya oleh tes) **[BELUM]**.
+- `GET /api/v1/fhir/Observation?patient=me` mengembalikan **FHIR R4 Bundle** hasil skrining. Kode: PHQ-9 = LOINC `44261-6`,
+  GAD-7 = LOINC `70274-6`, **PSS-10 = LOINC `106860-0`** ("Perceived stress scale-10 total score [PSS-10]"). Ketiganya berstatus
+  ACTIVE di LOINC 2.82 (diperiksa 15 Okt 2026 lewat server terminologi publik tx.fhir.org, dan oleh riset proposal di loinc.org)
+  **[TERBUKTI]**. SRQ-20 tidak punya kode LOINC total skor: memakai sistem lokal Mindra dengan `Observation.code.text`
+  terisi. Bundel **tidak memuat jawaban per butir** (butir 9 PHQ-9 tidak keluar). **Bundel belum divalidasi dengan validator
+  HL7 resmi** (hanya diperiksa strukturnya oleh tes) **[BELUM]**.
 - `POST /api/v1/satusehat/sync` hanya untuk pengguna yang menyalakan persetujuan (`profiles.satusehat_consent`), tidak
   menggandakan bila diulang, dan dicatat di `satusehat_sync_log`.
 - **Mode `mock` = simulasi lokal sepenuhnya:** struktur diperiksa, dijawab dengan id tiruan `mock-...`, **tidak ada byte yang
@@ -459,7 +505,7 @@ dengan akun sungguhan di situs live ditandai pada bagian 13.
 kategori, rekomendasi, catatan "ini skrining, bukan diagnosis".
 
 **B. Tanda bahaya terdeteksi.** PHQ-9 butir 9 > 0 (atau SRQ-20 butir 17 = ya, atau kategori berat) -> banner krisis dengan tombol
-telepon SEJIWA -> trigger database membuat `crisis_alerts` -> psikolog tertaut (sesi aal2) melihat peringatan **tanpa muat
+telepon Healing119.id -> trigger database membuat `crisis_alerts` -> psikolog tertaut (sesi aal2) melihat peringatan **tanpa muat
 ulang** -> menandai "ditangani". Sama bila skrining diisi dari aplikasi mobile.
 
 **C. Bercerita ke Teman cerita.** Pesan dikirim -> batas laju -> deteksi krisis -> (krisis) balasan tetap + peringatan, atau
@@ -549,16 +595,18 @@ Flutter) belum dicabut karena akan merusak build lama.
 
 - **Minimisasi dan persetujuan:** statistik wilayah opt-in; SATUSEHAT hanya atas persetujuan dan tanpa jawaban per butir;
   pendamping bawaannya hanya mood harian dan peringatan darurat.
-- **Hak pengguna (UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi):** salinan data (`/profil/unduh`), penghapusan akun
-  (`delete_my_account()`), riwayat akses. Salinan cadangan penyedia basis data dapat bertahan sampai siklusnya berakhir
+- **Hak pengguna (UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi, dan peraturan pelaksanaannya PP No. 33 Tahun 2026 yang
+  berlaku 16 Januari 2027):** salinan data (`/profil/unduh`), penghapusan akun (`delete_my_account()`), riwayat akses. Salinan cadangan penyedia basis data dapat bertahan sampai siklusnya berakhir
   (tertulis di kebijakan privasi).
 - **Etika AI:** pendamping AI bukan terapis; disclaimer ditampilkan; tidak mendiagnosis; jalur krisis tidak bergantung pada AI;
   data yang dikirim ke pihak ketiga diminimalkan.
 - **Batas yang harus disebut:** naskah syarat dan kebijakan **belum ditinjau ahli hukum**; alamat kontak pengelola data belum
   dicantumkan; usia hanya pernyataan sendiri; `user_metadata` (tempat versi persetujuan) bisa ditulis pemiliknya sendiri,
   jadi **bukan bukti persetujuan yang kebal ubah**.
-- Nomor bantuan krisis (SEJIWA 119 ext. 8, 112) **belum diverifikasi manusia ke sumber resmi** (`verified: false` di
-  `lib/domain/crisis/resources.ts`) **[PEMILIK]**.
+- Nomor bantuan krisis: **Healing119.id (119 ext. 8) diverifikasi** ke halaman resmi Kemenkes pada 15 Okt 2026 (`verified: true`
+  dengan `sourceUrl` di `lib/domain/crisis/resources.ts`); **112 belum diverifikasi manusia** (`verified: false`) **[PEMILIK]**.
+- **Batas usia 17 tahun** (pernyataan sendiri) berpotensi bertabrakan dengan definisi anak (di bawah 18 tahun) dalam pelindungan
+  data pribadi; lihat bagian 0a. **Belum ditelaah ahli hukum.**
 
 ## 10. UI/UX dan aksesibilitas
 
@@ -599,7 +647,7 @@ Sumber: `web/docs/TESTING.md` (lengkap dengan perintah untuk mengulang). Ringkas
 
 | Bukti | Hasil | Status |
 | --- | --- | --- |
-| Vitest (unit, komponen, RLS di Postgres via PGlite) | **2356 lulus**, 118 berkas; `pnpm build && pnpm test` | [TERBUKTI] |
+| Vitest (unit, komponen, RLS di Postgres via PGlite) | **2370 lulus**, 119 berkas; `pnpm build && pnpm test` | [TERBUKTI] |
 | Playwright + axe (desktop 1440, mobile 390) terhadap build produksi lokal | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan); 1 ulangan lokal untuk kegagalan hidrasi acak | [TERBUKTI] |
 | Aksesibilitas axe WCAG 2.2 AA | 0 pelanggaran, 33 rute x 2 viewport | [TERBUKTI] |
 | Flutter | `flutter analyze` 0 galat dan 0 peringatan; `flutter test` 160 lulus | [TERBUKTI] |
@@ -686,13 +734,14 @@ dari perilaku (service role, Upstash, Anthropic). Lihat bagian 15.
 
 | Keterbatasan | Catatan |
 | --- | --- |
-| SATUSEHAT hanya simulasi lokal | Pemeta FHIR dan alur persetujuan teruji; belum ada kredensial staging atau nomor IHS; LOINC belum diverifikasi ke loinc.org; belum divalidasi HL7 |
+| SATUSEHAT hanya simulasi lokal | Pemeta FHIR dan alur persetujuan teruji; belum ada kredensial staging atau nomor IHS; kode LOINC PHQ-9, GAD-7, dan PSS-10 aktif (diperiksa 15 Okt 2026); bundel belum divalidasi HL7 |
 | Teman cerita belum dicoba dengan model asli | Diuji dengan model tiruan, termasuk jalur krisis |
 | Uji pengguna (SUS dan UEQ-S), k6, uptime belum ada | Alat siap; menunggu pemilik |
 | Tidak ada CAPTCHA di daftar dan masuk | Pertahanan yang ada: batas laju Supabase Auth dan web |
 | Verifikasi STR psikolog manual | Admin memeriksa nomor; otomatis adalah proyeksi |
 | Verifikasi usia hanya pernyataan sendiri | |
-| Nomor krisis belum diverifikasi manusia | `verified: false` di sumber tunggal |
+| Nomor 112 belum diverifikasi manusia | Healing119.id sudah (15 Okt 2026); 112 `verified: false` di sumber tunggal |
+| Batas usia 17 tahun (pernyataan sendiri) dan definisi anak di bawah 18 tahun | Risiko kepatuhan, belum ditelaah ahli hukum; keputusan pemilik (bagian 0a) |
 | Naskah hukum belum ditinjau ahli hukum; kontak pengelola belum dicantumkan | |
 | Direktori layanan terdekat berisi data contoh (sintetis) | Halaman menyatakannya; bendera `FACILITY_DIRECTORY_VERIFIED` mencegah data karangan tampil sebagai fakta |
 | Aplikasi Flutter belum dijalankan di perangkat setelah perubahan 14 Okt | Analisis statis dan tes lulus |
@@ -735,7 +784,9 @@ layar dan uji dengan pengguna disabilitas.
 7. Isi `WEB_API_BASE_URL` di `.env` Flutter, bangun ulang, coba di perangkat (Teman cerita, pesan konsultasi, profil).
 8. Variabel repositori GitHub `DEMO_URL` (mengaktifkan `uptime.yml`) dan monitor UptimeRobot (langkah di `TESTING.md` bagian 5);
    tangkap layar status ke `docs/img/uptime.png`.
-9. Verifikasi nomor krisis (SEJIWA 119 ext. 8, 112, dan nomor di data bawaan Flutter) ke sumber resmi.
+9. Verifikasi nomor krisis yang belum: **112** dan nomor lain di data bawaan Flutter (Yayasan Pulih, 1500-454). Healing119.id sudah
+   diverifikasi (15 Okt 2026). Bila perlu, pastikan jam layanannya langsung ke healing119.id, karena halaman Kemenkes hanya
+   menulis "pagi hingga malam hari".
 10. **Uji pengguna (SUS dan UEQ-S) 24-26 Okt, minimal 30 responden**; jalankan **k6** terhadap lokal dan demo (hasil k6 saja yang boleh disebut k6).
 
 **Administrasi lomba (bagian 2) dan keputusan**
@@ -744,6 +795,10 @@ layar dan uji dengan pengguna disabilitas.
 12. Keputusan: apakah mengganti alamat (`<nama>.vercel.app` yang lebih rapi lewat Settings > Domains; bila ya ubah Site URL
     Supabase dan `NEXT_PUBLIC_SITE_URL`); apakah menutup ketidakcocokan id hidrasi (perbaikan kecil, risiko rendah); tinjauan
     hukum atas naskah syarat dan kebijakan.
+13. **Keputusan batas usia:** tetap 17 tahun (pernyataan sendiri), naik menjadi 18 tahun, atau menambah persetujuan orang tua
+    (bagian 0a). Disarankan menaikkan ke 18 tahun atau meminta telaah hukum sebelum penilaian.
+14. Bila templat email pendaftaran sudah ditempel di Supabase, **tempel ulang versi terbaru** (`web/docs/email-templates/
+    konfirmasi-pendaftaran.html`): kalimat daruratnya kini memuat Healing119.id, jam layanan, dan 112.
 
 ## 16. Peta sumber
 
@@ -794,13 +849,15 @@ dari berkas di repositori, kecuali butir pertama.
 6. HL7 International. _FHIR Release 4 (R4)_ (4.0.1).
 7. W3C. _Web Content Accessibility Guidelines (WCAG) 2.2_ (Rekomendasi W3C, 2023).
 8. Brooke J. SUS: a quick and dirty usability scale. Dalam: _Usability Evaluation in Industry_; 1996.
-9. Undang-Undang Republik Indonesia Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi.
+9. Undang-Undang Republik Indonesia Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi, dan Peraturan Pemerintah Nomor 33 Tahun 2026 tentang Peraturan Pelaksanaan UU 27/2022 (berlaku 16 Januari 2027; periksa naskah resmi di JDIH Setneg).
 10. Kementerian Kesehatan RI. Platform SATUSEHAT (dokumentasi integrasi).
 11. Dokumentasi Supabase (Row Level Security, Auth MFA, Realtime) dan Next.js 15.
 12. OWASP. _Application Security Verification Standard_ / _Top 10_.
 13. Sharfina Z, Santoso HB. An Indonesian adaptation of the System Usability Scale (SUS). _ICACSIS_ 2016 (adaptasi bahasa Indonesia yang dipakai).
 14. Schrepp M, Hinderks A, Thomaschewski J. Design and evaluation of a short version of the User Experience Questionnaire (UEQ-S). _Int J Interact Multimed Artif Intell_ 2017;4(6):103.
 15. Hinderks A, Schrepp M, Thomaschewski J. A benchmark for the short version of the User Experience Questionnaire. _WEBIST_ 2018:373-377. DOI 10.5220/0007188303730377. Butir Indonesia UEQ-S: <https://www.ueq-online.org/Material/UEQS_Items.pdf>.
+16. Kementerian Kesehatan RI, Direktorat Jenderal Kesehatan Primer dan Komunitas. Cegah Bunuh Diri, Dukung Kesehatan Jiwa: Kenali Layanan Healing119.id. 7 Agustus 2025. <https://kesprimkom.kemkes.go.id/konten/158/151/0/cegah-bunuh-diri-dukung-kesehatan-jiwa-kenali-layanan-healing119-id>.
+17. Regenstrief Institute. LOINC 2.82: 44261-6 (PHQ-9 total score), 70274-6 (GAD-7 total score), 106860-0 (Perceived stress scale-10 total score [PSS-10]).
 
 ## 19. Glosarium
 
@@ -816,7 +873,7 @@ dari berkas di repositori, kecuali butir pertama.
 | LOINC | Sistem kode internasional untuk pengukuran dan observasi klinis |
 | SSE | Server-Sent Events: aliran respons satu arah yang dipakai untuk streaming balasan AI |
 | PHQ-9 / GAD-7 / PSS-10 / SRQ-20 | Kuesioner skrining depresi, kecemasan, stres, dan gangguan jiwa umum |
-| SEJIWA | Layanan konseling Kemenkes: 119 lalu tekan 8 (belum diverifikasi manusia) |
+| Healing119.id | Layanan hotline dukungan psikologis awal Kemenkes: telepon 119 ext. 8 atau WhatsApp lewat healing119.id; gratis, pagi hingga malam hari (bukan 24 jam); diverifikasi ke halaman resmi Kemenkes 15 Okt 2026. Sebelumnya dikenal sebagai SEJIWA menurut sejumlah media; belum ada pengumuman resmi pergantian nama |
 | SUS | System Usability Scale, kuesioner 10 butir (skor 0-100; patokan 68) |
 | UEQ-S | Versi pendek User Experience Questionnaire: 8 pasang kata sifat, skala -3 sampai +3; pragmatic (butir 1-4), hedonic (butir 5-8), overall (rata-rata semua); kategori benchmark Hinderks dkk. (2018) |
 | PGlite | Postgres sungguhan yang berjalan di memori, dipakai untuk menguji RLS tanpa menyentuh cloud |
@@ -914,7 +971,7 @@ Web (`web/.env.example`, Vercel): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPAB
 ## Lampiran F: statistik dan alur kerja repositori
 
 - Monorepo `Argy1/Mindra`: `web/` (Next.js), akar (Flutter: `lib/`, `test/`, `android/`, `ios/`), `supabase/migrations/`,
-  `.github/workflows/` (`ci.yml`: web, e2e, Flutter; `uptime.yml`), `docs/` (naskah hukum v1.1.0, panduan integrasi, sistem
+  `.github/workflows/` (`ci.yml`: web, e2e, Flutter; `uptime.yml`), `docs/` (naskah hukum v1.1.1, panduan integrasi, sistem
   desain mobile).
 - Ukuran: web sekitar 34,7 ribu baris TS/TSX (non-tes, termasuk `database.types.ts` hasil generate) dan 27,6 ribu baris tes;
   Flutter sekitar 41,4 ribu baris Dart (`lib/`) dan 1,7 ribu baris tes; SQL sekitar 4,2 ribu baris.

@@ -1729,3 +1729,83 @@ skala; penolakan jawaban di luar skala; kesamaan butir dokumen dengan kode; temp
 perusakan sengaja, semuanya tertangkap. Dicoba juga ujung ke ujung dengan CSV sintetis bertitik koma lewat
 `pnpm usability:report`. Perbaikan kecil sepanjang jalan: rentang skor SUS di laporan sebelumnya ditulis "92.5" (titik), kini
 "92,5". **Belum ada responden dan belum ada skor.**
+
+---
+
+## Revisi dari riset proposal: Healing119.id, LOINC PSS-10, PP 33/2026 (15 Okt 2026)
+
+Riset proposal (Claude Cowork) meminta tiga perubahan di kode. Semuanya dikerjakan setelah **tiap klaim diperiksa ke sumbernya**.
+Pemeriksaan itu menghasilkan tiga keputusan yang menyimpang dari bahan riset; penulis proposal harus mengikuti keputusan ini
+(ringkasannya untuk penulis ada di [`HANDOFF-FASE-6.md`](HANDOFF-FASE-6.md) bagian 0a).
+
+### 1. Kontak krisis: label Healing119.id, tetapi bukan "24 jam", dan bukan "berganti nama dari SEJIWA"
+
+**Yang diminta.** Ganti semua label SEJIWA menjadi Healing119.id; `verified: true` dengan `sourceUrl` dan `verifiedAt` 2026-10-15;
+sebut layanan "24 jam, gratis".
+
+**Yang ditemukan di sumber** (halaman Ditjen Kesehatan Primer dan Komunitas Kemenkes, 7 Agustus 2025, dibaca utuh lewat peramban):
+
+| Klaim | Isi halaman |
+| ----- | ----------- |
+| 119 ext. 8 dan WhatsApp lewat healing119.id | **Benar**: "Hubungi 119 ekstensi 8 dari ponsel Anda", dan "Kunjungi www.healing119.id dan klik tombol WhatsApp" |
+| Gratis | **Benar**: "disediakan secara gratis" |
+| 24 jam | **Tidak ada.** "Layanan ini akan beroperasi dari pagi hingga malam hari, dan akan terus diperluas jangkauannya" |
+| Pertolongan pertama psikologis, bukan terapi | Halaman menulis "dukungan psikologis awal" dan membuka "tindak lanjut dan rujukan ke layanan profesional jika dibutuhkan". "Bukan terapi" tidak tertulis |
+| SEJIWA berganti nama menjadi Healing119.id | Halaman **tidak menyebut SEJIWA**. Ia menyebut Kemenkes "mengembangkan kembali" (reaktivasi) layanan healing119.id |
+
+**Keputusan.**
+
+- **Label diganti sesuai permintaan** (Healing119.id), karena sumber resmi memang mengonfirmasi 119 ext. 8 sebagai akses Healing119.id.
+  `verified: true`, `verifiedAt: 2026-10-15`, `sourceUrl` ke halaman itu. 112 tetap `verified: false`.
+- **Jam layanan ditulis seperti sumber: "pagi hingga malam hari".** Klaim 24 jam pada layanan krisis berbahaya: orang yang menelepon
+  pukul 02.00 dijanjikan layanan yang tidak ada. Frasa "24 jam" untuk hotline ini dihapus di web dan Flutter (enam tempat di
+  Flutter: lima teks dan bendera `isAvailable24h`). Tes penjaga (`resources.test.ts`) gagal bila jam layanan itu memuat "24".
+- **Cadangan 24 jam ditambahkan di balasan krisis tetap Teman cerita**: "Kalau belum ada yang menjawab, hubungi 112 atau datang ke
+  unit gawat darurat (IGD) terdekat; keduanya buka 24 jam." Overlay krisis Flutter sudah punya kalimat serupa.
+- **Hubungan dengan SEJIWA tidak ditulis sebagai fakta resmi.** Penghubungnya hanya media dan direktori (Kontan, Media Asuransi,
+  TherapyRoute); SEJIWA diluncurkan 29 April 2020 oleh Kominfo, Kemenkes, dan KemenPPPA; pengumuman pergantian nama tidak
+  ditemukan. Di dokumen hidup, SEJIWA hanya muncul sebagai "sebelumnya dikenal sebagai ... menurut sejumlah media". Catatan bertanggal
+  di bagian lain `DECISIONS.md`, `TEMUAN-KEAMANAN.md`, dan `PLAN.md` yang menyebut SEJIWA **tidak ditulis ulang** (itu riwayat).
+- Deskripsi memakai kata sumber ("dukungan psikologis awal ... Gratis"), WhatsApp disebut di teks tanpa tombol baru.
+- Nama dan nomor di `FacilityDirectory` kini dibaca dari sumber tunggal (sebelumnya ditulis langsung di komponen, yang membuat
+  penggantian nama seperti ini rawan terlewat).
+- Templat email pendaftaran memuat nama, jam layanan, dan 112. **Bila templat lama sudah ditempel di Supabase, tempel ulang.**
+
+### 2. FHIR: PSS-10 memakai LOINC 106860-0
+
+Diperiksa lewat server terminologi publik tx.fhir.org (memuat LOINC 2.82), karena `loinc.org` menjawab 403 untuk akses otomatis:
+`106860-0` = "Perceived stress scale-10 total score [PSS-10]", ACTIVE; `44261-6` (PHQ-9) dan `70274-6` (GAD-7) juga ACTIVE. Kode lokal
+`pss10-total` diganti di `observation.ts` dan `fhir_mappers.dart` (entri `pss` dan `pss10`). SRQ-20 tetap kode lokal, dan
+`Observation.code.text` sudah terisi untuk semua instrumen sejak awal (tidak perlu penambahan). Tes paritas yang membaca berkas Dart
+asli tetap lulus dan ditambah tes bahwa `pss10-total` tidak dipakai lagi. LOINC mencatat hak cipta RST Assessments, LLC pada entri
+PSS-10: hanya kodenya yang dipakai, bukan teks butir. Baris `satusehat_sync_log` lama tidak diubah. Bundel **belum** divalidasi
+dengan validator HL7. Catatan: bahan riset menyebut "ARCHITECTURE §7.5"; di `ARCHITECTURE.md` bagian itu adalah §6, dan §7.5 ada di
+`HANDOFF-FASE-6.md`; keduanya diperbarui.
+
+### 3. Kebijakan privasi: rujukan PP No. 33 Tahun 2026, versi naskah 1.1.1
+
+PP 33/2026 diperiksa lewat ulasan media dan firma hukum (Meridian Hukum, Katadata, Bisnis.com, Veritask), bukan naskah resmi
+JDIH Setneg: "PP No. 33 Tahun 2026 tentang Peraturan Pelaksanaan UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi", ditetapkan
+dan diundangkan 16 Juli 2026, **berlaku 16 Januari 2027**, LN 2026 No. 88. Rujukannya ditambahkan **satu kalimat** di
+`/kebijakan-privasi` dan `docs/privacy_policy.md`, dengan kata kerja yang jujur: naskah "dirancang dengan memperhatikan" UU PDP dan
+peraturan pelaksanaannya, bukan "mematuhi" (PP itu belum berlaku, dan naskah belum ditinjau ahli hukum). Substansi lain tidak
+berubah. Versi naskah naik **1.1.0 menjadi 1.1.1**, tanggal 15 Oktober 2026, di konstanta web, konstanta Flutter, dan kedua
+dokumen (ketentuan layanan ikut karena versinya satu untuk web dan mobile). Pengguna lama tetap tercatat setuju versi 1.1.0 dan
+tidak diminta setuju ulang, karena perubahannya hanya rujukan. Tes baru `lib/legal/legal-sync.test.ts` menjaga versi, tanggal,
+dan rujukan itu sama di semua tempat.
+
+### Temuan baru: batas usia 17 tahun
+
+Sambil memeriksa PP 33/2026 muncul risiko yang tidak diminta: pendaftaran memakai batas 17 tahun (diwarisi dari ketentuan aplikasi
+mobile), sedangkan "anak" dalam hukum Indonesia umumnya di bawah 18 tahun dan ulasan media menyebut PP itu mewajibkan persetujuan
+orang tua atau wali untuk data anak (Pasal 38 menurut Katadata; naskah belum diperiksa). **Tidak diubah di kode**: batas usia adalah
+keputusan produk dan hukum milik pemilik. Opsi: naikkan ke 18 tahun (perubahan kecil di web dan Flutter, direkomendasikan), tambah
+alur persetujuan orang tua (besar), atau telaah hukum dulu. Dicatat di `TEMUAN-KEAMANAN.md` dan `HANDOFF-FASE-6.md` agar proposal
+tidak menulis "sesuai UU PDP" tanpa batas ini.
+
+### Bukti
+
+`resources.test.ts` (jam layanan, sumber, tanpa SEJIWA di data), `companion.test.ts` (balasan krisis memuat jam apa adanya dan
+cadangan 112/IGD, "24 jam" hanya sekali), `observation.test.ts` (LOINC PSS-10, kode lokal lama hilang, SRQ-20 tetap lokal dengan
+`code.text`, paritas Dart), `legal-sync.test.ts`, serta tes dan e2e yang menyebut nama layanan diperbarui. Flutter: `flutter analyze`
+0 galat dan 0 peringatan (115 info, sama seperti sebelumnya) dan `flutter test` 160 lulus.

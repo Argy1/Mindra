@@ -60,7 +60,7 @@ test.describe('AppShell /dev/shell', () => {
     const dialog = page.getByRole('dialog', { name: 'Butuh bantuan sekarang' });
     await expect(dialog).toBeVisible();
     const calls = dialog.getByRole('link', { name: /^Hubungi / });
-    await expect(calls).toHaveCount(2); // SEJIWA dan 112
+    await expect(calls).toHaveCount(2); // Healing119.id dan 112
     await expect(calls.first()).toHaveAttribute('href', 'tel:119,8');
     await expect(calls.last()).toHaveAttribute('href', 'tel:112');
 

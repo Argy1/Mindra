@@ -86,7 +86,7 @@ class _CrisisOverlay extends StatelessWidget {
               background: const Color(0xFFFEF2F2),
               icon: Icons.call_rounded,
               title: 'Hubungi 119 ext. 8',
-              subtitle: 'Layanan jiwa nasional — 24 jam, gratis',
+              subtitle: 'Healing119.id (Kemenkes) — pagi hingga malam hari, gratis',
               onTap: () => Navigator.of(context).pop('crisis'),
             ),
             const SizedBox(height: AppSpacing.xs),

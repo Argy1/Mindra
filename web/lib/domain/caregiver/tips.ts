@@ -4,7 +4,7 @@ import { PRIMARY_CRISIS_RESOURCE } from '@/lib/domain/crisis/resources';
  * Panduan untuk pendamping. Isi dari `CaregiverTipModel.seeds` (Flutter), dengan perubahan:
  *   * emoji ❌/✓/🔴/🟡 diganti struktur daftar bertajuk (aturan UI: tanpa emoji; makna tidak
  *     boleh bergantung pada warna atau gambar),
- *   * nomor layanan krisis diambil dari sumber tunggal, bukan ditulis ulang ("119 ext 8" milik SEJIWA).
+ *   * nomor layanan krisis diambil dari sumber tunggal, bukan ditulis ulang ("119 ext 8" milik Healing119.id).
  */
 
 export type CaregiverTipCategory = 'supporting' | 'communication' | 'crisis' | 'self_care';

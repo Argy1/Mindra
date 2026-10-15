@@ -321,7 +321,7 @@ test.describe('Teman cerita (/dev/teman-cerita)', () => {
 
     const log = page.getByRole('log');
     await expect(log).toContainText('Apakah kamu aman sekarang?');
-    await expect(log).toContainText('SEJIWA di 119 ext. 8');
+    await expect(log).toContainText('Healing119.id di 119 ext. 8');
     await expectNoViolations(page);
   });
 

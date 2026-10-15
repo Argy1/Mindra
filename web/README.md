@@ -180,7 +180,7 @@ mobile). Rinciannya: [`docs/TEMUAN-KEAMANAN.md`](docs/TEMUAN-KEAMANAN.md).
 
 | Bukti                       | Hasil                                                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Vitest                      | **2356 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                      |
+| Vitest                      | **2370 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                      |
 | Playwright + axe            | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop dan mobile                                                         |
 | Aksesibilitas               | **0 pelanggaran axe WCAG 2.2 AA** di 33 rute x 2 viewport; audit keyboard otomatis; Lighthouse Aksesibilitas **100** di semua halaman  |
 | Lighthouse (halaman publik) | Lokal: Performa 93-100, Aksesibilitas 100, Praktik terbaik 100, SEO 100. **Di produksi (Vercel): Performa 98-100, ketiganya lain 100** |
@@ -249,8 +249,9 @@ Yang berjalan dan teruji ada di atas. Yang **belum**, ditulis terang:
   [TESTING.md](docs/TESTING.md)).
 - Belum ada: CAPTCHA (Turnstile) di daftar dan masuk, verifikasi STR otomatis (admin memeriksa manual), verifikasi usia
   (hanya pernyataan sendiri), uji dengan pembaca layar sungguhan.
-- Nomor bantuan krisis belum diverifikasi ke sumber resmi (`lib/domain/crisis/resources.ts`).
-- Syarat penggunaan dan kebijakan privasi (versi 1.1.0, disatukan dengan naskah aplikasi mobile) belum ditinjau ahli hukum, dan
+- Nomor bantuan krisis: Healing119.id (119 ext. 8) diverifikasi ke halaman resmi Kemenkes (15 Okt 2026; jam layanan pagi hingga
+  malam hari, bukan 24 jam); **112 belum diverifikasi** (`lib/domain/crisis/resources.ts`).
+- Syarat penggunaan dan kebijakan privasi (versi 1.1.1, disatukan dengan naskah aplikasi mobile; menyebut UU 27/2022 dan PP 33/2026) belum ditinjau ahli hukum, dan
   alamat kontak pengelola data belum dicantumkan.
 
 ## Dokumentasi

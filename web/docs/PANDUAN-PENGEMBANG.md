@@ -133,8 +133,8 @@ curl https://<situs>/api/v1/instruments
 curl -H "Authorization: Bearer $TOKEN" "https://<situs>/api/v1/assessments?limit=5"
 ```
 
-Pemeta FHIR (`lib/domain/fhir`) memakai LOINC `44261-6` (PHQ-9) dan `70274-6` (GAD-7); PSS-10 dan SRQ-20 memakai
-sistem lokal. Mode SATUSEHAT bawaan `mock` tidak mengirim apa pun keluar dari server; `staging` butuh kredensial
+Pemeta FHIR (`lib/domain/fhir`) memakai LOINC `44261-6` (PHQ-9), `70274-6` (GAD-7), dan `106860-0` (PSS-10); SRQ-20
+memakai sistem lokal. Mode SATUSEHAT bawaan `mock` tidak mengirim apa pun keluar dari server; `staging` butuh kredensial
 sandbox Kemenkes dan nomor IHS pasien (belum dicoba). Kunci dan batas dijelaskan di
 [`docs/DECISIONS.md`](DECISIONS.md) (Fase 3).
 

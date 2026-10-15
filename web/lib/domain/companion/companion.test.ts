@@ -217,6 +217,17 @@ describe('buildCrisisReply', () => {
     expect(reply).toMatch(/Apakah kamu aman sekarang\?/);
   });
 
+  it('menyebut jam layanan utama apa adanya dan menyertakan cadangan 24 jam (112 atau IGD)', () => {
+    // Healing119.id buka pagi hingga malam hari, bukan 24 jam: orang yang menulis tengah malam tetap punya jalan keluar.
+    expect(reply).toContain(
+      'Healing119.id di 119 ext. 8 sekarang. Layanan ini buka pagi hingga malam hari.',
+    );
+    expect(reply).toContain('hubungi 112 atau datang ke unit gawat darurat (IGD) terdekat');
+    expect(reply).toContain('keduanya buka 24 jam');
+    // "24 jam" hanya boleh muncul untuk cadangan, tidak untuk layanan utama.
+    expect(reply.match(/24 jam/g)).toHaveLength(1);
+  });
+
   it('hangat dan aman: tanpa tanda seru, tanpa emoji, tanpa kata klinis, tanpa meremehkan', () => {
     expect(reply).not.toContain('!');
     expect(reply).not.toMatch(/\p{Extended_Pictographic}/u);

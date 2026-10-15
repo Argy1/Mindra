@@ -39,7 +39,7 @@ async function noHorizontalOverflow(page: Page) {
 }
 
 test.describe('Bantuan (/bantuan)', () => {
-  test('terbuka tanpa masuk; bagian bernama; kontak krisis dari sumber tunggal (SEJIWA dan 112)', async ({
+  test('terbuka tanpa masuk; bagian bernama; kontak krisis dari sumber tunggal (Healing119.id dan 112)', async ({
     page,
   }) => {
     const response = await page.goto('/bantuan');
@@ -286,7 +286,7 @@ test.describe('Layanan terdekat (/dev/layanan-terdekat)', () => {
     await context.close();
   });
 
-  test('gagal memuat: peringatan dengan jalan keluar ke SEJIWA', async ({ page }) => {
+  test('gagal memuat: peringatan dengan jalan keluar ke Healing119.id', async ({ page }) => {
     await page.goto('/dev/layanan-terdekat?gagal=1');
     const alert = page.locator('[role="alert"]:not(#__next-route-announcer__)');
     await expect(alert).toContainText('Daftar layanan belum bisa dimuat');

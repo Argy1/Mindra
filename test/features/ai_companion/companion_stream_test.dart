@@ -81,14 +81,14 @@ void main() {
         () async {
       final events = await parse([
         'event: crisis\ndata: {"messageId":"m","message":"Aku di sini bersamamu.",'
-            '"resource":{"name":"SEJIWA (Kemenkes)","displayNumber":"119 ext. 8","telHref":"tel:119,8"}}\n\n',
+            '"resource":{"name":"Healing119.id (Kemenkes)","displayNumber":"119 ext. 8","telHref":"tel:119,8"}}\n\n',
         'event: crisis\ndata: {"message":"Tanpa sumber."}\n\n',
         'event: crisis\ndata: {"messageId":"x"}\n\n',
       ]);
       expect(events, hasLength(2));
       final first = events[0] as CompanionCrisis;
       expect(first.message, 'Aku di sini bersamamu.');
-      expect(first.resourceName, 'SEJIWA (Kemenkes)');
+      expect(first.resourceName, 'Healing119.id (Kemenkes)');
       expect(first.displayNumber, '119 ext. 8');
       expect(first.telHref, 'tel:119,8');
       final second = events[1] as CompanionCrisis;

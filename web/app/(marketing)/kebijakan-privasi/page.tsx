@@ -152,8 +152,9 @@ export default function PrivacyPolicyPage() {
           <p className="mt-1 text-sm">
             Mindra Web masih berupa karya lomba. Teks ini menggambarkan cara sistemnya bekerja saat
             ini dan dirancang dengan memperhatikan UU No. 27 Tahun 2022 tentang Pelindungan Data
-            Pribadi, tetapi belum ditinjau ahli hukum. Sebelum dirilis untuk umum, teks ini perlu
-            ditinjau, dan kontak resmi pengelola data dicantumkan.
+            Pribadi dan peraturan pelaksanaannya, yaitu PP No. 33 Tahun 2026 (berlaku mulai 16
+            Januari 2027), tetapi belum ditinjau ahli hukum. Sebelum dirilis untuk umum, teks ini
+            perlu ditinjau, dan kontak resmi pengelola data dicantumkan.
           </p>
         </Alert>
 

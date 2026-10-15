@@ -159,11 +159,41 @@ describe('observationFromAssessment', () => {
 });
 
 describe('INSTRUMENT_CODING', () => {
-  it('PHQ-9 dan GAD-7 memakai LOINC; PSS-10 dan SRQ-20 memakai sistem lokal (jujur, bukan kode karangan)', () => {
+  it('PHQ-9, GAD-7, dan PSS-10 memakai LOINC; SRQ-20 memakai sistem lokal (jujur, bukan kode karangan)', () => {
     expect(INSTRUMENT_CODING.phq9).toMatchObject({ system: 'http://loinc.org', code: '44261-6' });
     expect(INSTRUMENT_CODING.gad7).toMatchObject({ system: 'http://loinc.org', code: '70274-6' });
-    expect(INSTRUMENT_CODING.pss10.system).toBe('https://mindra.app/fhir/instrument');
-    expect(INSTRUMENT_CODING.srq20.system).toBe('https://mindra.app/fhir/instrument');
+    expect(INSTRUMENT_CODING.pss10).toEqual({
+      system: 'http://loinc.org',
+      code: '106860-0',
+      display: 'Perceived stress scale-10 total score [PSS-10]',
+    });
+    expect(INSTRUMENT_CODING.srq20).toMatchObject({
+      system: 'https://mindra.app/fhir/instrument',
+      code: 'srq20-total',
+    });
+  });
+
+  it('kode lokal lama PSS-10 (pss10-total) tidak dipakai lagi', () => {
+    expect(JSON.stringify(INSTRUMENT_CODING)).not.toContain('pss10-total');
+  });
+
+  it('Observation PSS-10 membawa kode LOINC, dan SRQ-20 tetap kode lokal dengan code.text terisi', () => {
+    const options = { patientRef: 'Patient/abc', issuedAt: ISSUED };
+    const pss = observationFromAssessment({ ...ASSESSMENT, type: 'pss10', score: 21 }, options);
+    expect(pss.code.coding).toEqual([
+      {
+        system: 'http://loinc.org',
+        code: '106860-0',
+        display: 'Perceived stress scale-10 total score [PSS-10]',
+      },
+    ]);
+    expect(pss.code.text).toBe('Perceived stress scale-10 total score [PSS-10]');
+    const srq = observationFromAssessment({ ...ASSESSMENT, type: 'srq20', score: 9 }, options);
+    expect(srq.code.coding[0]).toMatchObject({
+      system: 'https://mindra.app/fhir/instrument',
+      code: 'srq20-total',
+    });
+    expect(srq.code.text).toBe('WHO Self-Reporting Questionnaire 20 (SRQ-20) total score');
   });
 
   it('setiap instrumen punya kode unik', () => {

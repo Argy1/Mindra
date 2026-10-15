@@ -64,7 +64,7 @@ export const createFhirObservationRoute = (deps?: RouteDeps) =>
       operationId: 'searchFhirObservations',
       summary: 'Hasil skrining sebagai FHIR R4 Observation',
       description:
-        'Bundle `searchset` berisi Observation: satu per hasil skrining (skor total + interpretasi). PHQ-9 dan GAD-7 memakai kode LOINC; PSS-10 dan SRQ-20 memakai sistem kode lokal Mindra. Jawaban per butir tidak pernah disertakan. Respons memakai `application/fhir+json` dan galat berupa OperationOutcome.',
+        'Bundle `searchset` berisi Observation: satu per hasil skrining (skor total + interpretasi). PHQ-9, GAD-7, dan PSS-10 memakai kode LOINC; SRQ-20 memakai sistem kode lokal Mindra. Jawaban per butir tidak pernah disertakan. Respons memakai `application/fhir+json` dan galat berupa OperationOutcome.',
       tags: ['FHIR'],
       auth: 'bearer',
       format: 'fhir',

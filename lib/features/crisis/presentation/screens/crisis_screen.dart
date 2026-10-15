@@ -12,7 +12,7 @@ class CrisisScreen extends ConsumerWidget {
   const CrisisScreen({super.key});
 
   Future<void> _callHotline() async {
-    // 119 ext 8 — SEJIWA, layanan kesehatan jiwa Kementerian Kesehatan
+    // 119 ext 8 — Healing119.id, layanan dukungan psikologis awal Kementerian Kesehatan
     final uri = Uri(scheme: 'tel', path: '119,8');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
@@ -237,7 +237,7 @@ class _HotlineButton extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'SEJIWA (Kemenkes) • Gratis • 24 jam',
+                      'Healing119.id (Kemenkes) • Gratis • Pagi hingga malam hari',
                       style: AppTextStyles.bodyS.copyWith(
                         color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 12,

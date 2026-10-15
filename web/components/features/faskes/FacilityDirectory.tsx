@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { PRIMARY_CRISIS_RESOURCE } from '@/lib/domain/crisis/resources';
 import {
   FACILITY_TYPE_LABEL,
   arrangeFacilities,
@@ -100,7 +101,7 @@ export function FacilityDirectory({
           icon={<MapPin />}
           title="Daftar layanan belum bisa dimuat"
           headingLevel="h2"
-          description="Ada gangguan saat mengambil daftar. Muat ulang halaman sebentar lagi. Kalau kamu butuh bantuan sekarang, hubungi SEJIWA di 119 ext. 8 atau datang ke IGD terdekat."
+          description={`Ada gangguan saat mengambil daftar. Muat ulang halaman sebentar lagi. Kalau kamu butuh bantuan sekarang, hubungi ${PRIMARY_CRISIS_RESOURCE.name} di ${PRIMARY_CRISIS_RESOURCE.displayNumber} atau datang ke IGD terdekat.`}
         />
       </div>
     );
@@ -111,8 +112,9 @@ export function FacilityDirectory({
       {!verified ? (
         <Alert tone="info" title="Daftar ini masih contoh" titleAs="h2">
           Layanan di versi demo ini adalah data contoh yang belum diverifikasi, jadi jangan
-          dijadikan satu-satunya pegangan. Untuk bantuan sekarang, hubungi SEJIWA di 119 ext. 8 atau
-          datang ke unit gawat darurat (IGD) terdekat.
+          dijadikan satu-satunya pegangan. Untuk bantuan sekarang, hubungi{' '}
+          {PRIMARY_CRISIS_RESOURCE.name} di {PRIMARY_CRISIS_RESOURCE.displayNumber} atau datang ke
+          unit gawat darurat (IGD) terdekat.
         </Alert>
       ) : null}
 
@@ -195,7 +197,7 @@ export function FacilityDirectory({
           icon={<MapPin />}
           title="Tidak ada layanan yang cocok"
           headingLevel="h2"
-          description="Coba ganti provinsi atau kata pencarian. Kalau kamu butuh bantuan sekarang, hubungi SEJIWA di 119 ext. 8."
+          description={`Coba ganti provinsi atau kata pencarian. Kalau kamu butuh bantuan sekarang, hubungi ${PRIMARY_CRISIS_RESOURCE.name} di ${PRIMARY_CRISIS_RESOURCE.displayNumber}.`}
         />
       ) : (
         <>

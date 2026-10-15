@@ -369,7 +369,8 @@ secara eksplisit (RLS saja tidak cukup; lihat TEMUAN-KEAMANAN, Fase 3).
 ## 6. SATUSEHAT
 
 - Alur: pengguna menyetujui (consent) → asesmen dipetakan ke `Observation` FHIR R4
-  (PHQ-9 = LOINC `44261-6`, GAD-7 = LOINC `70274-6`; PSS-10/SRQ-20 memakai coding lokal) →
+  (PHQ-9 = LOINC `44261-6`, GAD-7 = LOINC `70274-6`, PSS-10 = LOINC `106860-0`; SRQ-20 memakai coding lokal
+  dengan `Observation.code.text`) →
   token OAuth2 client credentials → POST ke SATUSEHAT → catat di `satusehat_sync_log`.
 - Butuh kredensial **sandbox/staging** SATUSEHAT (organization id, client id, client secret)
   dan IHS number pasien. **Jika kredensial belum ada**, `lib/server/satusehat-client.ts` memakai
@@ -381,7 +382,10 @@ secara eksplisit (RLS saja tidak cukup; lihat TEMUAN-KEAMANAN, Fase 3).
   kegagalan yang tidak bisa diulang, tidak mengirim `Patient` palsu. Nilai `SATUSEHAT_MODE` yang salah ketik ditolak.
 - Sinkronisasi hanya untuk pengguna yang menyalakan persetujuan (`profiles.satusehat_consent`); hasilnya dicatat di
   `satusehat_sync_log` dan tidak digandakan bila diulang. Bundel FHIR tidak memuat jawaban per butir.
-- Verifikasi kode LOINC sebelum dipakai di proposal (belum dicek ulang ke loinc.org).
+- Kode LOINC `44261-6`, `70274-6`, dan `106860-0` **sudah diverifikasi pada 15 Okt 2026**: berstatus ACTIVE di LOINC 2.82
+  (diperiksa lewat server terminologi publik tx.fhir.org karena loinc.org menolak akses otomatis, dan oleh riset proposal di
+  loinc.org). PSS-10 semula memakai kode lokal `pss10-total` dan kini memakai `106860-0` di web dan Flutter. Bundel belum
+  divalidasi dengan validator HL7 resmi.
 
 ## 7. AI teman cerita
 

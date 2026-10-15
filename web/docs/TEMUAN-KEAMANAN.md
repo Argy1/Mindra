@@ -340,3 +340,21 @@ Cabut di console.anthropic.com, lalu buat kunci baru khusus server (variabel Ver
   `unsafe-eval`, HSTS, `X-Frame-Options: DENY`; `/api/health` menyentuh database dan menjawab ok.
 - **Masih bergantung pada pemilik:** Site URL dan Redirect URLs Supabase (tujuan tautan email), pencabutan kunci Anthropic lama
   (F7), SMTP kustom, pemasangan TOTP pada akun psikolog, admin faskes, dan admin, serta verifikasi nomor krisis.
+
+## Temuan tambahan (riset proposal, 15 Okt 2026)
+
+- **Hotline krisis dijanjikan "24 jam" padahal sumber resminya "pagi hingga malam hari" (keselamatan, sedang).** Web dan Flutter
+  menulis "24 jam" untuk 119 ext. 8 di banyak tempat (pita krisis, tombol bantuan, balasan krisis Teman cerita, layar krisis,
+  hasil skrining). Halaman resmi Kemenkes menyebut layanan beroperasi "dari pagi hingga malam hari". Orang yang menelepon tengah
+  malam akan mengira layanan sedang bermasalah. **Ditutup:** jam layanan ditulis seperti sumber di web dan Flutter, balasan
+  krisis tetap menyertakan cadangan 24 jam (112 atau IGD), dan tes penjaga gagal bila jam layanan itu memuat "24". Jam layanan
+  sebaiknya dikonfirmasi langsung ke healing119.id karena halaman Kemenkes hanya menulis kalimat umum.
+- **Nama layanan krisis salah di dua lapis.** Flutter semula melabeli 119 ext. 8 "Into The Light" (ditutup di Gelombang 1, menjadi
+  SEJIWA); kini label mengikuti sumber resmi Kemenkes, Healing119.id. Hubungan dengan SEJIWA tidak dinyatakan resmi (lihat DECISIONS).
+- **Batas usia 17 tahun versus definisi anak di bawah 18 tahun (kepatuhan, sedang, BELUM ditutup).** Pendaftaran web dan Flutter
+  hanya meminta pernyataan berusia 17 tahun ke atas (tanpa verifikasi). Menurut ulasan media tentang PP 33/2026 (berlaku 16 Januari
+  2027), pemrosesan data anak memerlukan persetujuan orang tua atau wali dan pengendali wajib mengidentifikasi pengguna anak
+  (Pasal 38 menurut Katadata; naskah resmi belum diperiksa). Pengguna berusia 17 tahun bisa termasuk "anak". Belum ditelaah ahli
+  hukum dan belum diubah (keputusan pemilik): naikkan ke 18 tahun, tambah persetujuan orang tua, atau telaah hukum dulu.
+- **Kode FHIR PSS-10 semula lokal** padahal ada kode LOINC resmi `106860-0`; kini dipakai (diverifikasi ACTIVE di LOINC 2.82).
+  Kode `44261-6` dan `70274-6` juga terverifikasi. Bundel belum divalidasi dengan validator HL7.

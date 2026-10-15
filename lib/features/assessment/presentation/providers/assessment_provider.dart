@@ -331,7 +331,7 @@ class AssessmentClinical {
           AssessmentRecommendation(
             title: 'Hubungi Hotline Krisis',
             description:
-                'Layanan kesehatan jiwa 119 ext. 8 (SEJIWA, Kemenkes) tersedia 24 jam.',
+                'Healing119.id (Kemenkes) di 119 ext. 8 tersedia pagi hingga malam hari. Di luar jam itu, hubungi 112 atau IGD terdekat.',
             ctaLabel: 'Lihat Bantuan',
             route: '/home/crisis',
             highlight: true,

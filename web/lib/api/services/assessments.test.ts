@@ -58,7 +58,7 @@ describe('createAssessmentResult', () => {
     const result = await createAssessmentResult(asClient(fake), USER, phq9(0, 1), NOW);
     expect(result.crisis.detected).toBe(true);
     expect(result.crisis.resource).toMatchObject({
-      name: 'SEJIWA',
+      name: 'Healing119.id',
       telHref: expect.stringMatching(/^tel:/),
     });
   });

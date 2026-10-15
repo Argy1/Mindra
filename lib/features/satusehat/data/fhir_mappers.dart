@@ -17,9 +17,9 @@ abstract final class FhirMappers {
 
   /// Verified LOINC total-score codes per instrument.
   ///
-  /// PHQ-9 and GAD-7 codes are confirmed against the LOINC database.
-  /// PSS-10 and SRQ-20 lack a single consensus LOINC total-score code; they
-  /// use a Mindra-local system until a verified LOINC code is obtained.
+  /// PHQ-9 (44261-6), GAD-7 (70274-6) and PSS-10 (106860-0) are ACTIVE in
+  /// LOINC 2.82 (checked 2026-10-15). SRQ-20 has no LOINC total-score code,
+  /// so it uses a Mindra-local system; `Observation.code.text` is always set.
   static const _instrumentCoding = {
     'phq9': (
       system: _loincSystem,
@@ -33,14 +33,14 @@ abstract final class FhirMappers {
           'Generalized anxiety disorder 7 item (GAD-7) total score',
     ),
     'pss': (
-      system: 'https://mindra.app/fhir/instrument',
-      code: 'pss10-total',
-      display: 'Perceived Stress Scale 10 item (PSS-10) total score',
+      system: _loincSystem,
+      code: '106860-0',
+      display: 'Perceived stress scale-10 total score [PSS-10]',
     ),
     'pss10': (
-      system: 'https://mindra.app/fhir/instrument',
-      code: 'pss10-total',
-      display: 'Perceived Stress Scale 10 item (PSS-10) total score',
+      system: _loincSystem,
+      code: '106860-0',
+      display: 'Perceived stress scale-10 total score [PSS-10]',
     ),
     'srq20': (
       system: 'https://mindra.app/fhir/instrument',

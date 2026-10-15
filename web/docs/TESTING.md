@@ -6,7 +6,7 @@ Terakhir diperbarui 14 Oktober 2026.
 
 | Bukti | Hasil | Cara mengulang |
 | ----- | ----- | -------------- |
-| Tes unit, komponen, dan basis data (Vitest) | **2356 lulus**, 118 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
+| Tes unit, komponen, dan basis data (Vitest) | **2370 lulus**, 119 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
 | Tes e2e + aksesibilitas (Playwright, desktop 1440 dan mobile 390) | **614 lulus**, 68 dilewati (spec yang butuh akun sungguhan), 0 gagal, terhadap build produksi | `E2E_PORT=3200 pnpm test:e2e` (server produksi di port itu) |
 | Audit aksesibilitas (axe, WCAG 2.2 AA) | 33 rute x 2 viewport, **0 pelanggaran**; ditambah keadaan yang berubah (dialog hapus akun dan persetujuan admin terbuka, napas berjalan dan selesai, grounding, lokasi aktif, daftar kosong dan gagal, panduan awal setelah galat) di `e2e/gelombang1.spec.ts` dan `e2e/gelombang3.spec.ts` | `e2e/fase5.spec.ts` |
 | Lighthouse (12.8.2) | Aksesibilitas **100** di semua 48 pengukuran; halaman publik P 93-100, BP 100, SEO 100 | `pnpm lighthouse` |
@@ -19,7 +19,7 @@ Terakhir diperbarui 14 Oktober 2026.
 
 ## 1. Tes otomatis
 
-- **Vitest** (2356 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
+- **Vitest** (2370 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
   slot konsultasi, SUS), kerangka API, komponen, dan **aturan RLS di Postgres sungguhan** (PGlite dengan peran dan klaim JWT
   yang meniru Supabase). Tes penjaga hasil build memastikan rute yang memuat data per pengguna tidak ikut diprerender (data satu orang tak boleh
   masuk cache CDN) dan halaman marketing tetap statis; tes itu hanya aktif setelah `pnpm build`.
@@ -52,6 +52,11 @@ Terakhir diperbarui 14 Oktober 2026.
   penyimpanan, axe pada keadaan yang berubah). **139 perusakan sengaja**, semua tertangkap kecuali 2 yang setara perilaku. Satu
   temuan di luar cakupan (ketidakcocokan id hidrasi acak, sudah ada sebelumnya) dicatat di `TEMUAN-KEAMANAN.md`; Playwright
   dikonfigurasi satu ulangan lokal.
+- **Revisi dari riset proposal (15 Okt 2026)**: kontak krisis Healing119.id (tes penjaga: jam layanan tidak boleh memuat "24",
+  sumber resmi dan tanggal verifikasi wajib ada, balasan krisis memuat cadangan 112 atau IGD), kode FHIR PSS-10 ke LOINC `106860-0`
+  (termasuk tes paritas yang membaca berkas Dart asli), `lib/legal/legal-sync.test.ts` (versi naskah 1.1.1 sama di web, Flutter,
+  dan dokumen; rujukan PP 33/2026), serta UEQ-S dan SUS Indonesia (151 tes usability, 27 perusakan sengaja tertangkap). Kode LOINC
+  diperiksa lewat tx.fhir.org (LOINC 2.82). Flutter: `flutter analyze` 0 galat dan 0 peringatan (115 info), `flutter test` 160 lulus.
 - **Pelajaran dari pengukuran yang tampak "lulus".** Tes aksesibilitas diberi kontrol negatif: elemen berkontras buruk dan
   tombol tanpa nama disuntikkan ke halaman, dan axe melaporkan `color-contrast` serta `button-name`. Artinya 0 pelanggaran
   di atas bukan karena audit yang tak bisa gagal.

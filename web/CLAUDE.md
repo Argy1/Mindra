@@ -90,9 +90,11 @@ Juri akan membuka repo GitHub. Kode harus rapi, punya README, dan mudah dibaca.
 - Hasil asesmen selalu disertai catatan: ini skrining, bukan diagnosis.
 - Saat krisis terdeteksi: tampilkan banner krisis (warna danger) dengan tombol langsung ke
   layanan darurat — lihat `design/app-asesmen.html`. Daftar kontak krisis disimpan di satu file
-  `lib/domain/crisis/resources.ts` (sumber tunggal). Catatan: aplikasi Flutter melabeli
-  "119 ext 8" sebagai Into The Light, padahal 119 ext 8 adalah layanan SEJIWA (Kemenkes).
-  Argy wajib memverifikasi ulang setiap nomor sebelum rilis.
+  `lib/domain/crisis/resources.ts` (sumber tunggal). Catatan: aplikasi Flutter dulu melabeli
+  "119 ext 8" sebagai Into The Light; yang benar Healing119.id (Kemenkes), diverifikasi ke halaman resmi
+  Kemenkes pada 15 Okt 2026. Jam layanannya "pagi hingga malam hari", BUKAN 24 jam: jangan menulis 24 jam untuk
+  layanan ini (112 dan IGD adalah cadangan 24 jam). Nomor 112 dan nomor lain belum diverifikasi; Argy wajib
+  memverifikasinya sebelum rilis.
 
 ### Aksesibilitas (bobot 15%)
 

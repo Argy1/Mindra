@@ -87,7 +87,7 @@ describe('createFetchTransport', () => {
           data: {
             messageId: 'x',
             message: 'm',
-            resource: { name: 'SEJIWA', displayNumber: '119 ext. 8', telHref: 'tel:119,8' },
+            resource: { name: 'Healing119.id', displayNumber: '119 ext. 8', telHref: 'tel:119,8' },
           },
         }),
     );
@@ -213,7 +213,7 @@ describe('chatReducer', () => {
         type: 'crisis',
         messageId: 'c1',
         message: 'Aku dengar kamu.',
-        resource: { name: 'SEJIWA', displayNumber: '119 ext. 8', telHref: 'tel:119,8' },
+        resource: { name: 'Healing119.id', displayNumber: '119 ext. 8', telHref: 'tel:119,8' },
       }),
       ev({ type: 'done', conversationId: CONV, messageId: 'c1', saved: true }),
     ]);

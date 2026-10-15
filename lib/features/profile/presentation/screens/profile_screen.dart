@@ -538,8 +538,9 @@ const _privacySections = <_InfoSection>[
 const _helpSections = <_InfoSection>[
   (
     heading: 'Dalam keadaan krisis',
-    body: 'Tekan tombol "Bantuan" di beranda untuk sumber dukungan 24 jam. '
-        'Untuk keadaan darurat, hubungi 119 ext. 8 atau 112.',
+    body: 'Tekan tombol "Bantuan" di beranda untuk sumber dukungan. '
+        'Untuk bicara dengan konselor, hubungi Healing119.id di 119 ext. 8 (pagi hingga malam hari). '
+        'Untuk bahaya yang sedang terjadi, hubungi 112 (24 jam).',
   ),
   (
     heading: 'Memulai',
