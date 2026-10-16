@@ -36,7 +36,7 @@ export function InviteCaregiver() {
 
   return (
     <details className="rounded-lg bg-sunken px-5 py-4" open={Boolean(code) || undefined}>
-      <summary className="inline-flex cursor-pointer items-center gap-2 font-semibold text-fg-1">
+      <summary className="flex w-full cursor-pointer items-center gap-2 font-semibold text-fg-1">
         <UserPlus aria-hidden className="size-5" />
         Undang pendamping
       </summary>

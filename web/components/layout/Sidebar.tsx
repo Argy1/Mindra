@@ -29,7 +29,7 @@ export function Sidebar({ nav, currentPath, user, badges }: SidebarProps) {
     // di dalam landmark (aturan axe `region`).
     <aside
       aria-label="Bilah samping"
-      className="sticky top-0 hidden h-dvh flex-col gap-1 overflow-y-auto border-r border-line-soft bg-raised px-4 py-6 shell:flex"
+      className="sticky top-0 hidden h-dvh flex-col gap-1 overflow-x-hidden overflow-y-auto border-r border-line-soft bg-raised px-4 py-6 shell:flex"
     >
       <Link
         href={nav.homeHref}
@@ -59,10 +59,12 @@ export function Sidebar({ nav, currentPath, user, badges }: SidebarProps) {
       <div className="mt-auto grid gap-3 pt-6">
         {nav.showHelp ? <HelpButton variant="sidebar" /> : null}
         <div className="flex items-center gap-2.5 border-t border-line-soft px-2 pt-4">
-          <Avatar name={user.name} tone="biru" />
-          <div className="min-w-0">
-            <p className="truncate text-sm leading-tight font-semibold text-fg-1">{user.name}</p>
-            <p className="meta">{user.roleLabel}</p>
+          <Avatar name={user.name} tone="biru" className="shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p title={user.name} className="truncate text-sm leading-tight font-semibold text-fg-1">
+              {user.name}
+            </p>
+            <p className="truncate meta">{user.roleLabel}</p>
           </div>
         </div>
       </div>

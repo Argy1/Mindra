@@ -1809,3 +1809,101 @@ tidak menulis "sesuai UU PDP" tanpa batas ini.
 cadangan 112/IGD, "24 jam" hanya sekali), `observation.test.ts` (LOINC PSS-10, kode lokal lama hilang, SRQ-20 tetap lokal dengan
 `code.text`, paritas Dart), `legal-sync.test.ts`, serta tes dan e2e yang menyebut nama layanan diperbarui. Flutter: `flutter analyze`
 0 galat dan 0 peringatan (115 info, sama seperti sebelumnya) dan `flutter test` 160 lulus.
+
+## Revisi dari uji live 15 Okt 2026 (temuan #2 sampai #19)
+
+Penguji (Claude Cowork, lewat peramban pemilik) menjalankan enam akun di situs live dan menemukan 18 hal yang perlu diperbaiki
+dan satu catatan informasi. Semuanya dikerjakan dalam empat kelompok commit. Yang sengaja diputuskan, dan alasannya:
+
+### A. Data demo yang masuk akal (#2, #4)
+
+**Akar masalah.** Seed lama membuat riwayat skrining untuk ratusan pengguna sintetis **tanpa menyentuh waktu**: tiap skrining
+berat memicu `create_crisis_alert_from_assessment`, dan semua peringatan itu bertanda waktu seed, jadi psikolog melihat 22
+peringatan terbuka "baru saja" dan satu faskes dengan 65 pengguna menghitung 130 peringatan dalam dua pekan.
+
+**Keputusan.**
+
+- Peringatan tetap dibuat oleh pemicu (itu perilaku produksi yang benar), lalu `created_at`-nya diset ke waktu skrining
+  penyebabnya. Tiap klien demo hanya boleh punya **paling banyak 3 peringatan terbuka** (yang terbaru); sisanya ditandai sudah
+  ditangani oleh psikolog demo beberapa jam setelah dibuat. Peringatan tidak pernah dibuka kembali. Pengguna sintetis non-klien
+  hanya punya peringatan terbuka bila skriningnya dalam 2 hari terakhir. Rasio per pengguna di agregat faskes jadi wajar.
+- Butir 9 PHQ-9 (pikiran menyakiti diri) tidak lagi terisi acak: pada pengguna tanpa tanda ideasi hanya terisi bila semua butir lain
+  sudah penuh. Dulu satu butir acak cukup membuat peringatan krisis.
+- Mood, tidur, dan skrining pengguna demo diisi **7 hari terakhir relatif terhadap waktu seed**, tidak pernah ke masa depan.
+- 10 psikolog demo punya bio singkat orang pertama (tanpa gelar, lembaga, atau klaim klinis) dan rating contoh 4,5 sampai 4,9 dengan
+  7 sampai 42 ulasan. **Ini data contoh**, bukan ulasan nyata; proposal tidak boleh menyebutnya sebagai penilaian pengguna.
+- `pnpm seed --refresh` menyegarkan semua itu **tanpa membuat ulang akun**. `--refresh --dry-run` hanya melaporkan rencana.
+
+**TOTP aman (syarat pemilik).** Pemilik sudah memasang TOTP di akun psikolog, faskes, dan admin demo. Akun tanpa kode dari ponsel
+itu tidak bisa dipakai, jadi seed dijaga berlapis: (1) mode refresh menerima `DataClient = Pick<SupabaseClient, 'from'>`, jadi
+tipe dan penjaga saat berjalan menolak `auth`/`rpc`; hanya `deleteUser` di mode `--reset` yang menghapus TOTP; (2) `--reset` menolak
+berjalan bila ada faktor TOTP terverifikasi atau bila daftar faktor tidak bisa dibaca, kecuali ditambah `--hapus-totp`; (3) refresh
+mencetak jumlah TOTP sebelum dan sesudah dan **gagal** bila berkurang. Tes: `tests/seed/totp.test.ts`, `tests/seed/refresh.test.ts`.
+
+Perintah yang disarankan setelah deploy: `pnpm seed --refresh --dry-run --yes`, lalu `pnpm seed --refresh --yes`.
+
+### B. UX MFA dan navigasi (#3, #8)
+
+Setelah TOTP berhasil dipasang, halaman Keamanan dimuat ulang dengan `?berhasil=1` dan menampilkan pesan sukses serta tombol
+**Lanjut ke dasbor** (hanya bila TOTP benar-benar aktif dan sesi sudah aal2; parameter palsu tidak menghasilkan pesan palsu). Tombol
+tetap berputar selama halaman berpindah, jadi jeda 5 sampai 8 detik tidak terlihat macet. `loading.tsx` (skeleton) ditambahkan untuk
+portal psikolog, faskes, admin, dan detail psikolog di konsultasi. Nama perangkat TOTP kini berformat WIB, mis. "Perangkat 16 Okt
+2026, 00.24 WIB" (sebelumnya jam UTC tanpa keterangan).
+
+### C. Konsistensi angka dan label (#5, #6, #7)
+
+- **Faskes (#5).** Dua angka PHQ-9 yang tampak bertentangan sebenarnya dua hal berbeda: kartu memakai **satu pekan lengkap
+  terakhir** (dan selisih dengan pekan sebelumnya), "Dibanding kota lain" memakai **rata-rata seluruh periode**. Kini tiap kartu
+  menulis periodenya ("pekan 5–11 Okt", "12 minggu terakhir"), perbandingan kota menulis "rata-rata PHQ-9, 12 minggu terakhir" dan
+  satu kalimat bahwa angkanya bisa berbeda dari kartu, dan catatan otomatis menulis periode serta kedua angka ujungnya (dua pekan
+  pertama dan dua pekan terakhir). Selisih yang tertulis dihitung dari angka yang tertulis itu, jadi tidak bisa terbaca bertentangan
+  karena pembulatan.
+- **"Skor memburuk" (#6).** Definisi lama hanya "naik 3 poin atau lebih dari skrining sebelumnya", sehingga klien yang naik 13 ke 15
+  (masuk kategori Berat) dihitung stabil. Kini memburuk = naik 3 poin atau lebih **atau pindah ke kategori yang lebih berat**; arah
+  sebaliknya memakai aturan yang sama ("membaik"). Kategori tersimpan yang rusak tidak ditebak: bila salah satu titik tidak punya
+  kategori sah, hanya selisih skor yang dipakai.
+- **Status sesi (#7).** Satu sumber label (`lib/domain/consultation/sessions.ts`): `confirmed` = "Terjadwal" di dasbor, detail klien,
+  Jadwal, dan halaman sesi pengguna. `tests/consistency/session-status.test.ts` menggagalkan build bila ada peta label kedua atau
+  kata "Terkonfirmasi" muncul lagi.
+
+### D. Tata letak dan teks kecil (#9 sampai #18)
+
+| #   | Perubahan |
+| --- | --------- |
+| 9   | Sidebar `overflow-x-hidden`; nama dan peran `truncate` dengan `title` penuh |
+| 10  | Header halaman publik (`MarketingAuthActions`) menampilkan **Ke dasbor** bila ada cookie sesi. Halaman publik tetap statis (tes `dynamic-portals` menjaganya): yang dibaca hanya ADA-TIDAKNYA cookie `sb-*-auth-token` setelah hidrasi, bukan isinya, dan bukan pemeriksaan keamanan. Tombol mengarah ke `/masuk`, yang bagi pengguna yang sudah masuk dialihkan middleware ke beranda perannya |
+| 11  | `pre code` tanpa latar dan padding (urutan setelah aturan `code` sebaris) |
+| 12  | Jam praktik di dialog admin memakai `<select>` 24 jam per 30 menit, bukan `<input type="time">` yang mengikuti locale perangkat (AM/PM). Nilai kiriman form tetap `HH:MM`, jadi skema dan fungsi database tidak berubah |
+| 13  | Nomor STR diminta saat mendaftar sebagai psikolog (wajib, 5 sampai 60 karakter, huruf/angka/spasi/titik/garis miring/tanda hubung). Disimpan di `profiles.requested_str_number` lewat metadata signup dan `handle_new_user`; dialog persetujuan sudah terisi, admin tinggal mencocokkan dengan sumber resmi. Migrasi **aditif**: `20261016000000_psychologist_str_at_signup.sql` (kolom baru, `handle_new_user` dengan satu kolom tambahan, fungsi antrean baru `admin_pending_psychologist_applications`; fungsi lama tidak diubah). Kode web aman di-deploy sebelum SQL ditempel: bila fungsi baru belum ada (`PGRST202`/`42883`) antrean lama dipakai tanpa kolom STR |
+| 14  | Banner pendamping menyebut bahwa tombol menelepon Healing119.id (119 ext. 8) untuk meminta saran, **bukan** menghubungi orang yang didampingi |
+| 15  | Titik ganda "M.Psi.." hilang: nama dan tarif ditulis di baris terpisah tanpa tanda baca tambahan |
+| 16  | Pemilih hari membedakan **libur** (tidak ada jadwal), **penuh** (semua jam dipesan), dan **tidak tersedia** (terlalu dekat atau terlalu jauh) |
+| 17  | `<summary>` privasi `flex w-full`, jadi seluruh kotak bisa diklik |
+| 18  | Kolom hanya-baca (email profil) berlatar redup dengan `aria-readonly` |
+
+Klaim STR dari pemohon bukan bukti: itu hanya isian untuk dicocokkan. Sumber kebenaran STR yang sudah diverifikasi tetap
+`psychologists.str_number`, diisi `admin_review_psychologist`. Kolom `requested_str_number` tidak dijaga trigger seperti
+`requested_role` karena tidak memberi hak apa pun.
+
+### #19. Jam layanan Healing119.id: FAQ Kemenkes menyebut 24 jam, teks sengaja TIDAK diubah
+
+Penguji menemukan dua sumber resmi yang bertentangan: halaman Kesprimkom Kemenkes (7 Agustus 2025) menulis layanan beroperasi
+"dari pagi hingga malam hari", sedangkan FAQ Kemenkes (berkas PDF) menurut laporan penguji menulis "24 jam". **Halaman Kesprimkom
+dibaca langsung; FAQ PDF belum dibaca.** Teks di aplikasi dipertahankan ("pagi hingga malam hari") dengan alasan:
+
+1. Salah ke sisi aman. Bila layanan sebenarnya 24 jam dan kita menulis "pagi hingga malam", pengguna paling buruk menelepon 112/IGD
+   yang memang kita tulis sebagai cadangan 24 jam. Bila kita menulis "24 jam" padahal tidak, orang dalam krisis bisa menelepon
+   tengah malam dan tidak dijawab.
+2. Dua sumber resmi yang bertentangan tidak bisa dibereskan dari sini; yang bisa membereskannya adalah Kemenkes/healing119.id.
+3. Jam layanan Healing119.id **tidak diubah** dalam revisi ini.
+
+**Tindak lanjut untuk pemilik:** konfirmasi langsung ke healing119.id (atau Kemenkes) jam layanan terkini. Setelah itu cukup ubah
+`availability` dan `verifiedAt` di `lib/domain/crisis/resources.ts` (sumber tunggal). **Untuk proposal:** jangan menulis "24 jam"
+untuk Healing119.id selama konfirmasi itu belum ada; tulis "pagi hingga malam hari (sumber: Kemenkes, 7 Agustus 2025)" dan 112/IGD
+sebagai cadangan 24 jam.
+
+### Bukti
+
+Uji mutasi pada logika baru: 25 perusakan seed, 9 perusakan MFA, 13 perusakan konsistensi angka dan label, dan 30 perusakan
+kelompok D (termasuk 5 perusakan SQL yang dijalankan di PGlite): semuanya tertangkap setelah tes diperkuat (beberapa perusakan
+awalnya lolos dan dipakai untuk memperkuat tes).

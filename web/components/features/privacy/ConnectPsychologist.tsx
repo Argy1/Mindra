@@ -42,7 +42,7 @@ export function ConnectPsychologist({ options }: { options: readonly ConnectOpti
 
   return (
     <details className="rounded-lg bg-sunken px-5 py-4">
-      <summary className="inline-flex cursor-pointer items-center gap-2 font-semibold text-fg-1">
+      <summary className="flex w-full cursor-pointer items-center gap-2 font-semibold text-fg-1">
         <Stethoscope aria-hidden className="size-5" />
         Hubungkan psikolog
       </summary>

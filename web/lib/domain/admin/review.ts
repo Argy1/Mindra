@@ -24,6 +24,24 @@ export const DEFAULT_TITLE = 'M.Psi., Psikolog';
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+/**
+ * Pilihan jam 24 jam (WIB) per 30 menit, "00:00" sampai "23:30". Dipakai <select>, bukan <input type="time">:
+ * input waktu bawaan browser mengikuti locale perangkat (mis. "09:00 AM / 03:00 PM") padahal jadwal praktik
+ * ditulis 24 jam. `current` (mis. isian yang dikembalikan server setelah galat) disisipkan bila di luar kisi,
+ * supaya nilainya tidak hilang diam-diam.
+ */
+export function timeOptions(current?: string): string[] {
+  const options = Array.from({ length: 48 }, (_, index) => {
+    const hour = String(Math.floor(index / 2)).padStart(2, '0');
+    return `${hour}:${index % 2 === 0 ? '00' : '30'}`;
+  });
+  if (current && TIME.test(current) && !options.includes(current)) {
+    options.push(current);
+    options.sort();
+  }
+  return options;
+}
+
 const text = (max: number, message: string) =>
   z
     .string({ error: message })

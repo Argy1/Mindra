@@ -293,6 +293,16 @@ Next.js. Admin tidak memegang kunci sakti, tidak ada jalan "setengah jadi" (pera
 dan penjaga kolom istimewa pada `profiles` tetap menolak semua jalan lain. Uji: `tests/db/region-admin.test.ts` (33) dan
 6 uji kesetaraan slot di `consultation-parity.test.ts`, plus 33 uji mutasi SQL.
 
+### 4.2f-bis Nomor STR saat pendaftaran calon psikolog (`20261016000000_psychologist_str_at_signup.sql`)
+
+| Objek                                         | Fungsi |
+| --------------------------------------------- | ------ |
+| kolom `profiles.requested_str_number`         | Nomor STR yang DIISI pemohon saat mendaftar (1 sampai 60 karakter, CHECK). Klaim untuk dicocokkan admin, bukan bukti; STR terverifikasi tetap `psychologists.str_number` |
+| `handle_new_user()` (diganti)                 | Bentuk sama dengan migrasi web, ditambah satu kolom: `requested_str` dari metadata signup disalin HANYA bila `requested_role = 'psychologist'`, dipangkas dan dipotong 60 karakter. `search_path` kosong ditulis ulang |
+| `admin_pending_psychologist_applications()`   | Antrean pemohon DENGAN kolom STR; syarat sama dengan `admin_pending_psychologists()` (admin + aal2, 42501 selain itu). Fungsi lama tidak diubah |
+
+Aditif dan aman diterapkan sebelum atau sesudah deploy web: bila fungsi baru belum ada, web memakai antrean lama (tanpa STR). Uji: `tests/db/str-signup.test.ts`.
+
 ### 4.2g Migrasi Gelombang 3: ringkasan penggunaan Teman cerita (`20261014000700_companion_activity_summary.sql`)
 
 | Objek                                    | Fungsi                                                                                                                       |

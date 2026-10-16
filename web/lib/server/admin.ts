@@ -12,6 +12,8 @@ export interface PendingPsychologist {
   name: string;
   email: string;
   createdAt: string;
+  /** Nomor STR yang diisi pemohon saat mendaftar (klaim untuk dicocokkan admin); null bila tidak diisi. */
+  strNumber: string | null;
 }
 
 export interface ReviewRecord {
@@ -21,8 +23,26 @@ export interface ReviewRecord {
   createdAt: string;
 }
 
+/** Kode galat PostgREST/Postgres bila fungsi belum ada (migrasi belum diterapkan): PGRST202 dan 42883. */
+const MISSING_FUNCTION_CODES = new Set(['PGRST202', '42883']);
+
 export async function getPendingPsychologists(): Promise<PendingPsychologist[]> {
   const supabase = await createClient();
+  const applications = await supabase.rpc('admin_pending_psychologist_applications');
+  if (!applications.error) {
+    return (applications.data ?? []).map((row) => ({
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      createdAt: row.created_at,
+      strNumber: row.str_number,
+    }));
+  }
+
+  // Migrasi 20261016000000 belum diterapkan di database ini: antrean lama tetap terbaca (tanpa kolom STR), jadi
+  // kode web boleh lebih dulu di-deploy daripada SQL-nya. Galat lain (mis. 42501 bukan admin) tidak ditutupi.
+  if (!MISSING_FUNCTION_CODES.has(applications.error.code))
+    throw new Error('Antrean tidak bisa dibaca.');
   const { data, error } = await supabase.rpc('admin_pending_psychologists');
   if (error) throw new Error('Antrean tidak bisa dibaca.');
   return (data ?? []).map((row) => ({
@@ -30,6 +50,7 @@ export async function getPendingPsychologists(): Promise<PendingPsychologist[]> 
     name: row.name,
     email: row.email,
     createdAt: row.created_at,
+    strNumber: null,
   }));
 }
 

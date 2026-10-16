@@ -229,8 +229,11 @@ test.describe('Antrean admin (/dev/admin)', () => {
 
     await expect(dialog.getByLabel('Nama di direktori')).toHaveValue('Calon Psikolog Demo');
     await expect(dialog.getByLabel('Gelar')).toHaveValue('M.Psi., Psikolog');
-    await expect(dialog.getByLabel('Jam mulai (WIB)')).toHaveValue('09:00');
-    await expect(dialog.getByLabel('Jam selesai (WIB)')).toHaveValue('15:00');
+    // Pilihan 24 jam (bukan input time yang mengikuti locale perangkat dan menampilkan AM/PM).
+    await expect(dialog.getByLabel('Jam mulai (WIB')).toHaveValue('09:00');
+    await expect(dialog.getByLabel('Jam selesai (WIB')).toHaveValue('15:00');
+    await expect(dialog.locator('input[type="time"]')).toHaveCount(0);
+    await expect(dialog.getByLabel('Jam mulai (WIB').locator('option')).toHaveCount(48);
     for (const day of ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']) {
       await expect(dialog.getByRole('checkbox', { name: day })).toBeChecked();
     }
@@ -241,6 +244,18 @@ test.describe('Antrean admin (/dev/admin)', () => {
     await expect(
       dialog.getByRole('checkbox', { name: /sudah memeriksa nomor STR/ }),
     ).not.toBeChecked();
+  });
+
+  test('pemohon yang mengisi STR saat mendaftar: kartu menampilkannya dan dialog sudah terisi', async ({
+    page,
+  }) => {
+    await page.goto('/dev/admin');
+    await expect(page.getByText('STR dari pemohon: STR-0123 4567 8901')).toBeVisible();
+    await expect(page.getByText('STR belum diisi')).toBeVisible();
+    await page.getByRole('button', { name: /Tinjau dan setujui Dr. Sinta Wulandari/ }).click();
+    const dialog = page.getByRole('dialog', { name: /Setujui Dr. Sinta Wulandari/ });
+    await expect(dialog.getByLabel('Nomor STR', { exact: true })).toHaveValue('STR-0123 4567 8901');
+    await expect(dialog).toContainText('Cocokkan dengan sumber resmi sebelum menyetujui');
   });
 
   test('setujui tanpa STR dan dengan tarif bukan angka: pesan per kolom, fokus ke kolom pertama bermasalah', async ({
@@ -268,10 +283,10 @@ test.describe('Antrean admin (/dev/admin)', () => {
     await page.getByRole('button', { name: /Tinjau dan setujui Calon Psikolog Demo/ }).click();
     const dialog = page.getByRole('dialog', { name: /Setujui/ });
     await dialog.getByLabel('Nomor STR', { exact: true }).fill('STR-1');
-    await dialog.getByLabel('Jam mulai (WIB)').fill('15:00');
-    await dialog.getByLabel('Jam selesai (WIB)').fill('09:00');
+    await dialog.getByLabel('Jam mulai (WIB').selectOption('15:00');
+    await dialog.getByLabel('Jam selesai (WIB').selectOption('09:00');
     await dialog.getByRole('button', { name: 'Setujui akun' }).click();
-    await expect(dialog.getByLabel('Jam selesai (WIB)')).toHaveAccessibleDescription(
+    await expect(dialog.getByLabel('Jam selesai (WIB')).toHaveAccessibleDescription(
       /setelah jam mulai/,
     );
 

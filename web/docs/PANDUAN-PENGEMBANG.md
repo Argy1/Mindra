@@ -24,7 +24,7 @@ menjawab bahwa layanan belum dikonfigurasi.
 | `pnpm typecheck` | `tsc --noEmit` (TypeScript strict)                                     |
 | `pnpm test`      | Vitest: unit, komponen, dan **uji RLS pada Postgres** (PGlite)         |
 | `pnpm test:e2e`  | Playwright + axe-core (desktop 1440 dan mobile 390)                    |
-| `pnpm seed`      | Isi data demo (butuh `SUPABASE_SERVICE_ROLE_KEY`; `--reset` menghapus) |
+| `pnpm seed`      | Isi data demo (butuh `SUPABASE_SERVICE_ROLE_KEY`). Mode: `--refresh` (segarkan tanpa menyentuh akun, aman bagi TOTP), `--add-accounts`, `--reset` (menghapus akun; menolak bila ada TOTP kecuali `--hapus-totp`) |
 | `pnpm db:types`  | Regenerasi `lib/supabase/database.types.ts` dari proyek Supabase       |
 | `pnpm format`    | Prettier                                                               |
 | `pnpm lighthouse` | Audit Lighthouse semua halaman utama (server produksi; lihat [`TESTING.md`](TESTING.md)) |
@@ -74,8 +74,10 @@ pnpm exec playwright test e2e/fase3.auth.spec.ts --project=desktop-1440
    - `20261014000400_drop_inert_psychologist_policies.sql` (Fase 3: menghapus 4 policy psikolog lama yang inert, menutup sisa F5)
    - `20261014000500_facility_mfa_and_booking.sql` (Fase 4: **MFA admin faskes di database**, constraint anti-bentrok jadwal konsultasi, fungsi pemesanan; butuh ekstensi `btree_gist`; **mengubah perilaku aplikasi Flutter**: sesi yang bertumpuk kini ditolak)
    - `20261014000600_region_optin_admin_review.sql` (Gelombang 1: **statistik wilayah opt-in** `profiles.share_region_stats` dan `facility_aggregate()` yang hanya menghitung yang setuju; `psychologist_available_slots()` untuk daftar slot (dipakai web dan Flutter); `delete_my_account()`; **portal admin**: tabel `admin_actions`, `admin_pending_psychologists()`, `admin_review_psychologist()`, dan pintu peninjauan pada trigger penjaga kolom istimewa)
+   - `20261014000700_companion_activity_summary.sql` (Gelombang 3: `client_companion_activity()`, ringkasan penggunaan Teman cerita tanpa isi percakapan)
+   - `20261016000000_psychologist_str_at_signup.sql` (temuan #13 uji live: **nomor STR diminta saat calon psikolog mendaftar**: kolom `profiles.requested_str_number`, `handle_new_user` dengan satu kolom tambahan, dan `admin_pending_psychologist_applications()`; aditif, kode web tetap jalan sebelum SQL ini ditempel)
 
-   Pada proyek yang lima migrasi Flutter-nya sudah ada, cukup delapan migrasi web. Halaman Fase 2 (`/privasi`,
+   Pada proyek yang lima migrasi Flutter-nya sudah ada, cukup sembilan migrasi web. Halaman Fase 2 (`/privasi`,
    `/psikolog`, `/pendamping`) memakai RPC dari `…000300`; tanpa migrasi itu halaman tersebut menampilkan halaman galat. Semuanya idempotent.
    Rincian celah yang ditutup: [`docs/TEMUAN-KEAMANAN.md`](TEMUAN-KEAMANAN.md).
 
@@ -90,6 +92,12 @@ pnpm exec playwright test e2e/fase3.auth.spec.ts --project=desktop-1440
    `pnpm seed --yes --add-accounts`: akun yang belum ada ditambahkan tanpa menyentuh data demo lain (`--reset` menghapus
    dan membuat ulang semuanya). Setiap migrasi berubah, jalankan `pnpm db:types` (butuh
    `SUPABASE_PROJECT_ID` dan `SUPABASE_ACCESS_TOKEN` di `.env.local`).
+
+   **Menyegarkan data demo tanpa membuat ulang akun** (mis. peringatan krisis terbuka menumpuk, mood tidak lagi mengisi 7 hari terakhir):
+   `pnpm seed --refresh --dry-run --yes` untuk melihat rencana, lalu `pnpm seed --refresh --yes`. Akun, kata sandi, dan **TOTP
+   psikolog/faskes/admin tidak disentuh**: mode ini hanya memegang klien data (`from`), dan mencetak jumlah TOTP sebelum dan
+   sesudah, lalu gagal bila berkurang. Jangan memakai `--reset` pada proyek yang akun demonya sudah dipasangi TOTP; bila perlu,
+   `--reset` menolak sendiri kecuali `--hapus-totp`. Idempoten: dijalankan dua kali menghasilkan keadaan yang sama.
 
 ## MFA psikolog
 

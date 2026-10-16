@@ -5,6 +5,7 @@
  * Fase 4 (migrasi 20261014000500): book_consultation, psychologist_booked_slots, psychologist_schedule.
  * Gelombang 1 (migrasi 20261014000600): profiles.share_region_stats, tabel admin_actions, fungsi
  * psychologist_available_slots, delete_my_account, admin_pending_psychologists, admin_review_psychologist.
+ * Temuan #13 (migrasi 20261016000000): profiles.requested_str_number, admin_pending_psychologist_applications.
  *
  * Migrasi 20261014000100–000300 sudah diterapkan ke proyek cloud (14 Okt 2026). Nama argumen, tipe hasil,
  * dan kolom tiap fungsi di atas sudah dicocokkan dengan `pg_get_function_arguments/result` di cloud.
@@ -776,6 +777,7 @@ export type Database = {
           notifications_enabled: boolean
           reminder_time: string | null
           requested_role: string | null
+          requested_str_number: string | null
           role: string
           satusehat_consent: boolean
           share_region_stats: boolean
@@ -798,6 +800,7 @@ export type Database = {
           notifications_enabled?: boolean
           reminder_time?: string | null
           requested_role?: string | null
+          requested_str_number?: string | null
           role?: string
           satusehat_consent?: boolean
           share_region_stats?: boolean
@@ -820,6 +823,7 @@ export type Database = {
           notifications_enabled?: boolean
           reminder_time?: string | null
           requested_role?: string | null
+          requested_str_number?: string | null
           role?: string
           satusehat_consent?: boolean
           share_region_stats?: boolean
@@ -1144,6 +1148,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_pending_psychologist_applications: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          str_number: string | null
+        }[]
+      }
       admin_pending_psychologists: {
         Args: never
         Returns: { created_at: string; email: string; id: string; name: string }[]

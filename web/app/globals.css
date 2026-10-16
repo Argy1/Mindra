@@ -557,6 +557,14 @@
     padding: 2px 6px;
     border-radius: var(--radius-xs);
   }
+  /* Kode di dalam blok <pre> mengikuti blok itu (mis. latar gelap), bukan gaya kode sebaris di atas:
+     kalau tidak, tiap baris tampak "terseleksi" dengan latar terang di atas blok gelap. */
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+  }
 
   ::selection {
     background: var(--biru-100);

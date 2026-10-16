@@ -126,6 +126,19 @@ export const countAvailable = (days: readonly SlotDay[]): number =>
     0,
   );
 
+/**
+ * Keterangan satu hari di pemilih hari. Tiga keadaan yang berbeda artinya bagi pemesan:
+ *   * tidak ada jadwal praktik hari itu → "libur" (tidak ada yang bisa dilakukan, bukan salah siapa pun);
+ *   * ada jadwal tetapi semua jam sudah dipesan → "penuh";
+ *   * ada jadwal tetapi tidak ada yang bisa dipesan karena waktunya (terlalu dekat atau terlalu jauh) → "tidak tersedia".
+ */
+export function dayAvailabilityLabel(day: SlotDay): string {
+  if (day.slots.length === 0) return 'libur';
+  const open = day.slots.filter((slot) => slot.state === 'available').length;
+  if (open > 0) return `${open} jam`;
+  return day.slots.some((slot) => slot.state === 'taken') ? 'penuh' : 'tidak tersedia';
+}
+
 /** Hari pertama yang masih punya slot tersedia, atau null. */
 export function nextAvailable(days: readonly SlotDay[]): { date: string; slot: Slot } | null {
   for (const day of days) {

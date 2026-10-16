@@ -83,6 +83,7 @@ export async function signUpAction(_previous: FormState, formData: FormData): Pr
     'email',
     'password',
     'accountType',
+    'strNumber',
     'ageConfirmed',
     'consent',
   ]);
@@ -90,6 +91,7 @@ export async function signUpAction(_previous: FormState, formData: FormData): Pr
     name: raw.name ?? '',
     email: raw.email ?? '',
     accountType: raw.accountType === 'psychologist' ? 'psychologist' : 'self',
+    strNumber: raw.accountType === 'psychologist' ? (raw.strNumber ?? '') : '',
     ageConfirmed: raw.ageConfirmed === 'on' ? 'on' : '',
     consent: raw.consent === 'on' ? 'on' : '',
   };
@@ -114,7 +116,9 @@ export async function signUpAction(_previous: FormState, formData: FormData): Pr
           // Bukti persetujuan: versi naskah dan waktunya (metadata akun; tidak pernah dipercaya untuk keputusan akses).
           terms_version: LEGAL_VERSION,
           terms_accepted_at: new Date().toISOString(),
-          ...(parsed.data.accountType === 'psychologist' ? { requested_role: 'psychologist' } : {}),
+          ...(parsed.data.accountType === 'psychologist'
+            ? { requested_role: 'psychologist', requested_str: parsed.data.strNumber }
+            : {}),
         },
       },
     });

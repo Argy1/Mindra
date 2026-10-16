@@ -43,12 +43,23 @@ export const loginSchema = z.object({
 export const ACCOUNT_TYPES = ['self', 'psychologist'] as const;
 export type AccountType = (typeof ACCOUNT_TYPES)[number];
 
+/** Batas nomor STR: sama dengan CHECK `profiles_requested_str_check` (1 sampai 60 karakter) di database. */
+export const STR_MAX = 60;
+export const STR_MIN = 5;
+/** Huruf, angka, spasi, titik, garis miring, dan tanda hubung: cukup untuk format nomor STR tanpa menebak formatnya. */
+const STR_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}\p{Zs}./-]*$/u;
+
 export const registerSchema = z
   .object({
     name,
     email,
     password: newPassword,
     accountType: z.enum(ACCOUNT_TYPES, { error: 'Pilih salah satu.' }).default('self'),
+    // Hanya dipakai (dan wajib) bila mendaftar sebagai psikolog; untuk pendaftar biasa nilainya dibuang di bawah.
+    strNumber: z
+      .string()
+      .optional()
+      .transform((value) => (value ?? '').trim().replace(/\s+/g, ' ')),
     // Kotak centang HTML mengirim "on" bila dicentang dan tidak mengirim apa pun bila tidak.
     ageConfirmed: z.literal('on', {
       error: `Centang bahwa kamu berusia ${MIN_AGE} tahun ke atas.`,
@@ -58,7 +69,28 @@ export const registerSchema = z
   .refine((data) => data.password.toLowerCase() !== data.email, {
     path: ['password'],
     error: 'Kata sandi tidak boleh sama dengan emailmu.',
-  });
+  })
+  .superRefine((data, ctx) => {
+    if (data.accountType !== 'psychologist') return;
+    const issue = (message: string) =>
+      ctx.addIssue({ code: 'custom', path: ['strNumber'], message });
+    if (data.strNumber === '') {
+      issue('Isi nomor STR-mu. Admin mencocokkannya dengan sumber resmi sebelum akunmu disetujui.');
+    } else if (data.strNumber.length < STR_MIN) {
+      issue('Nomor STR terlalu pendek. Periksa lagi dengan teliti.');
+    } else if (data.strNumber.length > STR_MAX) {
+      issue(`Nomor STR maksimal ${STR_MAX} karakter.`);
+    } else if (!STR_PATTERN.test(data.strNumber)) {
+      issue(
+        'Nomor STR hanya boleh berisi huruf, angka, spasi, titik, garis miring, dan tanda hubung.',
+      );
+    }
+  })
+  // Nomor STR hanya berarti bagi pemohon psikolog; pendaftar biasa tidak membawanya ke mana pun.
+  .transform((data) => ({
+    ...data,
+    strNumber: data.accountType === 'psychologist' ? data.strNumber : undefined,
+  }));
 
 export const forgotPasswordSchema = z.object({ email });
 

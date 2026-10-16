@@ -62,10 +62,53 @@ describe('registerSchema', () => {
     expect(parsed.accountType).toBe('self');
   });
 
-  it('"Saya psikolog" diterima sebagai permintaan', () => {
-    expect(
-      registerSchema.parse({ ...validRegister, accountType: 'psychologist' }).accountType,
-    ).toBe('psychologist');
+  it('"Saya psikolog" diterima sebagai permintaan bila nomor STR diisi', () => {
+    const parsed = registerSchema.parse({
+      ...validRegister,
+      accountType: 'psychologist',
+      strNumber: 'STR-1234',
+    });
+    expect(parsed.accountType).toBe('psychologist');
+    expect(parsed.strNumber).toBe('STR-1234');
+  });
+
+  describe('nomor STR calon psikolog', () => {
+    const psychologist = { ...validRegister, accountType: 'psychologist' };
+    const strError = (strNumber: unknown) =>
+      errorsOf(registerSchema.safeParse({ ...psychologist, strNumber })).strNumber;
+
+    it('wajib untuk psikolog: kosong, spasi saja, atau tidak dikirim ditolak dengan alasan yang jelas', () => {
+      const required = /Isi nomor STR-mu/;
+      expect(strError('')).toMatch(required);
+      expect(strError('     ')).toMatch(required);
+      expect(strError(undefined)).toMatch(required);
+    });
+
+    it('pangkas dan rapikan spasi; panjang 5 sampai 60 karakter', () => {
+      expect(
+        registerSchema.parse({ ...psychologist, strNumber: '  STR   12345  678 ' }).strNumber,
+      ).toBe('STR 12345 678');
+      expect(strError('1234')).toMatch(/terlalu pendek/);
+      expect(strError('12345')).toBeUndefined();
+      expect(strError('1'.repeat(60))).toBeUndefined();
+      expect(strError('1'.repeat(61))).toMatch(/maksimal 60 karakter/);
+    });
+
+    it('hanya huruf, angka, spasi, titik, garis miring, dan tanda hubung', () => {
+      for (const ok of ['STR-1234/5678', 'No. 12.345.678', 'str 123456', 'ABC.123-45/6']) {
+        expect(strError(ok), ok).toBeUndefined();
+      }
+      for (const bad of ['<script>1', "1234'; drop", 'STR#12345', '-12345', '12345;67']) {
+        expect(strError(bad), bad).toMatch(/hanya boleh berisi/);
+      }
+    });
+
+    it('pendaftar biasa tidak diminta STR, dan STR yang ikut terkirim dibuang (tidak sampai ke metadata)', () => {
+      const plain = registerSchema.parse({ ...validRegister, strNumber: 'STR-DISELIPKAN' });
+      expect(plain.strNumber).toBeUndefined();
+      expect(registerSchema.safeParse({ ...validRegister }).success).toBe(true);
+      expect(registerSchema.parse({ ...validRegister, strNumber: '' }).strNumber).toBeUndefined();
+    });
   });
 
   it('SERANGAN: accountType="admin" ditolak (peran tidak bisa dipilih lewat formulir)', () => {

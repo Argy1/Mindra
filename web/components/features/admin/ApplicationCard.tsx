@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/Toast';
 import { reviewPsychologistAction } from '@/lib/admin/actions';
 import { initialFormState, type FormState } from '@/lib/auth/form-state';
-import { DEFAULT_TITLE, PRACTICE_DAYS } from '@/lib/domain/admin/review';
+import { DEFAULT_TITLE, PRACTICE_DAYS, timeOptions } from '@/lib/domain/admin/review';
 import type { PendingPsychologist } from '@/lib/server/admin';
 import { formatDateId } from '@/lib/utils/date';
 
@@ -78,8 +79,13 @@ function ApproveDialog({
             name="strNumber"
             label="Nomor STR"
             autoComplete="off"
-            defaultValue={text('strNumber', '')}
+            defaultValue={text('strNumber', applicant.strNumber ?? '')}
             error={errors.strNumber}
+            helper={
+              applicant.strNumber
+                ? 'Diisi pemohon saat mendaftar. Cocokkan dengan sumber resmi sebelum menyetujui.'
+                : 'Pemohon tidak mengisi nomor STR saat mendaftar. Isi setelah kamu memeriksanya.'
+            }
             required
           />
           <Input
@@ -130,20 +136,30 @@ function ApproveDialog({
         </fieldset>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input
+          <Select
             name="start"
-            label="Jam mulai (WIB)"
-            type="time"
+            label="Jam mulai (WIB, 24 jam)"
             defaultValue={text('start', '09:00')}
             error={errors.start}
-          />
-          <Input
+          >
+            {timeOptions(kept?.start).map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </Select>
+          <Select
             name="end"
-            label="Jam selesai (WIB)"
-            type="time"
+            label="Jam selesai (WIB, 24 jam)"
             defaultValue={text('end', '15:00')}
             error={errors.end}
-          />
+          >
+            {timeOptions(kept?.end).map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </Select>
         </div>
         <p className="-mt-2 meta">
           Satu sesi 50 menit pada kisi 60 menit dari jam mulai. Hari dan jam bisa diubah nanti lewat
@@ -223,6 +239,9 @@ export function ApplicationCard({ applicant }: { applicant: PendingPsychologist 
         <div className="min-w-0 flex-1 basis-56">
           <h3 className="font-semibold text-fg-1">{applicant.name}</h3>
           <p className="meta break-all">{applicant.email}</p>
+          <p className="meta">
+            {applicant.strNumber ? `STR dari pemohon: ${applicant.strNumber}` : 'STR belum diisi'}
+          </p>
           <p className="meta">
             Mengajukan{' '}
             {formatDateId(new Date(applicant.createdAt), {

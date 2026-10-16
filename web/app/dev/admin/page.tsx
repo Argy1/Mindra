@@ -13,12 +13,14 @@ const PENDING: PendingPsychologist[] = [
     name: 'Calon Psikolog Demo',
     email: 'calon.psikolog@demo.mindra.test',
     createdAt: '2026-10-12T03:20:00.000Z',
+    strNumber: null,
   },
   {
     id: '00000000-0000-4000-8000-0000000000b2',
     name: 'Dr. Sinta Wulandari',
     email: 'sinta@praktik.example',
     createdAt: '2026-10-13T08:05:00.000Z',
+    strNumber: 'STR-0123 4567 8901',
   },
 ];
 

@@ -11,6 +11,7 @@ import { bookConsultationAction } from '@/lib/consultation/actions';
 import { formatRupiah } from '@/lib/domain/consultation/directory';
 import {
   SESSION_MINUTES,
+  dayAvailabilityLabel,
   nextAvailable,
   type Slot,
   type SlotDay,
@@ -141,9 +142,7 @@ export function SlotPicker({ psychologistId, psychologistName, fee, days }: Slot
                   <span className="text-sm font-semibold">
                     {formatShortDayId(`${entry.date}T12:00:00+07:00`)}
                   </span>
-                  <span className="text-xs text-fg-3">
-                    {count === 0 ? 'penuh' : `${count} jam`}
-                  </span>
+                  <span className="text-xs text-fg-3">{dayAvailabilityLabel(entry)}</span>
                 </label>
               </div>
             );
@@ -196,10 +195,10 @@ export function SlotPicker({ psychologistId, psychologistName, fee, days }: Slot
       {selected ? (
         <div className="rounded-lg bg-biru-50 px-4 py-3.5 text-sm text-biru-900">
           <p className="font-semibold">{describeSession(selected.startsAt)}</p>
-          <p className="mt-0.5">
-            Dengan {psychologistName}. Tarif per sesi {formatRupiah(fee)}; pembayaran belum tersedia
-            di Mindra Web.
-          </p>
+          {/* Nama dan tarif di baris sendiri: gelar seperti "M.Psi." sudah berakhir titik, jadi tidak ada
+              tanda baca yang ditambahkan setelah nama (sebelumnya jadi "M.Psi.. Tarif"). */}
+          <p className="mt-0.5">Dengan {psychologistName}</p>
+          <p>Tarif per sesi {formatRupiah(fee)}; pembayaran belum tersedia di Mindra Web.</p>
         </div>
       ) : null}
 

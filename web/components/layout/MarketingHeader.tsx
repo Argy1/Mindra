@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Container } from '@/components/layout/Container';
 import { Logo } from '@/components/layout/Logo';
-import { Button } from '@/components/ui/Button';
+import { MarketingAuthActions } from '@/components/layout/MarketingAuthActions';
 
 /** Tautan jangkar ke bagian landing. Awalan "/" supaya tetap benar dari halaman marketing lain. */
 const NAV_LINKS = [
@@ -33,12 +33,7 @@ export function MarketingHeader() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Button href="/masuk" variant="ghost" size="sm">
-            Masuk
-          </Button>
-          <Button href="/daftar" size="sm">
-            Daftar gratis
-          </Button>
+          <MarketingAuthActions />
         </div>
       </Container>
     </header>

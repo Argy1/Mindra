@@ -117,6 +117,30 @@ test.describe('/daftar', () => {
     await expect(group.getByRole('radio', { name: /Saya psikolog/ })).toBeChecked();
   });
 
+  test('nomor STR hanya diminta bila memilih "Saya psikolog", dan wajib diisi', async ({
+    page,
+  }) => {
+    await page.goto('/daftar');
+    await expect(page.getByLabel('Nomor STR')).toHaveCount(0);
+
+    await page.getByRole('radio', { name: /Saya psikolog/ }).check({ force: true });
+    const str = page.getByLabel('Nomor STR');
+    await expect(str).toBeVisible();
+    await expect(str).toHaveAttribute('required', '');
+
+    await page.getByLabel('Nama panggilan').fill('Rina Sari');
+    await page.getByLabel('Email').fill('rina.str@example.com');
+    await page.getByLabel('Kata sandi', { exact: true }).fill('kata-sandi-aman');
+    await page.getByRole('checkbox', { name: /berusia 17 tahun/ }).check({ force: true });
+    await page.getByRole('checkbox', { name: /ketentuan layanan/ }).check({ force: true });
+    await page.getByRole('button', { name: 'Buat akun' }).click();
+    await expect(str).toHaveAccessibleDescription(/Isi nomor STR-mu/);
+    await expect(str).toBeFocused();
+
+    await page.getByRole('radio', { name: /Untuk diriku sendiri/ }).check({ force: true });
+    await expect(page.getByLabel('Nomor STR')).toHaveCount(0);
+  });
+
   test('usia dan persetujuan tetap tercentang setelah galat validasi lain; tautan naskah hukum ada', async ({
     page,
   }) => {

@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { CardHeader } from '@/components/ui/CardHeader';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 import { CrisisBanner } from '@/components/ui/CrisisBanner';
+import { PRIMARY_CRISIS_RESOURCE } from '@/lib/domain/crisis/resources';
 import { INSTRUMENTS } from '@/lib/domain/assessment/instruments';
 import type { MoodTrend } from '@/lib/domain/insight/engine';
 import type { CaregiverPatientDetail } from '@/lib/server/caregiver';
@@ -60,6 +61,12 @@ export function CaregiverDetailView({ detail }: { detail: CaregiverPatientDetail
             <p className="body-m text-danger-900">
               Hubungi {patient.name} sekarang dan tanyakan kabarnya dengan tenang. Tetap bersamanya
               bila bisa, dan ajak mencari bantuan profesional.
+            </p>
+            {/* Tombol banner menelepon layanan krisis, BUKAN orang yang didampingi: dijelaskan supaya tidak salah paham. */}
+            <p className="mt-2 body-m text-danger-900">
+              Tombol di bawah menelepon {PRIMARY_CRISIS_RESOURCE.name} (
+              {PRIMARY_CRISIS_RESOURCE.displayNumber}) untuk meminta saran, bukan menghubungi{' '}
+              {patient.name}.
             </p>
           </CrisisBanner>
         </div>

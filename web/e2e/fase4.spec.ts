@@ -102,6 +102,8 @@ test.describe('dasbor faskes (/dev/faskes)', () => {
     // Tiga pemuatan halaman berturut-turut ke server dev saat seluruh suite berjalan paralel.
     test.setTimeout(90_000);
     await page.goto('/dev/faskes');
+    // Periode juga tertulis di kartu dan perbandingan kota; judul halaman yang dipakai sebagai patokan.
+    const heading = page.locator('section[aria-labelledby="judul"]');
     const nav = page.getByRole('navigation', { name: 'Periode' });
     await expect(nav.getByRole('link', { name: '12 minggu' })).toHaveAttribute(
       'aria-current',
@@ -110,16 +112,16 @@ test.describe('dasbor faskes (/dev/faskes)', () => {
 
     await nav.getByRole('link', { name: '4 minggu' }).click();
     await expect(page).toHaveURL(/periode=4/, { timeout: 20_000 });
-    await expect(page.getByText('4 minggu terakhir')).toBeVisible();
+    await expect(heading.getByText('4 minggu terakhir')).toBeVisible();
     await expect(nav.getByRole('link', { name: '4 minggu' })).toHaveAttribute(
       'aria-current',
       'true',
     );
 
     await page.goto('/dev/faskes?periode=999');
-    await expect(page.getByText('12 minggu terakhir')).toBeVisible();
+    await expect(heading.getByText('12 minggu terakhir')).toBeVisible();
     await page.goto('/dev/faskes?periode=52');
-    await expect(page.getByText('1 tahun terakhir')).toBeVisible();
+    await expect(heading.getByText('1 tahun terakhir')).toBeVisible();
   });
 
   test('tidak ada overflow horizontal dan lolos axe, di semua periode', async ({ page }) => {

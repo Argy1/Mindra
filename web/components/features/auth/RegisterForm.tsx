@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { FormMessage } from '@/components/features/auth/FormMessage';
 import { SubmitButton } from '@/components/features/auth/SubmitButton';
 import { useFocusFirstError } from '@/components/features/auth/use-focus-first-error';
@@ -13,17 +13,29 @@ import { RadioGroup } from '@/components/ui/RadioGroup';
 import { signUpAction } from '@/lib/auth/actions';
 import { initialFormState } from '@/lib/auth/form-state';
 import { MIN_AGE } from '@/lib/legal/version';
+import { STR_MAX, type AccountType } from '@/lib/validation/auth';
 
 export function RegisterForm() {
   const [state, formAction] = useActionState(signUpAction, initialFormState);
   const formRef = useFocusFirstError(state);
+  // Pilihan yang dikembalikan server setelah galat. Radio TETAP tak-terkendali dengan `defaultChecked` dari nilai ini:
+  // React 19 mereset formulir setelah tiap aksi, dan reset mengembalikan radio ke `defaultChecked`. Bila radio
+  // dikendalikan state, tampilannya bisa kembali ke "diriku sendiri" sementara kolom STR masih tampil.
+  const submitted: AccountType =
+    state.values?.accountType === 'psychologist' ? 'psychologist' : 'self';
+  // Cermin pilihan saat ini hanya untuk menampilkan/menyembunyikan kolom STR; disetel ulang tiap kali ada hasil
+  // aksi baru (pola "sesuaikan state saat prop berubah", tanpa efek).
+  const [choice, setChoice] = useState<AccountType>(submitted);
+  const [seenState, setSeenState] = useState(state);
+  if (seenState !== state) {
+    setSeenState(state);
+    setChoice(submitted);
+  }
 
   // Setelah berhasil, formulir diganti pesan konfirmasi (bukan dibiarkan terisi ulang).
   if (state.status === 'success') {
     return <FormMessage state={state} />;
   }
-
-  const accountType = state.values?.accountType === 'psychologist' ? 'psychologist' : 'self';
 
   return (
     <form ref={formRef} action={formAction} noValidate className="grid gap-5">
@@ -61,16 +73,31 @@ export function RegisterForm() {
           name="accountType"
           value="self"
           label="Untuk diriku sendiri"
-          defaultChecked={accountType === 'self'}
+          defaultChecked={submitted === 'self'}
+          onChange={() => setChoice('self')}
         />
         <RadioCard
           name="accountType"
           value="psychologist"
           label="Saya psikolog"
           description="Akunmu ditinjau dulu sebelum bisa melihat klien."
-          defaultChecked={accountType === 'psychologist'}
+          defaultChecked={submitted === 'psychologist'}
+          onChange={() => setChoice('psychologist')}
         />
       </RadioGroup>
+
+      {choice === 'psychologist' ? (
+        <Input
+          name="strNumber"
+          label="Nomor STR"
+          autoComplete="off"
+          required
+          maxLength={STR_MAX}
+          defaultValue={state.values?.strNumber}
+          helper="Surat Tanda Registrasi psikologmu. Admin mencocokkannya dengan sumber resmi sebelum akunmu disetujui."
+          error={state.fieldErrors?.strNumber}
+        />
+      ) : null}
 
       <Checkbox
         name="ageConfirmed"
