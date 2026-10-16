@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, useTransition, type FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { createClient } from '@/lib/supabase/client';
@@ -25,6 +25,7 @@ export function TotpChallenge({
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [navigating, startNavigation] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Halaman ini hanya punya satu tujuan: fokus langsung ke kolom kode (bukan atribut autoFocus).
@@ -52,8 +53,11 @@ export function TotpChallenge({
         setCode('');
         return;
       }
-      router.replace(redirectTo);
-      router.refresh();
+      // Tombol tetap berputar selama dasbor dimuat (bisa beberapa detik), bukan kembali tampak siap.
+      startNavigation(() => {
+        router.replace(redirectTo);
+        router.refresh();
+      });
     } catch {
       setError(GENERIC);
     } finally {
@@ -75,7 +79,7 @@ export function TotpChallenge({
         onChange={(event) => setCode(event.target.value)}
         error={error ?? undefined}
       />
-      <Button type="submit" loading={busy}>
+      <Button type="submit" loading={busy || navigating}>
         Verifikasi
       </Button>
     </form>

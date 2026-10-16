@@ -1,19 +1,22 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState, useTransition, type FormEvent } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { MFA_ENROLLED_PARAM } from '@/lib/auth/mfa';
+import { totpDeviceName } from '@/lib/domain/mfa/device-name';
 import { createClient } from '@/lib/supabase/client';
 import { groupTotpSecret, TOTP_LENGTH, totpCodeSchema } from '@/lib/validation/mfa';
 
 interface TotpEnrollmentProps {
-  /** `first` = pendaftaran pertama (wajib) lalu masuk portal; `backup` = menambah perangkat cadangan. */
+  /**
+   * `first` = pendaftaran pertama (wajib): setelah berhasil halaman Keamanan dimuat ulang dengan pesan sukses dan
+   * tombol "Lanjut ke dasbor" (lihat MfaSecurityView); `backup` = menambah perangkat cadangan, pesannya di tempat.
+   */
   mode: 'first' | 'backup';
-  /** Tujuan setelah pendaftaran pertama selesai (beranda portal sesuai peran). */
-  redirectTo?: string;
 }
 
 type Step =
@@ -31,8 +34,10 @@ const GENERIC = 'Belum bisa menyelesaikan pendaftaran. Periksa koneksimu, lalu c
  * Supabase dan hanya ditampilkan sekali di sini; server Mindra tidak pernah melihat secret maupun kode.
  * Percobaan yang ditinggalkan (faktor belum terverifikasi) dibersihkan dulu supaya tidak menumpuk.
  */
-export function TotpEnrollment({ mode, redirectTo = '/psikolog' }: TotpEnrollmentProps) {
+export function TotpEnrollment({ mode }: TotpEnrollmentProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const [navigating, startNavigation] = useTransition();
   const [step, setStep] = useState<Step>({ name: 'idle' });
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +57,7 @@ export function TotpEnrollment({ mode, redirectTo = '/psikolog' }: TotpEnrollmen
       const { data, error: enrollError } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
         issuer: 'Mindra',
-        friendlyName: `Perangkat ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`,
+        friendlyName: totpDeviceName(new Date()),
       });
       if (enrollError || !data) {
         setError(GENERIC);
@@ -92,8 +97,13 @@ export function TotpEnrollment({ mode, redirectTo = '/psikolog' }: TotpEnrollmen
         setCode('');
         return;
       }
+      if (mode === 'first') {
+        // Muat ulang halaman Keamanan (bukan langsung ke dasbor): pemilik melihat pesan sukses dan memilih sendiri
+        // kapan lanjut. Tombol tetap berputar selama halaman diperbarui, jadi tidak tampak macet.
+        startNavigation(() => router.replace(`${pathname}?${MFA_ENROLLED_PARAM}=1`));
+        return;
+      }
       setStep({ name: 'done' });
-      if (mode === 'first') router.replace(redirectTo);
       router.refresh();
     } catch {
       setError(GENERIC);
@@ -105,11 +115,7 @@ export function TotpEnrollment({ mode, redirectTo = '/psikolog' }: TotpEnrollmen
   if (step.name === 'done') {
     return (
       <Alert tone="success" role="status" compact>
-        <p className="text-sm">
-          {mode === 'first'
-            ? 'Verifikasi dua langkah aktif. Mengarahkanmu ke ringkasan klien.'
-            : 'Perangkat cadangan ditambahkan.'}
-        </p>
+        <p className="text-sm">Perangkat cadangan ditambahkan.</p>
       </Alert>
     );
   }
@@ -178,7 +184,7 @@ export function TotpEnrollment({ mode, redirectTo = '/psikolog' }: TotpEnrollmen
         </li>
       </ol>
       <div>
-        <Button type="submit" loading={busy}>
+        <Button type="submit" loading={busy || navigating}>
           Verifikasi dan aktifkan
         </Button>
       </div>

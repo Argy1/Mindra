@@ -3,6 +3,7 @@ import { TotpChallenge } from '@/components/features/psychologist/TotpChallenge'
 import { TotpEnrollment } from '@/components/features/psychologist/TotpEnrollment';
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CardHeader } from '@/components/ui/CardHeader';
 import { MFA_ROUTES_BY_ROLE, type MfaRole } from '@/lib/auth/mfa';
@@ -22,11 +23,14 @@ interface MfaViewProps {
 export async function MfaSecurityView({
   role,
   required,
+  justEnrolled = false,
   intro,
   requiredNotice,
 }: MfaViewProps & {
   /** `?wajib=1`: pengguna dialihkan ke sini karena belum memasang TOTP. */
   required: boolean;
+  /** `?berhasil=1`: TOTP baru saja terverifikasi; tampilkan pesan sukses dan tombol lanjut ke dasbor. */
+  justEnrolled?: boolean;
   intro: string;
   requiredNotice: string;
 }) {
@@ -47,6 +51,24 @@ export async function MfaSecurityView({
         </h1>
         <p className="mt-1.5 lead">{intro}</p>
       </section>
+
+      {justEnrolled && active && aal?.currentLevel === 'aal2' ? (
+        <Alert
+          tone="success"
+          role="status"
+          title="Verifikasi dua langkah aktif"
+          titleAs="h2"
+          className="mb-5"
+        >
+          <p className="mt-1 text-sm">
+            Mulai sekarang kamu masuk dengan kata sandi dan kode dari aplikasi autentikator. Bila
+            ponselmu hilang, tambahkan perangkat cadangan di bawah.
+          </p>
+          <div className="mt-4">
+            <Button href={routes.home}>Lanjut ke dasbor</Button>
+          </div>
+        </Alert>
+      ) : null}
 
       {required && !active ? (
         <Alert tone="info" className="mb-5" role="status">
@@ -91,7 +113,7 @@ export async function MfaSecurityView({
               <p className="mt-2 mb-4 body-m">
                 Bila ponselmu hilang, perangkat cadangan mencegah kamu terkunci dari akunmu.
               </p>
-              <TotpEnrollment mode="backup" redirectTo={routes.home} />
+              <TotpEnrollment mode="backup" />
             </details>
           </div>
         ) : (
@@ -99,7 +121,7 @@ export async function MfaSecurityView({
             <p className="body-m">
               Pasang aplikasi autentikator di ponselmu, lalu pindai kode QR yang muncul.
             </p>
-            <TotpEnrollment mode="first" redirectTo={routes.home} />
+            <TotpEnrollment mode="first" />
           </div>
         )}
       </Card>

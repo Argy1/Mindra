@@ -9,6 +9,9 @@ import type { UserRole } from '@/lib/auth/roles';
  * aal1 yang dipakai langsung ke PostgREST pun tidak membaca data klien.
  */
 
+/** Parameter alamat `?berhasil=1`: halaman Keamanan baru saja memasang TOTP dan menampilkan pesan sukses. */
+export const MFA_ENROLLED_PARAM = 'berhasil';
+
 export type MfaLevel = 'aal1' | 'aal2';
 export interface AalInfo {
   currentLevel: MfaLevel | null;
