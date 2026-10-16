@@ -2,6 +2,7 @@ import { CalendarBlank } from '@phosphor-icons/react/ssr';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CardHeader } from '@/components/ui/CardHeader';
+import { statusLabel } from '@/lib/domain/consultation/sessions';
 import { formatTimeId } from '@/lib/utils/date';
 import { cn } from '@/lib/utils/cn';
 
@@ -14,12 +15,6 @@ export interface TodaySession {
   durationMinutes: number;
   status: string;
 }
-
-const STATUS_NOTE: Readonly<Record<string, string>> = {
-  pending: 'Menunggu konfirmasi',
-  confirmed: 'Terkonfirmasi',
-  ongoing: 'Sedang berlangsung',
-};
 
 /** Sesi dianggap "sekarang" bila sedang berjalan atau mulai dalam 30 menit. */
 const UPCOMING_WINDOW_MS = 30 * 60_000;
@@ -68,8 +63,7 @@ export function TodaySessions({ sessions, now }: TodaySessionsProps) {
                     {session.patientName}
                   </strong>
                   <span className="meta">
-                    {session.durationMinutes} menit ·{' '}
-                    {STATUS_NOTE[session.status] ?? session.status}
+                    {session.durationMinutes} menit · {statusLabel(session.status)}
                   </span>
                   {current ? (
                     <Button

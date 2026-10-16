@@ -85,6 +85,59 @@ describe('skrining dan tren', () => {
     expect(trendFor([10])).toBe('none');
   });
 
+  it('pindah ke kategori yang lebih berat juga memburuk walau selisih skornya hanya 1-2 poin', () => {
+    const trendFor = (scores: number[]) =>
+      build({
+        assessments: scores.map((score, i) => phq('a', score, `2026-10-0${i + 1}`)),
+      })[0]!.assessment as { trend: string; worsened: boolean };
+    // 13 (sedang) → 15 (berat): naik 2 poin, tetapi masuk kategori Berat.
+    expect(trendFor([13, 15])).toMatchObject({ trend: 'worse', worsened: true });
+    // 9 (ringan) → 10 (sedang): naik 1 poin, kategori naik.
+    expect(trendFor([9, 10])).toMatchObject({ trend: 'worse', worsened: true });
+    // Turun kategori = membaik, walau selisihnya kecil.
+    expect(trendFor([15, 14])).toMatchObject({ trend: 'better', worsened: false });
+    // Naik 2 poin di dalam kategori yang sama tetap stabil.
+    expect(trendFor([10, 12])).toMatchObject({ trend: 'stable', worsened: false });
+  });
+
+  it('kategori tersimpan rusak: hanya selisih skor yang menentukan (tidak ada tebakan kategori)', () => {
+    // 13 bertanda Sedang yang sah, 15 bertanda rusak: kategori tidak boleh ditebak jadi "minimal" (itu tampak membaik).
+    const rows = [
+      { ...phq('a', 13, '2026-10-01') },
+      { ...phq('a', 15, '2026-10-02'), category: 'aneh' },
+    ];
+    expect(build({ assessments: rows })[0]!.assessment).toMatchObject({
+      trend: 'stable',
+      worsened: false,
+    });
+  });
+
+  it('klien yang tren skornya naik hingga Berat dihitung pada ubin "skor memburuk"', () => {
+    const summaries = build({
+      clients: [client('a', 'Alice'), client('b', 'Bagas'), client('c', 'Citra')],
+      assessments: [
+        // Alice: 11 → 13 → 15 (tiap langkah +2, tetapi akhirnya masuk Berat)
+        phq('a', 11, '2026-09-20'),
+        phq('a', 13, '2026-10-01'),
+        phq('a', 15, '2026-10-10'),
+        // Bagas: 8 → 12 → 17 (lonjakan besar)
+        phq('b', 8, '2026-09-20'),
+        phq('b', 12, '2026-10-01'),
+        phq('b', 17, '2026-10-10'),
+        // Citra: stabil di kategori Sedang
+        phq('c', 10, '2026-10-01'),
+        phq('c', 11, '2026-10-10'),
+      ],
+    });
+    const stats = summarizeDashboard(summaries, [], 0, TODAY);
+    expect(stats.worsened).toBe(2);
+    expect(
+      filterClients(summaries, 'memburuk')
+        .map((s) => s.name)
+        .sort(),
+    ).toEqual(['Alice', 'Bagas']);
+  });
+
   it('instrumen berbeda tidak dibandingkan satu sama lain', () => {
     const [summary] = build({
       assessments: [

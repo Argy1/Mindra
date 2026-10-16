@@ -1,3 +1,4 @@
+import { statusLabel } from '@/lib/domain/consultation/sessions';
 import { addDaysToKey, dateKeyWib } from '@/lib/utils/date';
 
 /**
@@ -22,14 +23,8 @@ export interface ScheduleDay {
 
 export const ANONYMOUS_CLIENT = 'Klien (belum menautkan akun)';
 
-export const SCHEDULE_STATUS: Readonly<Record<string, string>> = {
-  pending: 'Menunggu konfirmasi',
-  confirmed: 'Terjadwal',
-  ongoing: 'Sedang berlangsung',
-  completed: 'Selesai',
-};
-
-export const scheduleStatusLabel = (status: string): string => SCHEDULE_STATUS[status] ?? status;
+/** Label status sesi di Jadwal: sama dengan seluruh aplikasi (lihat STATUS_LABEL). */
+export const scheduleStatusLabel = statusLabel;
 
 /** Sesi dikelompokkan per hari WIB, urut waktu. `from` menentukan awal; hari tanpa sesi tidak dimunculkan. */
 export function groupByDay(items: readonly ScheduleItem[]): ScheduleDay[] {

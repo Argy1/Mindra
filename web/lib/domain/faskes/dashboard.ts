@@ -349,22 +349,35 @@ function mean(values: readonly number[]): number {
   return values.reduce((a, b) => a + b, 0) / values.length;
 }
 
+const round1 = (value: number): number => Math.round(value * 10) / 10;
+
+/** "12 minggu" / "1 tahun" untuk jumlah pekan satu periode; bentuk lain jatuh ke "N minggu". */
+export function periodLabelOfWeeks(weekCount: number): string {
+  return PERIODS.find((period) => period.weeks === weekCount)?.label ?? `${weekCount} minggu`;
+}
+
 /**
- * Satu kalimat dari tren PHQ-9: awal periode (2 pekan tampil pertama) dibanding akhir (2 terakhir). Hanya
- * menyebut arah dan besarnya, tidak menebak sebab. Butuh minimal 4 pekan tampil.
+ * Satu kalimat dari tren PHQ-9: 2 pekan tampil pertama dibanding 2 pekan tampil terakhir dalam periode. Kedua
+ * angka ikut ditulis (dan selisihnya dihitung dari angka yang tertulis itu) supaya tidak terbaca bertentangan
+ * dengan kartu ringkasan, yang memakai satu pekan saja. Hanya menyebut arah dan besarnya, tidak menebak sebab.
+ * Butuh minimal 4 pekan tampil.
  */
 export function trendNote(weeks: readonly WeekPoint[]): string | null {
   const values = weeks.flatMap((week) => (week.phq9 === null ? [] : [week.phq9]));
   if (values.length < 4) return null;
-  const change = mean(values.slice(-2)) - mean(values.slice(0, 2));
+  const start = round1(mean(values.slice(0, 2)));
+  const end = round1(mean(values.slice(-2)));
+  const change = round1(end - start);
+  const span = `${periodLabelOfWeeks(weeks.length)} terakhir`;
+  const range = `dari ${formatDecimalId(start)} di dua pekan pertama menjadi ${formatDecimalId(end)} di dua pekan terakhir`;
   const size = formatDecimalId(Math.abs(change));
   if (change >= NOTE_THRESHOLD) {
-    return `Rata-rata PHQ-9 naik ${size} poin dari awal periode. Penyuluhan atau konseling kelompok di wilayahmu bisa dipertimbangkan.`;
+    return `Dalam ${span}, rata-rata PHQ-9 mingguan naik ${size} poin (${range}). Penyuluhan atau konseling kelompok di wilayahmu bisa dipertimbangkan.`;
   }
   if (change <= -NOTE_THRESHOLD) {
-    return `Rata-rata PHQ-9 turun ${size} poin dari awal periode. Program yang sedang berjalan layak dipertahankan.`;
+    return `Dalam ${span}, rata-rata PHQ-9 mingguan turun ${size} poin (${range}). Program yang sedang berjalan layak dipertahankan.`;
   }
-  return 'Rata-rata PHQ-9 relatif stabil sepanjang periode.';
+  return `Dalam ${span}, rata-rata PHQ-9 mingguan relatif stabil (${formatDecimalId(start)} di dua pekan pertama, ${formatDecimalId(end)} di dua pekan terakhir).`;
 }
 
 // ─── Label pekan ─────────────────────────────────────────────────────────────────

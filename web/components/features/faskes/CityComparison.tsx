@@ -7,7 +7,13 @@ import { formatDecimalId } from '@/lib/utils/date';
  * datanya kurang dari 10 pengguna ditulis "disembunyikan", tidak digambar sebagai batang nol: nol akan
  * dibaca "tidak ada masalah", padahal artinya "tidak cukup orang untuk ditampilkan".
  */
-export function CityComparison({ cities }: { cities: readonly CityRow[] }) {
+export function CityComparison({
+  cities,
+  periodLabel,
+}: {
+  cities: readonly CityRow[];
+  periodLabel: string;
+}) {
   const visible = cities.filter((city) => !city.hidden);
   const top = Math.max(...visible.map((city) => city.avgPhq9 ?? 0), 0);
   const scale = top > 0 ? top / 0.85 : 1;
@@ -61,6 +67,10 @@ export function CityComparison({ cities }: { cities: readonly CityRow[] }) {
           </li>
         ))}
       </ul>
+      <p className="mt-3 meta">
+        Rata-rata seluruh {periodLabel} terakhir, jadi bisa berbeda dari kartu di atas yang memakai
+        satu pekan.
+      </p>
       {hidden.length > 0 ? (
         <p className="mt-3 meta">
           {hidden.map((city) => city.city).join(', ')} disembunyikan karena penggunanya kurang dari

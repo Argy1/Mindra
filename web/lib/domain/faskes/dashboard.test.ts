@@ -5,6 +5,7 @@ import {
   mondayOf,
   parsePeriod,
   percentages,
+  periodLabelOfWeeks,
   periodRange,
   trendNote,
   weekRangeLabel,
@@ -314,6 +315,37 @@ describe('trendNote', () => {
     expect(trendNote(series(6, 6.2, 7.4, 7.6))).toMatch(/naik 1,4 poin/);
     expect(trendNote(series(8, 8, 6.5, 6.5))).toMatch(/turun 1,5 poin/);
     expect(trendNote(series(7, 7.2, 7.4, 7.5))).toMatch(/stabil/);
+  });
+
+  it('menulis periode dan kedua angka ujungnya; selisih dihitung dari angka yang tertulis itu', () => {
+    // 6 dan 6,2 → 6,1; 7,4 dan 7,6 → 7,5; selisih 1,4 sama dengan 7,5 - 6,1 (tidak bertentangan dengan yang tertulis).
+    expect(trendNote(series(6, 6.2, 7.4, 7.6))).toBe(
+      'Dalam 4 minggu terakhir, rata-rata PHQ-9 mingguan naik 1,4 poin (dari 6,1 di dua pekan pertama menjadi 7,5 di dua pekan terakhir). Penyuluhan atau konseling kelompok di wilayahmu bisa dipertimbangkan.',
+    );
+    expect(trendNote(series(8, 8, 6.5, 6.5))).toBe(
+      'Dalam 4 minggu terakhir, rata-rata PHQ-9 mingguan turun 1,5 poin (dari 8,0 di dua pekan pertama menjadi 6,5 di dua pekan terakhir). Program yang sedang berjalan layak dipertahankan.',
+    );
+    expect(trendNote(series(7, 7.2, 7.4, 7.5))).toBe(
+      'Dalam 4 minggu terakhir, rata-rata PHQ-9 mingguan relatif stabil (7,1 di dua pekan pertama, 7,5 di dua pekan terakhir).',
+    );
+  });
+
+  it('selisih yang ditulis selalu sama dengan selisih kedua angka yang ditulis (setelah dibulatkan)', () => {
+    // Tak dibulatkan 7,06 - 6,04 = 1,02, tetapi yang tertulis 7,1 dan 6,0, jadi selisihnya 1,1.
+    expect(trendNote(series(6.04, 6.04, 7.06, 7.06))).toMatch(
+      /naik 1,1 poin \(dari 6,0 di dua pekan pertama menjadi 7,1 /,
+    );
+    // Tak dibulatkan 0,99 (di bawah ambang), tetapi tertulis 6,0 → 7,0 = 1,0 sehingga dilaporkan naik.
+    expect(trendNote(series(6.04, 6.04, 7.03, 7.03))).toMatch(
+      /naik 1,0 poin \(dari 6,0 di dua pekan pertama menjadi 7,0 /,
+    );
+  });
+
+  it('label periode mengikuti jumlah pekan: 12 minggu, 1 tahun, dan jumlah lain', () => {
+    expect(periodLabelOfWeeks(12)).toBe('12 minggu');
+    expect(periodLabelOfWeeks(52)).toBe('1 tahun');
+    expect(periodLabelOfWeeks(4)).toBe('4 minggu');
+    expect(periodLabelOfWeeks(7)).toBe('7 minggu');
   });
 
   it('kurang dari 4 pekan bernilai: tidak ada catatan', () => {

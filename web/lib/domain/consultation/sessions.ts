@@ -13,6 +13,10 @@ export interface SessionItem {
   fee: number;
 }
 
+/**
+ * Satu-satunya sumber label status sesi: dipakai halaman "Sesi kamu", Jadwal, dasbor, dan detail klien, supaya
+ * status yang sama tidak tampil dengan dua kata berbeda di dua tempat.
+ */
 export const STATUS_LABEL: Readonly<Record<string, string>> = {
   pending: 'Menunggu konfirmasi',
   confirmed: 'Terjadwal',

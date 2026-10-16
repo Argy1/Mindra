@@ -59,13 +59,18 @@ test.describe('dasbor faskes (/dev/faskes)', () => {
     await expect(page.getByText('Semua angka di halaman ini adalah gabungan anonim')).toBeVisible();
 
     for (const label of [
-      'warga aktif pekan terakhir',
+      'warga aktif',
       'rata-rata skor PHQ-9',
       'skor sedang atau berat',
-      'peringatan krisis dalam periode',
+      'peringatan krisis',
     ]) {
       await expect(page.getByRole('term').filter({ hasText: label })).toHaveCount(1);
     }
+    // Tiap kartu menulis periodenya (satu pekan, atau seluruh periode untuk peringatan krisis).
+    await expect(page.getByRole('term').filter({ hasText: /pekan \d+/ })).toHaveCount(3);
+    await expect(page.getByRole('term').filter({ hasText: 'peringatan krisis' })).toContainText(
+      'minggu terakhir',
+    );
 
     // Grafik punya ringkasan teks yang menyebut arah dan puncak, bukan hanya gambar.
     const chart = page.locator('svg[role="img"]:visible').first();

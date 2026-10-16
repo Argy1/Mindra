@@ -11,19 +11,12 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { CardHeader } from '@/components/ui/CardHeader';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { statusLabel } from '@/lib/domain/consultation/sessions';
 import { ALERT_STATUS_LABEL, isAlertSeverity } from '@/lib/domain/psychologist/alerts';
 import { summarizeMoods, summarizeSleep } from '@/lib/domain/psychologist/detail';
 import { PERMISSION_LABEL, PSYCHOLOGIST_PERMISSION_KEYS } from '@/lib/domain/privacy/permissions';
 import type { ClientDetail } from '@/lib/server/psychologist';
 import { dateKeyWib, formatDateId, formatTimeId } from '@/lib/utils/date';
-
-const CONSULTATION_STATUS: Readonly<Record<string, string>> = {
-  pending: 'Menunggu konfirmasi',
-  confirmed: 'Terkonfirmasi',
-  ongoing: 'Sedang berlangsung',
-  completed: 'Selesai',
-  cancelled: 'Dibatalkan',
-};
 
 const SEVERITY_LABEL = { critical: 'Kritis', high: 'Tinggi' } as const;
 
@@ -169,7 +162,7 @@ export function ClientDetailView({ detail, now }: { detail: ClientDetail; now: D
                       })}
                       , {formatTimeId(consultation.scheduledAt)} WIB
                     </h3>
-                    <Badge>{CONSULTATION_STATUS[consultation.status] ?? consultation.status}</Badge>
+                    <Badge>{statusLabel(consultation.status)}</Badge>
                   </header>
                   <SessionNoteForm
                     consultationId={consultation.id}

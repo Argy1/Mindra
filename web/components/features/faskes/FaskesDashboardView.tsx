@@ -84,7 +84,7 @@ export function FaskesDashboardView({
         </p>
       ) : null}
 
-      <StatCards summary={view.summary} />
+      <StatCards summary={view.summary} periodLabel={periodLabel} />
 
       <div className="grid grid-cols-1 items-start gap-5 min-[68.8125rem]:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <Card as="section" aria-labelledby="h-tren" hero>
@@ -116,10 +116,10 @@ export function FaskesDashboardView({
             <CardHeader
               title="Dibanding kota lain"
               titleId="h-kota"
-              action={<span className="meta">PHQ-9 rata-rata</span>}
+              action={<span className="meta">rata-rata PHQ-9, {periodLabel} terakhir</span>}
             />
             {view.cities.length > 0 ? (
-              <CityComparison cities={view.cities} />
+              <CityComparison cities={view.cities} periodLabel={periodLabel} />
             ) : (
               <p className="body-m">Belum ada kota lain yang aktif pada periode ini.</p>
             )}

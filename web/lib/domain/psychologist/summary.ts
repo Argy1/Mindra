@@ -8,8 +8,10 @@ import { addDaysToKey, dateKeyWib, lastDaysKeys } from '@/lib/utils/date';
  * mentah yang SUDAH disaring RLS dan izin, lalu menyusun tabel klien dan angka ringkasan.
  *
  * Aturan yang bisa dipertanggungjawabkan di tanya jawab:
- *   * "Skor memburuk" = skor skrining terbaru NAIK ≥ 3 poin dari skrining sebelumnya pada instrumen yang
- *     sama (pada keempat instrumen, skor lebih tinggi = lebih berat).
+ *   * "Skor memburuk" = skrining terbaru dibanding skrining sebelumnya pada instrumen yang sama (skor lebih
+ *     tinggi = lebih berat) NAIK ≥ 3 poin ATAU pindah ke kategori yang lebih berat. Syarat kedua penting:
+ *     naik 2 poin dari 13 ke 15 hanya "stabil" bila dilihat dari selisih, padahal klien baru saja masuk
+ *     kategori Berat. Arah sebaliknya ("membaik") memakai aturan yang sama.
  *   * "Belum check-in 3 hari" = tidak ada catatan mood hari ini maupun dua hari sebelumnya (WIB).
  *   * Data yang TIDAK dibagikan klien (izin mati) tidak pernah dihitung dan ditandai `shared: false`,
  *     bukan ditampilkan sebagai "tidak ada data".
@@ -106,11 +108,24 @@ function groupBy<T>(rows: readonly T[], key: (row: T) => string): Map<string, T[
   return map;
 }
 
-function trendOf(scores: readonly number[]): ScoreTrend {
-  if (scores.length < 2) return 'none';
-  const delta = scores[scores.length - 1]! - scores[scores.length - 2]!;
-  if (delta >= WORSENED_DELTA) return 'worse';
-  if (delta <= -WORSENED_DELTA) return 'better';
+interface ScorePoint {
+  score: number;
+  /** null = kategori tersimpan rusak/tidak ada: hanya selisih skor yang dipakai. */
+  category: AssessmentCategory | null;
+}
+
+/** Tren dari dua titik terakhir (lama → baru): selisih skor ≥ 3 poin, atau pindah kategori. */
+export function trendOf(points: readonly ScorePoint[]): ScoreTrend {
+  if (points.length < 2) return 'none';
+  const latest = points[points.length - 1]!;
+  const previous = points[points.length - 2]!;
+  const delta = latest.score - previous.score;
+  const shift =
+    latest.category && previous.category
+      ? CATEGORY_RANK[latest.category] - CATEGORY_RANK[previous.category]
+      : 0;
+  if (delta >= WORSENED_DELTA || shift > 0) return 'worse';
+  if (delta <= -WORSENED_DELTA || shift < 0) return 'better';
   return 'stable';
 }
 
@@ -133,8 +148,14 @@ export function buildClientSummaries(input: BuildInput): ClientSummary[] {
         assessment = { shared: true, latest: null, scores: [], trend: 'none', worsened: false };
       } else {
         const sameType = rows.filter((row) => row.type === newest.type);
-        const scores = sameType.slice(-4).map((row) => row.total_score);
-        const trend = trendOf(scores);
+        const recent = sameType.slice(-4);
+        const scores = recent.map((row) => row.total_score);
+        const trend = trendOf(
+          recent.map((row) => ({
+            score: row.total_score,
+            category: isAssessmentCategory(row.category) ? row.category : null,
+          })),
+        );
         assessment = {
           shared: true,
           latest: {
