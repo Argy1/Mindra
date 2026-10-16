@@ -79,6 +79,27 @@ ditelaah ahli hukum** dan **belum diubah di kode** karena keputusannya ada pada 
 "sesuai PP 33/2026" tanpa menyebut batas ini**; tulis sebagai keterbatasan dan proyeksi (bagian 14). Uji pengguna sudah
 mengecualikan responden di bawah 18 tahun.
 
+## 0b. Perubahan sesudah uji live 15 Okt 2026 (16 Okt 2026): baca bila proposal menyebut data demo atau tangkapan layar
+
+Uji live atas enam akun (laporan `LAPORAN-UJI-LIVE-15OKT.md`, lokal) menemukan 18 hal yang diperbaiki di kode dan satu catatan
+informasi. Rinci dan alasannya ada di `docs/DECISIONS.md` ("Revisi dari uji live 15 Okt 2026"). Dampaknya bagi penulis proposal:
+
+| Yang berubah | Dampak pada proposal |
+| --- | --- |
+| **Data demo disegarkan** (`pnpm seed --refresh`): tiap klien demo paling banyak 3 peringatan krisis terbuka, bertanda waktu skrining penyebabnya; rasio peringatan per pengguna di agregat faskes wajar; mood, tidur, dan skrining pengguna demo mengisi 7 hari terakhir | **Tangkapan layar dan angka lama (mis. "22 peringatan terbuka", "130 peringatan dalam 2 pekan") tidak berlaku lagi.** Ambil tangkapan layar SESUDAH pemilik menjalankan `pnpm seed --refresh --yes`. Angka demo selalu data sintetis |
+| **Bio dan rating psikolog demo** (7 sampai 42 ulasan, 4,5 sampai 4,9) | **Data contoh, bukan ulasan pengguna nyata.** Jangan ditulis sebagai bukti kepuasan pengguna |
+| Setelah TOTP terpasang: pesan sukses dan tombol **Lanjut ke dasbor**; layar pemuatan (skeleton) di portal psikolog, faskes, admin, dan detail psikolog | Alur MFA di skrip demo: pasang TOTP, baca pesan sukses, tekan Lanjut ke dasbor |
+| Kartu dasbor faskes menulis periodenya ("pekan 5–11 Okt", "12 minggu terakhir"); perbandingan kota = rata-rata seluruh periode; catatan otomatis menulis periode dan dua angka ujung | Angka kartu (satu pekan) dan angka "Dibanding kota lain" (rata-rata periode) memang berbeda. Sebut periodenya bila mengutip |
+| "Skor memburuk" = naik 3 poin atau lebih **atau pindah ke kategori yang lebih berat** | Definisi untuk bab fitur psikolog |
+| Status sesi "Terjadwal" sama di semua layar | Gunakan "Terjadwal" |
+| **Nomor STR diminta saat mendaftar sebagai psikolog** (migrasi aditif `20261016000000`, **menunggu pemilik menempelkan SQL-nya**) | Klaim STR dari pemohon hanya untuk dicocokkan admin; **verifikasi otomatis ke sumber resmi tetap [BELUM]**. Sebelum SQL ditempel, kolom STR di dialog admin kosong seperti dulu |
+| Jam praktik di dialog admin berupa pilihan 24 jam; header halaman publik menampilkan "Ke dasbor" bagi yang sudah masuk; banner pendamping menjelaskan bahwa tombol menelepon Healing119.id | Hanya relevan untuk tangkapan layar |
+| **#19 Jam layanan Healing119.id**: halaman Kesprimkom (7 Agustus 2025) menulis "pagi hingga malam hari"; FAQ Kemenkes (PDF) menurut penguji menulis "24 jam". FAQ itu **belum saya baca**; teks aplikasi **tidak diubah** | **Jangan menulis "24 jam" untuk Healing119.id.** Tulis "pagi hingga malam hari (sumber: Kemenkes, 7 Agustus 2025)" dan 112/IGD sebagai cadangan 24 jam. Pemilik perlu mengonfirmasi ke healing119.id |
+
+**TOTP dan seed.** Akun psikolog, admin faskes, dan admin Mindra demo kini dilindungi TOTP di ponsel pemilik. `pnpm seed --refresh` tidak
+menyentuh akun maupun TOTP; `pnpm seed --reset` menolak berjalan bila ada TOTP terverifikasi (kecuali `--hapus-totp`). Untuk demo
+juri, siapkan ponsel itu atau rekam video login.
+
 ## 1. Ringkasan satu halaman
 
 **Mindra** adalah ekosistem kesehatan mental digital untuk masyarakat Indonesia. Tagline: **"Ruang aman untuk perasaanmu,
@@ -102,7 +123,7 @@ Tiga langkah yang ditawarkan, dan **pengguna selalu memegang kuncinya**:
 | Instrumen skrining | 4 (PHQ-9, GAD-7, PSS-10, SRQ-20; 46 butir), hasil identik di web, mobile, dan database | [TERBUKTI] |
 | Rute API | 14 (13 di `/api/v1` + `/api/health`); OpenAPI 3.1 + dokumentasi `/developers` | [TERBUKTI] |
 | Migrasi database | 13 (5 dari aplikasi mobile + 8 dari web). Additive, kecuali dua migrasi yang menghapus policy lama yang bocor atau tak berfungsi (`…000100` dan `…000400`), atas izin pemilik; tabel, kolom, dan data tidak dihapus | [TERBUKTI] |
-| Tes Vitest | **2370 lulus**, 119 berkas (domain murni, API, komponen, RLS di Postgres sungguhan via PGlite) | [TERBUKTI] |
+| Tes Vitest | **2526 lulus**, 141 berkas (domain murni, API, komponen, RLS di Postgres sungguhan via PGlite) | [TERBUKTI] |
 | Tes Playwright | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop 1440 dan mobile 390 | [TERBUKTI] |
 | Aksesibilitas (axe, WCAG 2.2 AA) | **0 pelanggaran** di 33 rute x 2 viewport | [TERBUKTI] |
 | Tes Flutter | **160 lulus**; `flutter analyze` 0 galat dan 0 peringatan (115 info) | [TERBUKTI] |
@@ -124,7 +145,7 @@ aplikasi Flutter belum dijalankan di perangkat setelah perubahan 14 Okt; uji pem
 | --- | --- | --- | --- |
 | 1 | Inovasi dan relevansi solusi | 30% | Dua aplikasi satu backend; izin ditegakkan di database; peringatan krisis realtime; agregat anonim + FHIR (6.4, 7) |
 | 2 | Kesesuaian dengan kebutuhan pengguna | 20% | Masalah I-NAMHS, kendali di pengguna, bantuan tanpa login, bahasa Indonesia hangat (3, 4, 10) |
-| 3 | Kualitas teknis: validasi input, autentikasi, kode modular dan maintainable | 20% | Zod di semua batas, RLS, MFA di database, domain murni + tes, 2370 tes, audit F1-F8 (7, 9, 11) |
+| 3 | Kualitas teknis: validasi input, autentikasi, kode modular dan maintainable | 20% | Zod di semua batas, RLS, MFA di database, domain murni + tes, 2526 tes, audit F1-F8 (7, 9, 11) |
 | 4 | UI/UX: konsistensi, usability, accessibility | 15% | Sistem desain, WCAG 2.2 AA 0 pelanggaran, Lighthouse A 100 (10). **Usability (SUS dan UEQ-S) belum terukur** |
 | 5 | Dokumentasi dan kelengkapan proposal | 15% | README, ARCHITECTURE, DECISIONS, TESTING, TEMUAN-KEAMANAN, dokumen ini (16) |
 
@@ -647,7 +668,7 @@ Sumber: `web/docs/TESTING.md` (lengkap dengan perintah untuk mengulang). Ringkas
 
 | Bukti | Hasil | Status |
 | --- | --- | --- |
-| Vitest (unit, komponen, RLS di Postgres via PGlite) | **2370 lulus**, 119 berkas; `pnpm build && pnpm test` | [TERBUKTI] |
+| Vitest (unit, komponen, RLS di Postgres via PGlite) | **2526 lulus**, 141 berkas; `pnpm build && pnpm test` | [TERBUKTI] |
 | Playwright + axe (desktop 1440, mobile 390) terhadap build produksi lokal | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan); 1 ulangan lokal untuk kegagalan hidrasi acak | [TERBUKTI] |
 | Aksesibilitas axe WCAG 2.2 AA | 0 pelanggaran, 33 rute x 2 viewport | [TERBUKTI] |
 | Flutter | `flutter analyze` 0 galat dan 0 peringatan; `flutter test` 160 lulus | [TERBUKTI] |
@@ -898,7 +919,8 @@ Kata sandi demo: `Mindra-Demo-2026` (sudah publik di README; bukan rahasia).
 
 Psikolog, admin faskes, dan admin Mindra **wajib TOTP**. Data demo: sekitar 300 pengguna sintetis di sekitar 8 kota dengan
 riwayat mood, tidur, dan skrining 8 minggu, 10 psikolog, 20 faskes; semua pengguna sintetis memberi persetujuan statistik
-wilayah agar dasbor faskes berisi. Isi dibuat oleh `pnpm seed --yes` (dan `--add-accounts` untuk akun yang kurang).
+wilayah agar dasbor faskes berisi. Isi dibuat oleh `pnpm seed --yes` (dan `--add-accounts` untuk akun yang kurang). Data disegarkan tanpa menyentuh akun dan TOTP lewat
+`pnpm seed --refresh --yes` (lihat bagian 0b); jangan memakai `--reset` pada akun yang sudah memasang TOTP.
 
 Menjalankan lokal: Node >= 22.12 dan pnpm; `cd web && pnpm install && cp .env.example .env.local && pnpm dev`. Landing,
 tentang, kebijakan, dan dokumentasi API tampil walau `.env.local` kosong. Detail: `docs/PANDUAN-PENGEMBANG.md`.
@@ -959,6 +981,7 @@ maksimal 32 kB, hanya `application/json`. `GET /api/v1/facilities?near=` belum a
 | `20261014000500_facility_mfa_and_booking.sql` | web | MFA admin faskes, `book_consultation`, EXCLUDE gist | diterapkan dan diverifikasi |
 | `20261014000600_region_optin_admin_review.sql` | web | Statistik wilayah opt-in, slot, hapus akun, portal admin | diterapkan dan diverifikasi |
 | `20261014000700_companion_activity_summary.sql` | web | Ringkasan penggunaan Teman cerita untuk psikolog | diterapkan dan diverifikasi (15 Okt 2026) |
+| `20261016000000_psychologist_str_at_signup.sql` | web | Nomor STR diminta saat calon psikolog mendaftar: `profiles.requested_str_number`, `handle_new_user` +1 kolom, `admin_pending_psychologist_applications()` | **menunggu pemilik menempelkannya** (aditif; web tetap jalan tanpanya) |
 
 ## Lampiran E: variabel lingkungan (hanya nama; nilai tidak pernah ditulis di repositori)
 

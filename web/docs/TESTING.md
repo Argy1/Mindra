@@ -6,7 +6,7 @@ Terakhir diperbarui 14 Oktober 2026.
 
 | Bukti | Hasil | Cara mengulang |
 | ----- | ----- | -------------- |
-| Tes unit, komponen, dan basis data (Vitest) | **2370 lulus**, 119 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
+| Tes unit, komponen, dan basis data (Vitest) | **2526 lulus**, 141 berkas, 0 gagal (setelah `pnpm build`) | `pnpm build && pnpm test` |
 | Tes e2e + aksesibilitas (Playwright, desktop 1440 dan mobile 390) | **614 lulus**, 68 dilewati (spec yang butuh akun sungguhan), 0 gagal, terhadap build produksi | `E2E_PORT=3200 pnpm test:e2e` (server produksi di port itu) |
 | Audit aksesibilitas (axe, WCAG 2.2 AA) | 33 rute x 2 viewport, **0 pelanggaran**; ditambah keadaan yang berubah (dialog hapus akun dan persetujuan admin terbuka, napas berjalan dan selesai, grounding, lokasi aktif, daftar kosong dan gagal, panduan awal setelah galat) di `e2e/gelombang1.spec.ts` dan `e2e/gelombang3.spec.ts` | `e2e/fase5.spec.ts` |
 | Lighthouse (12.8.2) | Aksesibilitas **100** di semua 48 pengukuran; halaman publik P 93-100, BP 100, SEO 100 | `pnpm lighthouse` |
@@ -19,7 +19,7 @@ Terakhir diperbarui 14 Oktober 2026.
 
 ## 1. Tes otomatis
 
-- **Vitest** (2370 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
+- **Vitest** (2526 tes): logika domain murni (skoring skrining identik dengan aplikasi Flutter, deteksi krisis, FHIR,
   slot konsultasi, SUS), kerangka API, komponen, dan **aturan RLS di Postgres sungguhan** (PGlite dengan peran dan klaim JWT
   yang meniru Supabase). Tes penjaga hasil build memastikan rute yang memuat data per pengguna tidak ikut diprerender (data satu orang tak boleh
   masuk cache CDN) dan halaman marketing tetap statis; tes itu hanya aktif setelah `pnpm build`.

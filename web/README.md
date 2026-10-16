@@ -180,7 +180,7 @@ mobile). Rinciannya: [`docs/TEMUAN-KEAMANAN.md`](docs/TEMUAN-KEAMANAN.md).
 
 | Bukti                       | Hasil                                                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Vitest                      | **2370 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                      |
+| Vitest                      | **2526 tes** lulus (domain murni, API, komponen, RLS di Postgres)                                                                      |
 | Playwright + axe            | **614 lulus**, 0 gagal, 68 dilewati (butuh akun sungguhan), desktop dan mobile                                                         |
 | Aksesibilitas               | **0 pelanggaran axe WCAG 2.2 AA** di 33 rute x 2 viewport; audit keyboard otomatis; Lighthouse Aksesibilitas **100** di semua halaman  |
 | Lighthouse (halaman publik) | Lokal: Performa 93-100, Aksesibilitas 100, Praktik terbaik 100, SEO 100. **Di produksi (Vercel): Performa 98-100, ketiganya lain 100** |
