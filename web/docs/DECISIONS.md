@@ -1902,6 +1902,10 @@ dibaca langsung; FAQ PDF belum dibaca.** Teks di aplikasi dipertahankan ("pagi h
 untuk Healing119.id selama konfirmasi itu belum ada; tulis "pagi hingga malam hari (sumber: Kemenkes, 7 Agustus 2025)" dan 112/IGD
 sebagai cadangan 24 jam.
 
+### Hasil di cloud (16 Okt 2026)
+
+Migrasi `20261016000000` ditempel pemilik dan diverifikasi (kolom, constraint, `handle_new_user` baru dengan `search_path` kosong, fungsi antrean). `pnpm seed --refresh --yes` dijalankan terhadap data demo: peringatan 614 menjadi 169 (terbuka 6, paling banyak 3 per pengguna), 10 psikolog ber-bio dan berulasan contoh, tanpa catatan di masa depan, 306 akun demo tidak berubah, dan **TOTP terverifikasi tetap 3** (dihitung dari `auth.mfa_factors` sebelum dan sesudah, selain hitungan di keluaran seed). Kota Bogor kini 70 pengguna dengan 15 peringatan dalam 14 hari.
+
 ### Bukti
 
 Uji mutasi pada logika baru: 25 perusakan seed, 9 perusakan MFA, 13 perusakan konsistensi angka dan label, dan 30 perusakan

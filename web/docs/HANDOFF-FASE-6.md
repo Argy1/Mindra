@@ -92,9 +92,11 @@ informasi. Rinci dan alasannya ada di `docs/DECISIONS.md` ("Revisi dari uji live
 | Kartu dasbor faskes menulis periodenya ("pekan 5–11 Okt", "12 minggu terakhir"); perbandingan kota = rata-rata seluruh periode; catatan otomatis menulis periode dan dua angka ujung | Angka kartu (satu pekan) dan angka "Dibanding kota lain" (rata-rata periode) memang berbeda. Sebut periodenya bila mengutip |
 | "Skor memburuk" = naik 3 poin atau lebih **atau pindah ke kategori yang lebih berat** | Definisi untuk bab fitur psikolog |
 | Status sesi "Terjadwal" sama di semua layar | Gunakan "Terjadwal" |
-| **Nomor STR diminta saat mendaftar sebagai psikolog** (migrasi aditif `20261016000000`, **menunggu pemilik menempelkan SQL-nya**) | Klaim STR dari pemohon hanya untuk dicocokkan admin; **verifikasi otomatis ke sumber resmi tetap [BELUM]**. Sebelum SQL ditempel, kolom STR di dialog admin kosong seperti dulu |
+| **Nomor STR diminta saat mendaftar sebagai psikolog** (migrasi aditif `20261016000000`, sudah diterapkan di cloud 16 Okt 2026) | Klaim STR dari pemohon hanya untuk dicocokkan admin; **verifikasi otomatis ke sumber resmi tetap [BELUM]**. Pemohon lama (sebelum kolom ini ada) tetap tanpa STR |
 | Jam praktik di dialog admin berupa pilihan 24 jam; header halaman publik menampilkan "Ke dasbor" bagi yang sudah masuk; banner pendamping menjelaskan bahwa tombol menelepon Healing119.id | Hanya relevan untuk tangkapan layar |
 | **#19 Jam layanan Healing119.id**: halaman Kesprimkom (7 Agustus 2025) menulis "pagi hingga malam hari"; FAQ Kemenkes (PDF) menurut penguji menulis "24 jam". FAQ itu **belum saya baca**; teks aplikasi **tidak diubah** | **Jangan menulis "24 jam" untuk Healing119.id.** Tulis "pagi hingga malam hari (sumber: Kemenkes, 7 Agustus 2025)" dan 112/IGD sebagai cadangan 24 jam. Pemilik perlu mengonfirmasi ke healing119.id |
+
+**Hasil penyegaran data demo di cloud [TERBUKTI], 16 Okt 2026** (`pnpm seed --refresh --yes`, diperiksa dengan SQL baca-saja sesudahnya): peringatan krisis 614 menjadi 169, yang terbuka 6 (paling banyak 3 per pengguna, tidak ada yang lebih tua dari 3 hari); 10 dari 10 psikolog demo punya bio dan ulasan contoh; tidak ada catatan mood atau skrining di masa depan; akun demo tetap 306; **TOTP terverifikasi tetap 3 (psikolog, admin faskes, admin Mindra)**. Kota Bogor: 70 pengguna dan 15 peringatan dalam 14 hari (sebelumnya 65 pengguna dan 130 peringatan).
 
 **TOTP dan seed.** Akun psikolog, admin faskes, dan admin Mindra demo kini dilindungi TOTP di ponsel pemilik. `pnpm seed --refresh` tidak
 menyentuh akun maupun TOTP; `pnpm seed --reset` menolak berjalan bila ada TOTP terverifikasi (kecuali `--hapus-totp`). Untuk demo
@@ -981,7 +983,7 @@ maksimal 32 kB, hanya `application/json`. `GET /api/v1/facilities?near=` belum a
 | `20261014000500_facility_mfa_and_booking.sql` | web | MFA admin faskes, `book_consultation`, EXCLUDE gist | diterapkan dan diverifikasi |
 | `20261014000600_region_optin_admin_review.sql` | web | Statistik wilayah opt-in, slot, hapus akun, portal admin | diterapkan dan diverifikasi |
 | `20261014000700_companion_activity_summary.sql` | web | Ringkasan penggunaan Teman cerita untuk psikolog | diterapkan dan diverifikasi (15 Okt 2026) |
-| `20261016000000_psychologist_str_at_signup.sql` | web | Nomor STR diminta saat calon psikolog mendaftar: `profiles.requested_str_number`, `handle_new_user` +1 kolom, `admin_pending_psychologist_applications()` | **menunggu pemilik menempelkannya** (aditif; web tetap jalan tanpanya) |
+| `20261016000000_psychologist_str_at_signup.sql` | web | Nomor STR diminta saat calon psikolog mendaftar: `profiles.requested_str_number`, `handle_new_user` +1 kolom, `admin_pending_psychologist_applications()` | diterapkan pemilik dan diverifikasi (16 Okt 2026): kolom, constraint, `handle_new_user` (tetap `security definer`, `search_path` kosong), fungsi antrean |
 
 ## Lampiran E: variabel lingkungan (hanya nama; nilai tidak pernah ditulis di repositori)
 
