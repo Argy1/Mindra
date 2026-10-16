@@ -1,11 +1,25 @@
 /**
  * Data demo Mindra Web (docs/ARCHITECTURE.md §4.3).
  *
- *   pnpm seed            isi data demo (akun, ±300 pengguna sintetis, 20 faskes, 10 psikolog)
- *   pnpm seed --reset    hapus HANYA data demo (profiles.is_demo = true + faskes/psikolog ber-ID tetap)
- *   pnpm seed --add-accounts  tambah akun demo yang BELUM ada (mis. akun baru Gelombang 1) tanpa menyentuh data demo lain
+ *   pnpm seed                  isi data demo (akun, ±300 pengguna sintetis, 20 faskes, 10 psikolog)
+ *   pnpm seed --refresh        segarkan DATA demo tanpa membuat ulang akun (lihat di bawah); idempoten
+ *   pnpm seed --refresh --dry-run   tampilkan rencananya saja, tidak menulis apa pun
+ *   pnpm seed --add-accounts   tambah akun demo yang BELUM ada (mis. akun baru Gelombang 1) tanpa menyentuh data demo lain
+ *   pnpm seed --reset          hapus HANYA data demo (profiles.is_demo = true + faskes/psikolog ber-ID tetap)
+ *   pnpm seed --reset --hapus-totp   izinkan --reset walau ada TOTP terpasang (TOTP ikut hilang bersama akunnya)
  *
  * Opsi: --yes  wajib bila target BUKAN Supabase lokal (mencegah salah sasaran).
+ *
+ * AKUN DAN TOTP: hanya `--reset` yang menghapus akun, dan ia MENOLAK berjalan bila salah satu akun demo punya TOTP
+ * terverifikasi (psikolog, admin faskes, admin wajib TOTP; memasangnya ulang merepotkan) kecuali ada `--hapus-totp`.
+ * `--refresh` dan `--add-accounts` tidak pernah menghapus atau mengubah akun yang sudah ada. `--refresh` bahkan tidak
+ * punya akses ke API akun: ia hanya menerima klien tabel (scripts/seed/refresh.ts). Ia mencetak jumlah TOTP
+ * terverifikasi sebelum dan sesudah sebagai bukti.
+ *
+ * `--refresh`: pengguna sintetis dibangun ulang relatif terhadap hari ini (mood, tidur, skrining, peringatan krisis);
+ * akun demo bernama hanya diisi pada hari yang kosong, tidak ada yang dihapus; peringatan krisis diberi tanggal
+ * skrining, yang lama ditandai ditangani dan paling banyak 3 yang tetap terbuka untuk klien psikolog demo; psikolog
+ * demo mendapat profil singkat dan penilaian contoh.
  *
  * Aman: tidak pernah menyentuh baris non-demo; tidak pernah mencetak kunci atau kata sandi.
  * Butuh NEXT_PUBLIC_SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY (dimuat dari .env.local lewat
@@ -25,19 +39,20 @@ import {
 } from './seed/catalog';
 import { generateUsers, type SyntheticUser } from './seed/people';
 import {
-  generateAssessments,
-  generateDemoUserRecords,
-  generateMood,
-  generateSleep,
-  type AssessmentRow,
-  type MoodRow,
-  type SleepRow,
-} from './seed/records';
+  finalizeAlerts,
+  insertAssessments,
+  insertChunked,
+  loadSyntheticHistory,
+  mapLimit,
+  nextFridayConsultation,
+  refreshDemoData,
+} from './seed/refresh';
+import { generateDemoUserRecords } from './seed/records';
 import { createRng } from './seed/rng';
+import { decideReset, describeTotp, findTotpLoss, totpSnapshot } from './seed/totp';
 
 const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\]|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/;
 const CONCURRENCY = 8;
-const CHUNK = 500;
 
 const log = (message: string) => console.log(`[seed] ${message}`);
 const fail = (message: string): never => {
@@ -47,31 +62,6 @@ const fail = (message: string): never => {
 
 // Klien tanpa generik skema: skrip ini menulis ke banyak tabel dan tidak ikut tipe ketat aplikasi.
 type Db = SupabaseClient;
-
-async function mapLimit<T, R>(
-  items: readonly T[],
-  limit: number,
-  fn: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = new Array<R>(items.length);
-  let cursor = 0;
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, async () => {
-      while (cursor < items.length) {
-        const index = cursor++;
-        results[index] = await fn(items[index] as T);
-      }
-    }),
-  );
-  return results;
-}
-
-async function insertChunked(db: Db, table: string, rows: readonly object[]): Promise<void> {
-  for (let start = 0; start < rows.length; start += CHUNK) {
-    const { error } = await db.from(table).insert(rows.slice(start, start + CHUNK));
-    if (error) fail(`insert ke ${table}: ${error.code ?? ''} ${error.message}`);
-  }
-}
 
 async function createAuthUser(
   db: Db,
@@ -113,7 +103,11 @@ async function createAuthUser(
 }
 
 // ─── Hapus data demo ───────────────────────────────────────────────────────────
-async function reset(db: Db): Promise<void> {
+async function reset(db: Db, allowTotpLoss: boolean): Promise<void> {
+  // Pengaman TOTP: --reset menghapus akun beserta TOTP-nya, jadi menolak kecuali diizinkan eksplisit.
+  const decision = decideReset(await totpSnapshot(db), allowTotpLoss);
+  if (!decision.allowed) fail(decision.reason);
+
   const { data: demo, error } = await db.from('profiles').select('id').eq('is_demo', true);
   if (error) fail(`membaca profil demo: ${error.message}`);
   const ids = (demo ?? []).map((row: { id: string }) => row.id);
@@ -168,6 +162,33 @@ async function addMissingAccounts(db: Db, demoPassword: string): Promise<void> {
   );
 }
 
+// ─── Segarkan data demo (tanpa menyentuh akun) ─────────────────────────────────
+async function refresh(db: Db, dryRun: boolean): Promise<void> {
+  const before = await totpSnapshot(db);
+  if (before) log(`TOTP terverifikasi sebelum penyegaran: ${describeTotp(before)}`);
+  else
+    log(
+      'peringatan: TOTP tidak bisa dibaca (hanya pemeriksaan; penyegaran tidak punya akses ke akun).',
+    );
+
+  // Hanya `from`: tidak ada `auth`, `rpc`, atau `schema` yang bisa dipanggil dari penyegaran.
+  const summary = await refreshDemoData({ from: db.from.bind(db) }, { dryRun, log }).catch(
+    (error: unknown) => fail(error instanceof Error ? error.message : String(error)),
+  );
+
+  const after = await totpSnapshot(db);
+  if (before && after) {
+    const lost = findTotpLoss(before, after);
+    if (lost.length > 0) fail(`TOTP berkurang untuk ${lost.join(', ')}`);
+    log(`TOTP terverifikasi sesudah penyegaran: ${describeTotp(after)} (utuh)`);
+  }
+  log(
+    dryRun
+      ? 'dry-run: tidak ada yang ditulis ke basis data.'
+      : `selesai: ${summary.syntheticUsers} pengguna sintetis disegarkan.`,
+  );
+}
+
 // ─── Isi data demo ─────────────────────────────────────────────────────────────
 async function seed(db: Db, demoPassword: string): Promise<void> {
   const { count } = await db
@@ -176,7 +197,7 @@ async function seed(db: Db, demoPassword: string): Promise<void> {
     .eq('is_demo', true);
   if ((count ?? 0) > 0)
     fail(
-      'data demo sudah ada. Jalankan `pnpm seed --add-accounts` untuk menambah akun demo yang belum ada, atau `pnpm seed --reset` dulu bila ingin membuat ulang semuanya.',
+      'data demo sudah ada. Jalankan `pnpm seed --refresh` untuk menyegarkan data tanpa membuat ulang akun, `pnpm seed --add-accounts` untuk menambah akun yang belum ada, atau `pnpm seed --reset` bila ingin membuat ulang semuanya (akun beserta TOTP-nya ikut dihapus).',
     );
 
   const { count: realUsers } = await db
@@ -213,6 +234,9 @@ async function seed(db: Db, demoPassword: string): Promise<void> {
       languages: ['id'],
       himpsi_verified: true,
       consultation_fee: p.fee,
+      bio: p.bio,
+      rating_average: p.ratingAverage,
+      total_reviews: p.totalReviews,
       is_active: true,
     })),
   );
@@ -263,51 +287,16 @@ async function seed(db: Db, demoPassword: string): Promise<void> {
   });
   log(`pengguna sintetis: ${users.length} di ${CITIES.length} kota`);
 
-  // 4. Catatan 8 minggu.
-  const mood: MoodRow[] = [];
-  const sleep: SleepRow[] = [];
-  const assessments: AssessmentRow[] = [];
-  for (const user of users) {
-    const id = userIds.get(user.index) as string;
-    mood.push(...generateMood(rng, id, user.distress, now));
-    sleep.push(...generateSleep(rng, id, user.distress, now));
-    assessments.push(
-      ...generateAssessments(rng, id, user.distress, now, { ideation: user.ideation }),
-    );
-  }
+  // 4. Catatan 8 minggu (kode yang sama dengan `--refresh`) dan catatan tetap akun demo "pengguna".
   const demoUserId = accountIds.get('user') as string;
+  const history = await loadSyntheticHistory(db, { synthetic: userIds, named: accountIds }, now);
   const demoRecords = generateDemoUserRecords(rng, demoUserId, now);
-  mood.push(...demoRecords.mood);
-  sleep.push(...demoRecords.sleep);
-  assessments.push(...demoRecords.assessments);
-
-  await insertChunked(db, 'mood_entries', mood);
-  await insertChunked(db, 'sleep_entries', sleep);
-  await insertChunked(db, 'assessments', assessments); // trigger database membuat crisis_alerts
-  log(`mood: ${mood.length}, tidur: ${sleep.length}, asesmen: ${assessments.length}`);
-
-  // Alert dibuat trigger pada saat INSERT; mundurkan ke waktu asesmennya supaya riwayat terlihat wajar.
-  const { data: alerts } = await db
-    .from('crisis_alerts')
-    .select('id, source_id')
-    .eq('source', 'assessment');
-  const sourceIds = (alerts ?? []).map((a: { source_id: string }) => a.source_id);
-  if (sourceIds.length > 0) {
-    const { data: sources } = await db
-      .from('assessments')
-      .select('id, completed_at')
-      .in('id', sourceIds);
-    const completedAt = new Map(
-      (sources ?? []).map((s: { id: string; completed_at: string }) => [s.id, s.completed_at]),
-    );
-    await mapLimit(alerts ?? [], CONCURRENCY, async (alert: { id: string; source_id: string }) => {
-      await db
-        .from('crisis_alerts')
-        .update({ created_at: completedAt.get(alert.source_id) })
-        .eq('id', alert.id);
-    });
-  }
-  log(`alert krisis: ${alerts?.length ?? 0}`);
+  await insertChunked(db, 'mood_entries', demoRecords.mood);
+  await insertChunked(db, 'sleep_entries', demoRecords.sleep);
+  const demoAssessments = await insertAssessments(db, demoRecords.assessments);
+  log(
+    `mood: ${history.inserted.moodEntries + demoRecords.mood.length}, tidur: ${history.inserted.sleepEntries + demoRecords.sleep.length}, asesmen: ${history.inserted.assessments + demoRecords.assessments.length}`,
+  );
 
   // 5. Hubungan antar peran.
   const psychologistAccount = accountIds.get('psychologist') as string;
@@ -355,17 +344,26 @@ async function seed(db: Db, demoPassword: string): Promise<void> {
     .insert({ profile_id: accountIds.get('facility'), facility_id: FACILITIES[0]?.id });
 
   // Konsultasi berikutnya: Jumat terdekat, 15.00 WIB (08.00 UTC).
-  const friday = new Date(now);
-  friday.setUTCDate(friday.getUTCDate() + ((5 - friday.getUTCDay() + 7) % 7 || 7));
-  friday.setUTCHours(8, 0, 0, 0);
   await db.from('consultations').insert({
     user_id: demoUserId,
     psychologist_id: PSYCHOLOGISTS[0]?.id,
-    scheduled_at: friday.toISOString(),
+    scheduled_at: nextFridayConsultation(now),
     status: 'confirmed',
   });
   log(
     `klien psikolog demo: ${clientIds.length}, pendamping demo: 1, admin faskes: 1, konsultasi: 1`,
+  );
+
+  // 6. Peringatan krisis dibuat trigger pada saat INSERT skrining: beri tanggal skrining dan tandai yang lama selesai.
+  const alerts = await finalizeAlerts(db, {
+    assessments: [...history.assessments, ...demoAssessments],
+    userIds: [...userIds.values(), demoUserId],
+    clientIds: new Set(clientIds),
+    responderId: psychologistAccount,
+    now,
+  });
+  log(
+    `alert krisis: ${alerts.total} (diperbarui ${alerts.patched}); terbuka untuk klien psikolog: ${alerts.openForClients}`,
   );
 }
 
@@ -377,6 +375,11 @@ async function main() {
     fail(
       'isi NEXT_PUBLIC_SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY di .env.local (lihat .env.example).',
     );
+
+  const modes = ['--reset', '--add-accounts', '--refresh'].filter((flag) => args.has(flag));
+  if (modes.length > 1) fail(`pilih satu mode saja (diberikan: ${modes.join(', ')}).`);
+  if (args.has('--dry-run') && !args.has('--refresh')) fail('--dry-run hanya untuk --refresh.');
+  if (args.has('--hapus-totp') && !args.has('--reset')) fail('--hapus-totp hanya untuk --reset.');
 
   const host = new URL(url as string).hostname;
   log(`target: ${host}`);
@@ -390,7 +393,8 @@ async function main() {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  if (args.has('--reset')) await reset(db);
+  if (args.has('--reset')) await reset(db, args.has('--hapus-totp'));
+  else if (args.has('--refresh')) await refresh(db, args.has('--dry-run'));
   else if (args.has('--add-accounts'))
     await addMissingAccounts(db, process.env.DEMO_PASSWORD || DEFAULT_DEMO_PASSWORD);
   else await seed(db, process.env.DEMO_PASSWORD || DEFAULT_DEMO_PASSWORD);

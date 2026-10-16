@@ -69,10 +69,15 @@ export function buildAnswers(
     remaining = Math.max(0, remaining - ideation);
   }
 
+  // Butir 9 PHQ-9 (pikiran menyakiti diri) hanya terisi bila diminta (`ideation`) atau bila semua butir lain sudah
+  // penuh (total 25-27). Tanpa aturan ini poin acak sering jatuh ke butir 9, trigger database menganggapnya krisis
+  // (kritis), dan hampir semua pengguna sintetis punya peringatan krisis (temuan uji live 15 Okt 2026).
+  const guardIdeationItem = type === 'phq9' && options.ideation !== true;
   while (remaining > 0) {
     const open = scored.flatMap((value, index) => (value < spec.itemMax ? [index] : []));
     if (open.length === 0) break;
-    const index = open[int(rng, 0, open.length - 1)] as number;
+    const candidates = guardIdeationItem && open.length > 1 ? open.filter((i) => i !== 8) : open;
+    const index = candidates[int(rng, 0, candidates.length - 1)] as number;
     scored[index] = (scored[index] as number) + 1;
     remaining -= 1;
   }

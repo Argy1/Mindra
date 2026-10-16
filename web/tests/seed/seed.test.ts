@@ -78,6 +78,23 @@ describe('katalog data demo', () => {
     expect(DEMO_EMAIL_DOMAIN.endsWith('.test')).toBe(true);
   });
 
+  it('10 psikolog demo punya profil singkat dan penilaian contoh yang wajar, tanpa klaim yang bisa dikira nyata', () => {
+    for (const psychologist of PSYCHOLOGISTS) {
+      expect(psychologist.bio.length, psychologist.fullName).toBeGreaterThan(80);
+      expect(psychologist.bio.length).toBeLessThan(400);
+      expect(psychologist.ratingAverage).toBeGreaterThanOrEqual(4.5);
+      expect(psychologist.ratingAverage).toBeLessThanOrEqual(5);
+      expect(psychologist.totalReviews).toBeGreaterThanOrEqual(5);
+      // Aturan copy: tanpa tanda seru, emoji, atau istilah klinis di teks yang dibaca pengguna.
+      expect(psychologist.bio).not.toMatch(/!|gangguan|diagnosa|pasien|\p{Extended_Pictographic}/u);
+      // Tidak mengarang riwayat pendidikan, institusi, atau lisensi.
+      expect(psychologist.bio).not.toMatch(
+        /universitas|lulusan|alumni|sertifikat|izin praktik|tahun pengalaman/i,
+      );
+    }
+    expect(new Set(PSYCHOLOGISTS.map((p) => p.bio)).size).toBe(10);
+  });
+
   it('data faskes tidak memuat alamat atau telepon (tidak mengklaim data nyata)', () => {
     for (const facility of FACILITIES)
       expect(Object.keys(facility)).not.toEqual(expect.arrayContaining(['address', 'phone']));
@@ -156,11 +173,34 @@ describe('instrumen sintetis', () => {
     }
   });
 
-  it('tanpa ideasi, phq9_9 tetap bisa > 0 secara acak (data acak, bukan dikunci nol)', () => {
-    const anyPositive = Array.from({ length: 60 }, (_, i) =>
-      buildAnswers(createRng(i), 'phq9', 20),
-    ).some((answers) => answers.find((a) => a.question_id === 'phq9_9')!.score > 0);
-    expect(anyPositive).toBe(true);
+  it('tanpa ideasi, phq9_9 SELALU 0 untuk total sampai 24 (butir 9 memicu peringatan krisis kritis)', () => {
+    // Sebelumnya poin acak sering jatuh ke butir 9, sehingga 257 dari 300 pengguna sintetis punya peringatan krisis.
+    for (let total = 0; total <= 24; total += 1) {
+      for (let seed = 0; seed < 25; seed += 1) {
+        const answers = buildAnswers(createRng(seed * 31 + total), 'phq9', total);
+        expect(
+          answers.find((a) => a.question_id === 'phq9_9')!.score,
+          `total ${total} seed ${seed}`,
+        ).toBe(0);
+        expect(totalFromAnswers('phq9', answers)).toBe(total);
+      }
+    }
+  });
+
+  it('tanpa ideasi, total 25-27 menyerap sisa ke butir 9 (semua butir lain penuh) dan totalnya tetap benar', () => {
+    for (const total of [25, 26, 27]) {
+      const answers = buildAnswers(createRng(total), 'phq9', total);
+      expect(answers.find((a) => a.question_id === 'phq9_9')!.score).toBe(total - 24);
+      expect(totalFromAnswers('phq9', answers)).toBe(total);
+    }
+  });
+
+  it('GAD-7 dan PSS-10 tidak terpengaruh aturan butir 9', () => {
+    for (const type of ['gad7', 'pss10'] as const) {
+      for (let total = 0; total <= maxScore(type); total += 1) {
+        expect(totalFromAnswers(type, buildAnswers(createRng(total), type, total))).toBe(total);
+      }
+    }
   });
 });
 
@@ -219,6 +259,48 @@ describe('catatan harian sintetis', () => {
       expect(row.category).toBe(categoryFor(row.type, row.total_score));
       expect(Date.parse(row.completed_at)).toBeGreaterThan(windowStart);
     }
+  });
+
+  it('tidak ada catatan bertanggal setelah "sekarang", juga bila seed dijalankan pagi hari', () => {
+    const early = new Date('2026-10-13T01:00:00Z'); // 08.00 WIB: jam acak 09.00-22.00 hari ini belum tiba
+    for (let seed = 0; seed < 20; seed += 1) {
+      for (const row of generateMood(createRng(seed), 'u', 0.5, early))
+        expect(Date.parse(row.created_at), `mood seed ${seed}`).toBeLessThanOrEqual(
+          early.getTime(),
+        );
+      for (const row of generateSleep(createRng(seed), 'u', 0.5, early))
+        expect(Date.parse(row.wake_time), `tidur seed ${seed}`).toBeLessThanOrEqual(
+          early.getTime(),
+        );
+      for (const row of generateAssessments(createRng(seed), 'u', 0.5, early, { ideation: true }))
+        expect(Date.parse(row.completed_at), `skrining seed ${seed}`).toBeLessThanOrEqual(
+          early.getTime(),
+        );
+    }
+  });
+
+  it('rasio peringatan krisis wajar: bukan mayoritas pengguna, dan hampir semuanya dari skrining Berat atau ideasi', () => {
+    // Aturan trigger database: butir 9 PHQ-9 > 0 (kritis) atau kategori Berat (tinggi).
+    const rng = createRng(20261013);
+    let alerts = 0;
+    let usersWithAlert = 0;
+    let critical = 0;
+    for (const u of users) {
+      const rows = generateAssessments(rng, 'u', u.distress, NOW, { ideation: u.ideation });
+      const mine = rows.filter(
+        (r) =>
+          r.category === 'severe' ||
+          (r.type === 'phq9' && r.answers.find((a) => a.question_id === 'phq9_9')!.score > 0),
+      );
+      alerts += mine.length;
+      if (mine.length > 0) usersWithAlert += 1;
+      critical += rows.filter(
+        (r) => r.type === 'phq9' && r.answers.find((a) => a.question_id === 'phq9_9')!.score > 0,
+      ).length;
+    }
+    expect(usersWithAlert / users.length).toBeLessThan(0.3); // sebelumnya 257 dari 300 (86%)
+    expect(alerts / users.length).toBeLessThan(1); // sebelumnya ~2 per pengguna dalam 8 minggu
+    expect(critical).toBeLessThanOrEqual(users.filter((u) => u.ideation).length + 2);
   });
 
   it('pengguna ber-ideasi mendapat PERSIS satu PHQ-9 dengan butir 9 > 0', () => {
@@ -319,6 +401,19 @@ describe.skipIf(!hasMigrations)('data demo vs skema sungguhan (PGlite)', () => {
     expect(rows[0]!.mood).toBeGreaterThan(5000);
     expect(rows[0]!.sleep).toBeGreaterThan(5000);
     expect(rows[0]!.assessments).toBeGreaterThan(900);
+  });
+
+  it('peringatan krisis yang dibuat trigger asli: minoritas pengguna, kritis hanya untuk yang ber-ideasi', async () => {
+    const { rows } = await db.query<{ total: number; users: number; critical: number }>(
+      `select count(*)::int as total, count(distinct user_id)::int as users,
+              count(*) filter (where severity = 'critical')::int as critical
+         from public.crisis_alerts`,
+    );
+    const ideation = users.filter((u) => u.ideation).length;
+    expect(rows[0]!.users / users.length).toBeLessThan(0.3);
+    expect(rows[0]!.total / users.length).toBeLessThan(1);
+    expect(rows[0]!.critical).toBeGreaterThanOrEqual(ideation);
+    expect(rows[0]!.critical).toBeLessThanOrEqual(ideation + 2);
   });
 
   it('kategori yang disimpan seed SAMA dengan public.classify_assessment untuk setiap baris', async () => {

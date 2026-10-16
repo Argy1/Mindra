@@ -136,6 +136,11 @@ export interface PsychologistSeed {
   fullName: string;
   specializations: string[];
   fee: number;
+  /** Profil singkat CONTOH (tanpa riwayat pendidikan atau klaim yang bisa dikira nyata). */
+  bio: string;
+  /** Penilaian CONTOH untuk memperagakan direktori; tidak ada tabel ulasan, hanya rata-rata dan jumlahnya. */
+  ratingAverage: number;
+  totalReviews: number;
   /** Akun demo psikolog menempati psikolog pertama. */
   linkedToDemoAccount: boolean;
 }
@@ -169,12 +174,47 @@ const SPECIALIZATIONS = [
   ['Adiksi', 'Dewasa'],
 ] as const;
 
+/**
+ * Profil singkat contoh, sudut pandang pertama dan bahasa sehari-hari, tanpa istilah klinis, tanpa tanda seru,
+ * tanpa emoji. Disusun searah dengan `SPECIALIZATIONS`. Halaman konsultasi menyatakan bahwa profil dan penilaian
+ * di versi demo adalah data contoh.
+ */
+const PSYCHOLOGIST_BIOS = [
+  'Saya mendampingi mahasiswa dan dewasa muda yang kewalahan oleh tugas, ujian, dan rasa cemas. Sesi kita berfokus pada langkah kecil yang bisa dicoba minggu ini, dengan tempo yang kamu pilih.',
+  'Saya sering menemani remaja yang merasa sedih berkepanjangan atau sulit bercerita di rumah. Kita mulai dari hal yang paling ingin kamu ceritakan, tanpa dihakimi.',
+  'Saya mendampingi orang yang sedang memulihkan diri dari pengalaman berat dan keluarga yang sedang mencari cara berbicara satu sama lain. Kita berjalan pelan, sesuai kesiapanmu.',
+  'Saya bekerja dengan pekerja muda yang lelah dan kehilangan semangat. Kita memetakan apa yang menguras tenagamu dan menyusun batas yang realistis.',
+  'Saya mendampingi remaja yang cemas menghadapi sekolah, pertemanan, dan masa depan. Kita berlatih menenangkan tubuh dan pikiran lewat latihan sederhana.',
+  'Saya menemani orang dewasa yang merasa hampa atau kehilangan minat pada hal yang dulu disukai. Kita mencari kembali kegiatan kecil yang terasa bermakna.',
+  'Saya mendampingi pasangan dan keluarga yang ingin berkomunikasi lebih jujur dan lebih tenang. Sesi bisa diikuti sendiri atau bersama.',
+  'Saya membantu mahasiswa tingkat akhir dan pencari kerja yang bingung menentukan arah. Kita menyusun langkah berikutnya sambil menjaga tenaga dan tidurmu.',
+  'Saya menemani orang yang sedang berduka atau menghadapi kehilangan. Tidak ada cara yang benar untuk berduka, dan kamu boleh datang apa adanya.',
+  'Saya mendampingi orang dewasa yang ingin mengurangi kebiasaan yang mengganggu hidupnya. Kita mulai dari tujuan kecil yang kamu tetapkan sendiri.',
+] as const;
+
+/** Penilaian contoh: rata-rata 4,5 sampai 4,9 dari 7 sampai 42 penilaian. Bukan ulasan nyata. */
+const SAMPLE_RATINGS: ReadonlyArray<readonly [average: number, reviews: number]> = [
+  [4.9, 42],
+  [4.8, 37],
+  [4.7, 29],
+  [4.8, 24],
+  [4.6, 18],
+  [4.7, 21],
+  [4.5, 12],
+  [4.8, 15],
+  [4.9, 9],
+  [4.6, 7],
+];
+
 export const PSYCHOLOGISTS: readonly PsychologistSeed[] = PSYCHOLOGIST_NAMES.map(
   (fullName, index) => ({
     id: psychologistId(index),
     fullName,
     specializations: [...(SPECIALIZATIONS[index] as readonly string[])],
     fee: 100_000 + (index % 5) * 25_000,
+    bio: PSYCHOLOGIST_BIOS[index] as string,
+    ratingAverage: (SAMPLE_RATINGS[index] as readonly [number, number])[0],
+    totalReviews: (SAMPLE_RATINGS[index] as readonly [number, number])[1],
     linkedToDemoAccount: index === 0,
   }),
 );
